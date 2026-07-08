@@ -1,0 +1,35 @@
+{
+  "name": "BGFCL স্টক ইনভেন্টরি",
+  "short_name": "BGFCL ইনভেন্টরি",
+  "description": "বাখরাবাদ গ্যাস ফিল্ড - ডিজিটাল স্টক ইনভেন্টরি ম্যানেজমেন্ট সিস্টেম",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0D1B2A",
+  "theme_color": "#0D1B2A",
+  "orientation": "portrait-primary",
+  "lang": "bn",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "মালামাল যোগ করুন",
+      "short_name": "যোগ করুন",
+      "url": "/index.html?action=add",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

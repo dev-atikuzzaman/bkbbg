@@ -1,0 +1,2660 @@
+ <!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="theme-color" content="#0D1B2A"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="BGFCL Inventory"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="icon" href="icon-192.png"/>
+  <link rel="apple-touch-icon" href="icon-192.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <title>BGFCL স্টক ইনভেন্টরি</title>
+<style>
+:root{
+  --navy:#0D1B2A;--navy-mid:#1A2E42;--navy-light:#243B55;
+  --amber:#F4A300;--amber-light:#FFD166;
+  --white:#F8FAFC;--muted:#94A3B8;
+  --green:#10B981;--green-l:#D1FAE5;
+  --red:#EF4444;--red-l:#FEE2E2;
+  --blue:#3B82F6;--blue-l:#DBEAFE;
+  --purple:#8B5CF6;--purple-l:#EDE9FE;
+  --orange:#F97316;--orange-l:#FFEDD5;
+  --teal:#14B8A6;--teal-l:#CCFBF1;
+  --border:#E2E8F0;--shadow:0 4px 24px rgba(13,27,42,.10);
+  --r:14px;--f:'Hind Siliguri',sans-serif;--mono:'Roboto Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--f);background:#EEF2F7;color:var(--navy);min-height:100vh;font-size:15px;}
+
+/* ── AUTH SCREEN ── */
+#authScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(135deg,var(--navy) 0%,#1E3A5F 100%);}
+.auth-card{background:white;border-radius:22px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.4);}
+.auth-hero{background:linear-gradient(135deg,var(--navy),#1E3A5F);padding:28px 24px 22px;text-align:center;}
+.auth-hero .logo{width:60px;height:60px;background:linear-gradient(135deg,var(--amber),#E8940A);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px;box-shadow:0 4px 16px rgba(244,163,0,.4);}
+.auth-hero h2{color:white;font-size:19px;font-weight:700;}
+.auth-hero p{color:var(--muted);font-size:12px;margin-top:4px;}
+.auth-tabs{display:flex;border-bottom:2px solid var(--border);}
+.auth-tab{flex:1;padding:14px;font-family:var(--f);font-size:14px;font-weight:600;border:none;background:white;cursor:pointer;color:var(--muted);transition:all .2s;}
+.auth-tab.active{color:var(--amber);border-bottom:2px solid var(--amber);margin-bottom:-2px;}
+.auth-body{padding:22px;}
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:var(--navy);}
+.fg input,.fg select,.fg textarea{width:100%;font-family:var(--f);font-size:14px;border:1.5px solid var(--border);border-radius:10px;padding:10px 13px;outline:none;transition:border-color .2s;background:white;}
+.fg input:focus,.fg select:focus{border-color:var(--amber);}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn-auth{width:100%;background:linear-gradient(135deg,var(--amber),#E8940A);color:var(--navy);font-family:var(--f);font-size:15px;font-weight:700;border:none;border-radius:11px;padding:13px;cursor:pointer;margin-top:6px;transition:transform .15s;}
+.btn-auth:hover{transform:translateY(-1px);}
+.auth-note{font-size:12px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6;}
+.auth-note a{color:var(--blue);cursor:pointer;text-decoration:underline;}
+.pending-box{background:#FEF3C7;border:1px solid #F59E0B;border-radius:12px;padding:16px;margin-top:10px;text-align:center;}
+.pending-box .p-icon{font-size:32px;margin-bottom:8px;}
+.pending-box h4{color:#92400E;font-size:15px;}
+.pending-box p{color:#B45309;font-size:12px;margin-top:6px;line-height:1.5;}
+
+/* ── APP SHELL ── */
+#appShell{display:none;}
+header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,#1E3A5F 100%);color:white;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,.3);}
+.header-top{display:flex;align-items:center;gap:12px;padding:12px 16px 8px;}
+.logo-badge{width:42px;height:42px;background:linear-gradient(135deg,var(--amber),#E8940A);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.header-text h1{font-size:16px;font-weight:700;color:white;line-height:1.2;}
+.header-text p{font-size:10px;color:var(--muted);margin-top:2px;}
+.header-right{margin-left:auto;display:flex;align-items:flex-start;gap:8px;}
+.conn-dot{width:10px;height:10px;border-radius:50%;background:var(--green);margin-top:5px;flex-shrink:0;animation:pulse 1.5s infinite;box-shadow:0 0 6px rgba(16,185,129,.8);}
+.conn-dot.offline{background:#F97316;box-shadow:0 0 6px rgba(249,115,22,.8);}
+.officer-info{text-align:right;cursor:pointer;line-height:1.4;max-width:150px;}
+.officer-name{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.officer-role{font-size:10px;color:rgba(255,255,255,.78);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.officer-dept{font-size:10px;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.officer-compact{display:none;font-size:10px;color:rgba(255,255,255,.7);}
+@media (max-width:340px){
+  .officer-role, .officer-dept{display:none;}
+  .officer-compact{display:block;}
+}
+.live-badge{background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.5);color:var(--green);font-size:10px;font-weight:600;padding:3px 7px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.user-chip{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:4px 10px 4px 6px;cursor:pointer;}
+.user-avatar{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;}
+.user-name{font-size:11px;color:rgba(255,255,255,.9);font-weight:600;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.role-pill{font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;}
+.role-super{background:linear-gradient(135deg,var(--amber),#E8940A);color:var(--navy);}
+.role-admin{background:rgba(59,130,246,.3);color:#93C5FD;}
+.role-viewer{background:rgba(148,163,184,.2);color:var(--muted);}
+
+.main-tabs{display:flex;gap:6px;padding:8px 14px 4px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.08);}
+.main-tabs::-webkit-scrollbar{display:none;}
+.main-tab{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.75);font-family:var(--f);font-size:13px;font-weight:700;padding:9px 16px;border-radius:10px 10px 0 0;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;transition:all .2s;}
+.main-tab.active{background:var(--amber);border-color:var(--amber);color:var(--navy);box-shadow:0 -2px 10px rgba(244,163,0,.3);}
+
+.filter-bar{display:flex;gap:6px;padding:6px 14px 10px;overflow-x:auto;scrollbar-width:none;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.filter-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);font-family:var(--f);font-size:12px;font-weight:500;padding:4px 11px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.filter-btn.active{background:var(--amber);border-color:var(--amber);color:var(--navy);font-weight:700;}
+
+/* MANPOWER / ACTIVITIES helpers */
+.subsec-title{font-size:13px;font-weight:700;color:var(--navy);margin:18px 0 10px;display:flex;align-items:center;gap:6px;}
+.field-toggle{display:none;}
+.field-toggle.show{display:block;}
+.print-only{display:none;}
+.cf-row{display:flex;align-items:center;justify-content:space-between;background:#F8FAFC;border-radius:8px;padding:8px 10px;margin-bottom:6px;}
+.cf-preview-img{width:34px;height:34px;object-fit:cover;border-radius:6px;}
+
+@media print{
+  @page{ size: landscape; margin: 10mm; }
+  header, .main-tabs, #installBar, .mo, #toast, #loaderOv,
+  .action-bar, #pendingBanner, .controls-row, .chart-tabs, #mainChart{display:none !important;}
+  body{background:white;}
+  main{padding:0;max-width:100% !important;}
+  .chart-sec, .dept-grid, .sum-grid{box-shadow:none;}
+  /* horizontal-scroll কন্টেইনার প্রিন্টে ক্লিপ হয়ে যেত — এখন পুরো টেবিল দেখাবে */
+  .log-wrap{overflow:visible !important;}
+  .log-table{width:100%;font-size:11px;table-layout:auto;}
+  .log-table th, .log-table td{padding:5px 6px;}
+  .dept-grid{grid-template-columns:repeat(3,1fr) !important;}
+  /* লাইভ ক্যানভাস মোবাইল প্রিন্টে প্রায়ই ফাঁকা দেখায় — তাই প্রিন্টের ঠিক আগে
+     এটাকে ছবিতে রূপান্তর করে #chartPrintImg-এ বসানো হয় (দেখুন printCurrentTab) */
+  #chartPrintImg[src]{display:block !important;}
+  .print-only{display:block;margin-bottom:14px;}
+  .print-only h2{font-size:18px;color:var(--navy);}
+  .print-only p{font-size:12px;color:#64748B;margin-top:2px;}
+}
+
+/* উপস্থিতি রিপোর্ট — পূর্ণ প্রিন্ট টেমপ্লেট */
+#reportPrintArea{display:none;}
+.rp-header{text-align:center;margin-bottom:14px;}
+.rp-header h1{font-size:20px;color:#0F1E3D;margin-bottom:3px;}
+.rp-header h2{font-size:16px;color:#1E3A5F;margin-bottom:3px;}
+.rp-address{font-size:12px;color:#475569;margin-bottom:6px;}
+.rp-title{font-size:15px;text-decoration:underline;margin-top:10px;font-weight:700;}
+.rp-meta{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin:16px 0;}
+.rp-table{width:100%;border-collapse:collapse;margin-bottom:18px;}
+.rp-table th, .rp-table td{border:1px solid #333;padding:6px 8px;font-size:13px;}
+.rp-table th{background:#E2E8F0;}
+.rp-desc{font-size:13px;margin-bottom:24px;}
+.rp-desc p{margin-top:4px;white-space:pre-wrap;}
+.rp-sign{display:flex;justify-content:space-between;margin-top:60px;font-size:13px;gap:10px;}
+.rp-sign>div{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;}
+.rp-dots{letter-spacing:3px;font-weight:700;}
+
+@media print{
+  body.report-print-mode #appShell{display:none !important;}
+  body.report-print-mode #reportPrintArea{display:block !important;padding:24px;}
+}
+
+/* MAIN */
+main{max-width:1100px;margin:0 auto;padding:18px 14px 120px;}
+
+/* PENDING BANNER */
+#pendingBanner{background:linear-gradient(135deg,#7C3AED22,#8B5CF622);border:1px solid #7C3AED44;border-radius:12px;padding:14px 16px;margin-bottom:16px;display:none;}
+#pendingBanner h4{color:#7C3AED;font-size:14px;font-weight:700;margin-bottom:10px;}
+.pending-card{background:white;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.pending-card:last-child{margin-bottom:0;}
+.pending-info{flex:1;}
+.pending-info strong{font-size:13px;display:block;}
+.pending-info span{font-size:11px;color:var(--muted);}
+.btn-approve{background:var(--green);color:white;font-family:var(--f);font-size:12px;font-weight:600;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;margin-right:6px;}
+.btn-reject{background:var(--red);color:white;font-family:var(--f);font-size:12px;font-weight:600;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;}
+
+/* CONTROLS */
+.controls-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.controls-row label{font-size:13px;font-weight:600;}
+.controls-row select{font-family:var(--f);font-size:14px;border:1.5px solid var(--border);border-radius:10px;padding:7px 12px;background:white;outline:none;}
+.action-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.btn-p{font-family:var(--f);font-size:12px;font-weight:700;border:none;border-radius:10px;padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:transform .15s;}
+.btn-p:hover{transform:translateY(-1px);}
+.bp-amber{background:linear-gradient(135deg,var(--amber),#E8940A);color:var(--navy);box-shadow:0 2px 8px rgba(244,163,0,.3);}
+.bp-blue{background:linear-gradient(135deg,var(--blue),#1D4ED8);color:white;box-shadow:0 2px 8px rgba(59,130,246,.3);}
+.bp-green{background:linear-gradient(135deg,var(--green),#059669);color:white;}
+.bp-purple{background:linear-gradient(135deg,var(--purple),#6D28D9);color:white;}
+.bp-sky{background:linear-gradient(135deg,#0EA5E9,#0284C7);color:white;}
+.btn-io-wrap{display:flex;gap:8px;}
+
+/* SUMMARY */
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:22px;}
+.sum-card{background:white;border-radius:var(--r);padding:14px;box-shadow:var(--shadow);border-left:4px solid transparent;}
+.sum-card .si{font-size:22px;margin-bottom:6px;}
+.sum-card .sv{font-size:24px;font-weight:700;font-family:var(--mono);line-height:1;}
+.sum-card .sl{font-size:11px;color:#64748B;margin-top:3px;}
+.sc-blue{border-color:var(--blue)}.sc-blue .sv{color:var(--blue);}
+.sc-green{border-color:var(--green)}.sc-green .sv{color:var(--green);}
+.sc-red{border-color:var(--red)}.sc-red .sv{color:var(--red);}
+.sc-amber{border-color:var(--amber)}.sc-amber .sv{color:var(--amber);}
+
+/* SECTION TITLE */
+.sec-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sec-title::after{content:'';flex:1;height:2px;background:linear-gradient(to right,var(--amber),transparent);}
+
+/* DEPT CARDS */
+.dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:24px;}
+.dept-card{background:white;border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;transition:transform .2s,box-shadow .2s;}
+.dept-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(13,27,42,.14);}
+.dept-hdr{padding:12px 14px 10px;display:flex;align-items:center;gap:10px;}
+.dept-icon{font-size:24px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:9px;flex-shrink:0;}
+.dept-name{font-size:14px;font-weight:700;}
+.dept-sub{font-size:11px;color:#64748B;}
+.dept-badge{margin-left:auto;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;}
+.prog-wrap{padding:0 14px 4px;}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:#64748B;margin-bottom:3px;}
+.prog-bar{height:7px;background:#F1F5F9;border-radius:6px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+.dept-items{padding:8px 14px 14px;}
+.items-list{list-style:none;}
+.item-row{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px dashed #F1F5F9;font-size:13px;}
+.item-extra{display:none;}
+.dept-items.expanded .item-extra{display:flex;}
+.item-row:last-child{border-bottom:none;}
+.item-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.item-name{flex:1;font-weight:500;}
+.item-qty{font-family:var(--mono);font-size:12px;font-weight:600;}
+.ist{font-size:10px;font-weight:600;padding:2px 5px;border-radius:7px;min-width:40px;text-align:center;}
+.ist-ok{background:var(--green-l);color:#059669;}
+.ist-low{background:var(--red-l);color:#DC2626;}
+.ist-mid{background:var(--orange-l);color:#EA580C;}
+.in-tag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:7px;background:var(--blue-l);color:#1D4ED8;}
+.btn-di{background:none;border:none;color:#CBD5E1;cursor:pointer;font-size:13px;padding:2px;border-radius:4px;transition:color .15s;}
+.btn-di:hover{color:var(--red);}
+.btn-ei{background:none;border:none;color:#CBD5E1;cursor:pointer;font-size:12px;padding:2px;border-radius:4px;transition:color .15s;}
+.btn-ei:hover{color:var(--blue);}
+.btn-expand{width:100%;background:none;border:none;border-top:1px solid var(--border);padding:8px;font-family:var(--f);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;text-align:center;transition:background .15s;}
+.btn-expand:hover{background:#F8FAFC;color:var(--navy);}
+
+/* CHART */
+.chart-sec{background:white;border-radius:var(--r);box-shadow:var(--shadow);padding:18px;margin-bottom:22px;}
+.chart-tabs{display:flex;gap:5px;margin-bottom:16px;flex-wrap:wrap;}
+.chart-tab{font-family:var(--f);font-size:12px;font-weight:600;padding:5px 12px;border-radius:7px;border:1.5px solid var(--border);background:white;cursor:pointer;color:#64748B;transition:all .15s;}
+.chart-tab.active{background:var(--navy);border-color:var(--navy);color:white;}
+canvas#mainChart{width:100%!important;max-height:300px;}
+
+/* LOG TABLE */
+.log-wrap{overflow-x:auto;}
+.log-table{width:100%;border-collapse:collapse;font-size:12px;}
+.log-table th{background:var(--navy);color:white;padding:9px 10px;text-align:left;font-weight:600;font-size:11px;}
+.log-table th:first-child{border-radius:8px 0 0 0;}
+.log-table th:last-child{border-radius:0 8px 0 0;}
+.log-table td{padding:8px 10px;border-bottom:1px solid #F1F5F9;color:#334155;}
+.log-table tr:hover td{background:#F8FAFC;}
+.tag-dept{font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;}
+
+/* MODALS */
+.mo{display:none;position:fixed;inset:0;background:rgba(13,27,42,.6);backdrop-filter:blur(4px);z-index:200;align-items:center;justify-content:center;padding:14px;}
+.mo.open{display:flex;}
+.modal{background:white;border-radius:18px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .25s ease;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mhdr{background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:16px 18px;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:space-between;}
+.mhdr h3{color:white;font-size:15px;}
+.btn-x{background:rgba(255,255,255,.15);border:none;color:white;width:28px;height:28px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.mbody{padding:18px;}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn-sub{width:100%;background:linear-gradient(135deg,var(--amber),#E8940A);color:var(--navy);font-family:var(--f);font-size:14px;font-weight:700;border:none;border-radius:10px;padding:12px;cursor:pointer;margin-top:6px;}
+
+/* INSTALL BAR */
+#installBar{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,var(--navy),var(--navy-mid));padding:12px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 -4px 20px rgba(0,0,0,.2);z-index:150;transform:translateY(100%);transition:transform .4s cubic-bezier(.4,0,.2,1);}
+#installBar.visible{transform:translateY(0);}
+#installBar .ii{font-size:26px;flex-shrink:0;}
+#installBar .it h4{color:white;font-size:13px;}
+#installBar .it p{color:var(--muted);font-size:10px;}
+#btnInstall{margin-left:auto;background:var(--amber);color:var(--navy);font-family:var(--f);font-size:13px;font-weight:700;border:none;border-radius:10px;padding:9px 16px;cursor:pointer;flex-shrink:0;}
+#btnIDismiss{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-family:var(--f);font-size:11px;border-radius:8px;padding:7px 11px;cursor:pointer;}
+
+/* LOADER & TOAST */
+#loaderOv{position:fixed;inset:0;background:rgba(13,27,42,.5);z-index:500;display:none;align-items:center;justify-content:center;}
+#loaderOv.show{display:flex;}
+.lbox{background:white;border-radius:14px;padding:24px 32px;text-align:center;}
+.spin{width:36px;height:36px;border:4px solid #E2E8F0;border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lbox p{font-size:13px;color:#64748B;}
+#toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--navy);color:white;padding:9px 18px;border-radius:10px;font-size:13px;opacity:0;transition:all .3s;z-index:400;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+.empty-st{text-align:center;padding:36px 16px;color:var(--muted);}
+.empty-st .ei{font-size:44px;margin-bottom:10px;}
+
+@media(max-width:600px){
+  .dept-grid{grid-template-columns:1fr;}
+  .sum-grid{grid-template-columns:repeat(2,1fr);}
+  .fg-row{grid-template-columns:1fr;}
+  main{padding:14px 10px 110px;}
+  .header-text h1{font-size:14px;}
+  .action-bar{gap:6px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ AUTH SCREEN ══════════ -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="auth-hero">
+      <div class="logo">⛽</div>
+      <h2>বাখরাবাদ গ্যাস ফিল্ড</h2>
+      <p>ডিজিটাল স্টক ইনভেন্টরি · BGFCL</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="auth-tabs" id="authTabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">🔑 লগইন</button>
+      <button class="auth-tab" onclick="switchAuthTab('signup')">📝 সাইন-আপ</button>
+      <button class="auth-tab" onclick="switchAuthTab('viewer')">👁️ ভিউয়ার</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="auth-body" id="loginForm">
+      <div class="fg"><label>ইমেইল</label><input type="email" id="liEmail" placeholder="আপনার ইমেইল"/></div>
+      <div class="fg"><label>পাসওয়ার্ড</label><input type="password" id="liPass" placeholder="পাসওয়ার্ড" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="btn-auth" onclick="doLogin()">🔓 লগইন করুন</button>
+      <p class="auth-note">পাসওয়ার্ড ভুলে গেছেন? <a onclick="doResetPass()">রিসেট করুন</a></p>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div class="auth-body" id="signupForm" style="display:none;">
+      <div class="fg-row">
+        <div class="fg"><label>পুরো নাম *</label><input type="text" id="suName" placeholder="আপনার নাম"/></div>
+        <div class="fg"><label>পদবী *</label><input type="text" id="suDesig" placeholder="সহকারী ব্যবস্থাপক"/></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>বিভাগ (চাকরি) *</label>
+          <select id="suDept">
+            <option value="">বিভাগ বেছে নিন</option>
+            <option value="field">ফিল্ড মেইনটেন্যান্স</option>
+            <option value="plant">প্লান্ট মেইনটেন্যান্স</option>
+            <option value="production">প্রোডাকশন</option>
+            <option value="compressor">কম্প্রেসর</option>
+            <option value="security">সিকিউরিটি</option>
+            <option value="admin">প্রশাসন</option>
+            <option value="electric">বিদ্যুৎ</option>
+          </select>
+        </div>
+        <div class="fg"><label>যে বিভাগের অ্যাডমিন হতে চান *</label>
+          <select id="suReqDept">
+            <option value="">বেছে নিন</option>
+            <option value="field">ফিল্ড মেইনটেন্যান্স</option>
+            <option value="plant">প্লান্ট মেইনটেন্যান্স</option>
+            <option value="production">প্রোডাকশন</option>
+            <option value="compressor">কম্প্রেসর</option>
+            <option value="security">সিকিউরিটি</option>
+            <option value="admin">প্রশাসন</option>
+            <option value="electric">বিদ্যুৎ</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>ইমেইল *</label><input type="email" id="suEmail" placeholder="অফিসিয়াল/ব্যক্তিগত ইমেইল"/></div>
+      <div class="fg-row">
+        <div class="fg"><label>পাসওয়ার্ড *</label><input type="password" id="suPass" placeholder="কমপক্ষে ৬ অক্ষর"/></div>
+        <div class="fg"><label>পাসওয়ার্ড নিশ্চিত</label><input type="password" id="suPass2" placeholder="আবার লিখুন"/></div>
+      </div>
+      <button class="btn-auth" onclick="doSignup()">📤 সাইন-আপ করুন</button>
+      <p class="auth-note">সাইন-আপের পর ইমেইল ভেরিফাই করুন।<br/>তারপর সুপার অ্যাডমিন অনুমোদন করলে অ্যাডমিন সুবিধা পাবেন।</p>
+    </div>
+
+    <!-- PENDING STATUS -->
+    <div class="auth-body" id="pendingForm" style="display:none;">
+      <div class="pending-box">
+        <div class="p-icon">⏳</div>
+        <h4>অনুমোদনের অপেক্ষায়</h4>
+        <p id="pendingMsg">আপনার আবেদন সুপার অ্যাডমিনের কাছে পাঠানো হয়েছে। অনুমোদন পেলে ইমেইলে জানানো হবে।</p>
+        <br/>
+        <button class="btn-auth" onclick="enterAsViewer()" style="background:linear-gradient(135deg,#64748B,#475569);">👁️ ভিউয়ার হিসেবে দেখুন</button>
+      </div>
+    </div>
+
+    <!-- VIEWER -->
+    <div class="auth-body" id="viewerForm" style="display:none;">
+      <div style="text-align:center;padding:10px 0;">
+        <div style="font-size:48px;margin-bottom:12px;">👁️</div>
+        <p style="font-size:14px;color:#64748B;margin-bottom:20px;">লগইন ছাড়াই স্টকের অবস্থা দেখুন।<br/>কোনো পরিবর্তন করতে পারবেন না।</p>
+        <button class="btn-auth" onclick="enterAsViewer()">👁️ ভিউয়ার হিসেবে প্রবেশ করুন</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ APP SHELL ══════════ -->
+<div id="appShell">
+<header>
+  <div class="header-top">
+    <div class="logo-badge">⛽</div>
+    <div class="header-text">
+      <h1>বাখরাবাদ গ্যাস ফিল্ড</h1>
+      <p>ডিজিটাল স্টক ইনভেন্টরি · BGFCL</p>
+    </div>
+    <div class="header-right">
+      <span class="conn-dot" id="connDot" title="সংযোগ স্ট্যাটাস"></span>
+      <div class="officer-info" onclick="showUserMenu()">
+        <div class="officer-name" id="officerName">লোড হচ্ছে</div>
+        <div class="officer-role" id="officerRole">—</div>
+        <div class="officer-dept" id="officerDept"></div>
+        <div class="officer-compact" id="officerCompact"></div>
+      </div>
+    </div>
+  </div>
+  <div class="main-tabs" id="mainTabs">
+    <button class="main-tab active" data-tab="materials">📦 মালামাল</button>
+    <button class="main-tab" data-tab="manpower">👷 জনবল</button>
+    <button class="main-tab" data-tab="activities">📝 কার্যক্রম</button>
+  </div>
+  <div class="filter-bar" id="deptFilter">
+    <button class="filter-btn active" data-dept="all">🔍 সব বিভাগ</button>
+    <button class="filter-btn" data-dept="field">🔧 ফিল্ড মেইনটেন্যান্স</button>
+    <button class="filter-btn" data-dept="plant">🏭 প্লান্ট মেইনটেন্যান্স</button>
+    <button class="filter-btn" data-dept="production">⚗️ প্রোডাকশন</button>
+    <button class="filter-btn" data-dept="compressor">💨 কম্প্রেসর</button>
+    <button class="filter-btn" data-dept="security">🛡️ সিকিউরিটি</button>
+    <button class="filter-btn" data-dept="admin">📋 প্রশাসন</button>
+    <button class="filter-btn" data-dept="electric">⚡ বিদ্যুৎ</button>
+  </div>
+</header>
+
+<main>
+  <!-- PRINT-ONLY HEADER (স্ক্রিনে অদৃশ্য, শুধু প্রিন্টে দেখা যাবে) -->
+  <div class="print-only" id="printBanner">
+    <h2>বাখরাবাদ গ্যাস ফিল্ড — <span id="printBannerTab">মালামাল</span> রিপোর্ট</h2>
+    <p id="printBannerDate"></p>
+  </div>
+
+  <!-- PENDING APPROVALS (super admin only) -->
+  <div id="pendingBanner">
+    <h4>⏳ অনুমোদন অপেক্ষায় (<span id="pendingCount">0</span> জন)</h4>
+    <div id="pendingList"></div>
+  </div>
+
+  <!-- CONTROLS (year/month — used by মালামাল ও কার্যক্রম ট্যাব) -->
+  <div class="controls-row" id="controlsRow">
+    <label>বছর:</label><select id="yearSel"></select>
+    <label>মাস:</label>
+    <select id="monthSel">
+      <option value="1">জানুয়ারি</option><option value="2">ফেব্রুয়ারি</option>
+      <option value="3">মার্চ</option><option value="4">এপ্রিল</option>
+      <option value="5">মে</option><option value="6">জুন</option>
+      <option value="7">জুলাই</option><option value="8">আগস্ট</option>
+      <option value="9">সেপ্টেম্বর</option><option value="10">অক্টোবর</option>
+      <option value="11">নভেম্বর</option><option value="12">ডিসেম্বর</option>
+    </select>
+  </div>
+
+  <!-- ═══════════ পেজ ১: মালামাল ═══════════ -->
+  <div id="page-materials" class="page-section">
+    <!-- ACTION BAR (hidden for viewer) -->
+    <div class="action-bar" id="actionBar" style="display:none;">
+      <button class="btn-p bp-amber" id="btnAddItem">➕ মালামাল যোগ</button>
+      <button class="btn-p bp-blue" id="btnAddLog">📦 আনলোড লগ</button>
+      <div class="btn-io-wrap">
+        <button class="btn-p bp-green" onclick="exportJSON()">📤 Export</button>
+        <label class="btn-p bp-purple" style="cursor:pointer;">📥 Import<input type="file" accept=".json" id="importFileMaterials" style="display:none" onchange="importJSON(event)"/></label>
+      </div>
+      <button class="btn-p" style="background:#334155;color:white;" onclick="printCurrentTab()">🖨️ Print</button>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="sum-grid">
+      <div class="sum-card sc-blue"><div class="si">📦</div><div class="sv" id="sumTotal">0</div><div class="sl">মোট আইটেম ধরন</div></div>
+      <div class="sum-card sc-green"><div class="si">🚚</div><div class="sv" id="sumIncoming">0</div><div class="sl">আসন্ন মালামাল</div></div>
+      <div class="sum-card sc-red"><div class="si">⚠️</div><div class="sv" id="sumLow">0</div><div class="sl">সংকটজনক স্টক</div></div>
+      <div class="sum-card sc-amber"><div class="si">🏢</div><div class="sv" id="sumDepts">7</div><div class="sl">মোট বিভাগ</div></div>
+    </div>
+
+    <!-- DEPT CARDS -->
+    <div class="sec-title">📊 বিভাগভিত্তিক স্টক অবস্থা</div>
+    <div class="dept-grid" id="deptGrid"></div>
+
+    <!-- CHART -->
+    <div class="chart-sec">
+      <div class="sec-title">📈 গ্রাফিক্যাল বিশ্লেষণ</div>
+      <div class="chart-tabs">
+        <button class="chart-tab active" data-chart="bar">বিভাগ তুলনা</button>
+        <button class="chart-tab" data-chart="line">মাসভিত্তিক ট্রেন্ড</button>
+        <button class="chart-tab" data-chart="pie">স্টক বিতরণ</button>
+        <button class="chart-tab" data-chart="status">স্টক অবস্থা</button>
+      </div>
+      <canvas id="mainChart"></canvas>
+      <img id="chartPrintImg" style="display:none;width:100%;border-radius:8px;"/>
+    </div>
+
+    <!-- UNLOAD LOG -->
+    <div class="chart-sec">
+      <div class="sec-title">🚚 আনলোড লগ — <span id="logLabel"></span></div>
+      <div class="log-wrap">
+        <table class="log-table">
+          <thead><tr>
+            <th>তারিখ</th><th>মালামাল</th><th>বিভাগ</th>
+            <th>পরিমাণ</th><th>স্থান</th><th>সরবরাহকারী</th>
+            <th id="logActCol"></th>
+          </tr></thead>
+          <tbody id="logBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ পেজ ২: জনবল ═══════════ -->
+  <div id="page-manpower" class="page-section" style="display:none;">
+    <div class="action-bar" id="actionBarManpower" style="display:none;">
+      <button class="btn-p bp-amber" id="btnAddManpower">➕ জনবল যোগ</button>
+      <button class="btn-p bp-blue" onclick="openAttendanceReport()">📋 উপস্থিতি রিপোর্ট</button>
+      <div class="btn-io-wrap">
+        <button class="btn-p bp-green" onclick="exportJSON()">📤 Export</button>
+        <label class="btn-p bp-purple" style="cursor:pointer;">📥 Import<input type="file" accept=".json" id="importFileManpower" style="display:none" onchange="importJSON(event)"/></label>
+      </div>
+      <button class="btn-p" style="background:#334155;color:white;" onclick="printCurrentTab()">🖨️ Print</button>
+    </div>
+
+    <div class="sum-grid">
+      <div class="sum-card sc-blue"><div class="si">👷</div><div class="sv" id="sumDaily">0</div><div class="sl">দৈনিক শ্রমিক</div></div>
+      <div class="sum-card sc-green"><div class="si">🧑‍💼</div><div class="sv" id="sumStaff">0</div><div class="sl">সাধারণ স্টাফ</div></div>
+      <div class="sum-card sc-amber"><div class="si">👥</div><div class="sv" id="sumManTotal">0</div><div class="sl">মোট জনবল</div></div>
+    </div>
+
+    <div class="sec-title">👷 দৈনিক শ্রমিক তালিকা</div>
+    <div class="chart-sec">
+      <div class="log-wrap">
+        <table class="log-table">
+          <thead><tr id="dailyTheadRow">
+            <th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th><th id="dailyActCol"></th>
+          </tr></thead>
+          <tbody id="dailyBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sec-title">🧑‍💼 সাধারণ স্টাফ তালিকা</div>
+    <div class="chart-sec">
+      <div class="log-wrap">
+        <table class="log-table">
+          <thead><tr id="staffTheadRow">
+            <th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th>
+            <th>শেষ CL</th><th>CL বাকি</th><th>অন্য ছুটি (তারিখ)</th><th>অন্য ছুটি বাকি</th><th>AL নেয়া হয়েছে</th><th>AL নেয়ার তারিখ</th>
+            <th id="staffActCol"></th>
+          </tr></thead>
+          <tbody id="staffBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ পেজ ৩: কার্যক্রম ═══════════ -->
+  <div id="page-activities" class="page-section" style="display:none;">
+    <div class="action-bar" id="actionBarActivities" style="display:none;">
+      <button class="btn-p bp-amber" id="btnAddActivity">➕ কার্যক্রম যোগ</button>
+      <div class="btn-io-wrap">
+        <button class="btn-p bp-green" onclick="exportJSON()">📤 Export</button>
+        <label class="btn-p bp-purple" style="cursor:pointer;">📥 Import<input type="file" accept=".json" id="importFileActivities" style="display:none" onchange="importJSON(event)"/></label>
+      </div>
+      <button class="btn-p" style="background:#334155;color:white;" onclick="printCurrentTab()">🖨️ Print</button>
+    </div>
+
+    <div class="chart-sec">
+      <div class="sec-title">📝 দৈনন্দিন কার্যক্রম — <span id="actLabel"></span></div>
+      <div class="log-wrap">
+        <table class="log-table">
+          <thead><tr id="activityTheadRow">
+            <th>তারিখ</th><th>বিভাগ</th><th>বিবরণ</th><th id="activityActCol"></th>
+          </tr></thead>
+          <tbody id="activityBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+</div><!-- /appShell -->
+
+<!-- পূর্ণ টেমপ্লেট প্রিন্ট এরিয়া (স্ক্রিনে অদৃশ্য, printAttendanceReport() কল হলে JS দিয়ে পূরণ ও দৃশ্যমান হবে) -->
+<div id="reportPrintArea"></div>
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- ADD ITEM -->
+<div class="mo" id="modalItem">
+  <div class="modal">
+    <div class="mhdr"><h3>📦 নতুন মালামাল</h3><button class="btn-x" onclick="closeModal('modalItem')">✕</button></div>
+    <div class="mbody">
+      <div class="fg"><label>বিভাগ *</label>
+        <select id="fDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
+      </div>
+      <div class="fg"><label>মালামালের নাম *</label><input type="text" id="fName" placeholder="যেমন: বল ভালভ ২ ইঞ্চি"/></div>
+      <div class="fg-row">
+        <div class="fg"><label>বর্তমান পরিমাণ *</label><input type="number" id="fQty" placeholder="0" min="0"/></div>
+        <div class="fg"><label>অপটিমাম পরিমাণ *</label><input type="number" id="fOptimum" placeholder="0" min="0"/></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>একক</label><input type="text" id="fUnit" placeholder="পিস / কেজি / লিটার"/></div>
+        <div class="fg"><label>আসন্ন পরিমাণ</label><input type="number" id="fIncoming" placeholder="0" min="0"/></div>
+      </div>
+      <div class="fg"><label>মন্তব্য</label><textarea id="fNote" rows="2" style="resize:vertical;"></textarea></div>
+      <div id="fCustomFields"></div>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('items','fCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
+      <button class="btn-sub" onclick="saveItem()">✅ সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT ITEM -->
+<div class="mo" id="modalEditItem">
+  <div class="modal">
+    <div class="mhdr"><h3>✏️ মালামাল সম্পাদনা</h3><button class="btn-x" onclick="closeModal('modalEditItem')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="editItemId"/>
+      <div class="fg"><label>মালামালের নাম *</label><input type="text" id="efName"/></div>
+      <div class="fg-row">
+        <div class="fg"><label>বর্তমান পরিমাণ *</label><input type="number" id="efQty" min="0"/></div>
+        <div class="fg"><label>অপটিমাম পরিমাণ *</label><input type="number" id="efOptimum" min="0"/></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>একক</label><input type="text" id="efUnit"/></div>
+        <div class="fg"><label>আসন্ন পরিমাণ</label><input type="number" id="efIncoming" min="0"/></div>
+      </div>
+      <div class="fg"><label>মন্তব্য</label><textarea id="efNote" rows="2" style="resize:vertical;"></textarea></div>
+      <div id="efCustomFields"></div>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('items','efCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
+      <button class="btn-sub" onclick="updateItem()">✅ আপডেট করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LOG -->
+<div class="mo" id="modalLog">
+  <div class="modal">
+    <div class="mhdr"><h3>🚚 আনলোড লগ</h3><button class="btn-x" onclick="closeModal('modalLog')">✕</button></div>
+    <div class="mbody">
+      <div class="fg-row">
+        <div class="fg"><label>তারিখ *</label><input type="date" id="lDate"/></div>
+        <div class="fg"><label>বিভাগ *</label>
+          <select id="lDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
+        </div>
+      </div>
+      <div class="fg"><label>মালামালের নাম *</label><input type="text" id="lItem" placeholder="যেমন: পাইপ ফিটিং"/></div>
+      <div class="fg-row">
+        <div class="fg"><label>পরিমাণ *</label><input type="number" id="lQty" min="0"/></div>
+        <div class="fg"><label>একক</label><input type="text" id="lUnit" placeholder="পিস / কেজি"/></div>
+      </div>
+      <div class="fg"><label>আনলোড স্থান *</label><input type="text" id="lLocation" placeholder="মেইন গেট গুদাম"/></div>
+      <div class="fg"><label>সরবরাহকারী</label><input type="text" id="lSupplier"/></div>
+      <button class="btn-sub" onclick="saveLog()">✅ লগ সংরক্ষণ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MANPOWER -->
+<div class="mo" id="modalManpower">
+  <div class="modal">
+    <div class="mhdr"><h3 id="modalManpowerTitle">👷 নতুন জনবল যোগ</h3><button class="btn-x" onclick="closeModal('modalManpower')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="mpId"/>
+      <div class="fg-row">
+        <div class="fg"><label>বিভাগ *</label>
+          <select id="mpDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
+        </div>
+        <div class="fg"><label>জনবলের ধরন *</label>
+          <select id="mpType" onchange="toggleManpowerFields()"><option value="daily">দৈনিক শ্রমিক</option><option value="staff">সাধারণ স্টাফ</option></select>
+        </div>
+      </div>
+      <div class="fg"><label>নাম *</label><input type="text" id="mpName" placeholder="পূর্ণ নাম"/></div>
+      <div class="fg-row">
+        <div class="fg"><label>পদবী</label><input type="text" id="mpDesig" placeholder="যেমন: হেল্পার"/></div>
+        <div class="fg"><label>ফোন</label><input type="text" id="mpPhone" placeholder="01xxxxxxxxx"/></div>
+      </div>
+      <div class="fg"><label>ঠিকানা</label><textarea id="mpAddress" rows="2" style="resize:vertical;"></textarea></div>
+
+      <div id="mpStaffFields" style="display:none;">
+        <div class="subsec-title">🗂️ স্টাফ সংক্রান্ত অতিরিক্ত তথ্য</div>
+        <div class="fg-row">
+          <div class="fg"><label>শেষ CL ছুটি নেবার তারিখ</label><input type="date" id="mpClDate"/></div>
+          <div class="fg"><label>CL বাকি আছে</label><input type="number" id="mpClRemain" min="0" placeholder="0"/></div>
+        </div>
+        <div class="fg-row">
+          <div class="fg"><label>অন্য ছুটি নেবার তারিখ</label><input type="date" id="mpOtherDate"/></div>
+          <div class="fg"><label>অন্য ছুটি বাকি আছে</label><input type="number" id="mpOtherRemain" min="0" placeholder="0"/></div>
+        </div>
+        <div class="fg"><label>AL নেয়া হয়েছে কিনা</label>
+          <select id="mpAlTaken" onchange="toggleAlDateField()"><option value="no">না</option><option value="yes">হ্যাঁ</option></select>
+        </div>
+        <div class="fg" id="mpAlDateWrap" style="display:none;"><label>AL নেয়ার তারিখ</label><input type="date" id="mpAlDate"/></div>
+      </div>
+      <div id="mpCustomFields"></div>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('manpower','mpCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
+      <button class="btn-sub" onclick="saveManpowerForm()">✅ সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- ATTENDANCE (দৈনিক শ্রমিক উপস্থিতি) -->
+<div class="mo" id="modalAttendance">
+  <div class="modal">
+    <div class="mhdr"><h3>📅 উপস্থিতি — <span id="attWorkerName"></span></h3><button class="btn-x" onclick="closeModal('modalAttendance')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="attWorkerId"/>
+      <div class="fg-row">
+        <div class="fg"><label>তারিখ *</label><input type="date" id="attDate"/></div>
+        <div class="fg"><label>উপস্থিত আছেন? *</label>
+          <select id="attPresent"><option value="yes">হ্যাঁ (P)</option><option value="no">না (A)</option></select>
+        </div>
+      </div>
+      <button class="btn-sub" onclick="saveAttendanceEntry()">✅ সংরক্ষণ করুন</button>
+      <div class="subsec-title">📋 সাম্প্রতিক এন্ট্রি</div>
+      <div id="attRecentList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT ACTIVITY -->
+<div class="mo" id="modalActivity">
+  <div class="modal">
+    <div class="mhdr"><h3 id="modalActivityTitle">📝 নতুন কার্যক্রম</h3><button class="btn-x" onclick="closeModal('modalActivity')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="actId"/>
+      <div class="fg-row">
+        <div class="fg"><label>তারিখ *</label><input type="date" id="actDate"/></div>
+        <div class="fg"><label>বিভাগ *</label>
+          <select id="actDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
+        </div>
+      </div>
+      <div class="fg"><label>কাজের বিবরণ *</label><textarea id="actDesc" rows="4" style="resize:vertical;" placeholder="আজকের সম্পাদিত কাজের বিবরণ লিখুন..."></textarea></div>
+      <div id="actCustomFields"></div>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('activities','actCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
+      <button class="btn-sub" onclick="saveActivityForm()">✅ সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- উপস্থিতি রিপোর্ট / প্রিন্ট টেমপ্লেট -->
+<div class="mo" id="modalAttendanceReport">
+  <div class="modal" style="max-width:640px;">
+    <div class="mhdr"><h3>📋 উপস্থিতি রিপোর্ট ও প্রিন্ট</h3><button class="btn-x" onclick="closeModal('modalAttendanceReport')">✕</button></div>
+    <div class="mbody">
+      <div class="subsec-title">🏢 প্রতিষ্ঠানের তথ্য (প্রিন্টে দেখানো হবে)</div>
+      <div class="fg"><label>মূল কোম্পানির নাম</label><input type="text" id="repMainCompany" onchange="saveReportHeaderFromForm()"/></div>
+      <div class="fg"><label>অধীনস্থ কোম্পানির নাম</label><input type="text" id="repSubCompany" onchange="saveReportHeaderFromForm()"/></div>
+      <div class="fg"><label>অধীনস্থ কোম্পানির ঠিকানা</label><input type="text" id="repSubAddress" onchange="saveReportHeaderFromForm()"/></div>
+      <div class="fg"><label>প্রতিবেদনের শিরোনাম</label><input type="text" id="repTitle" onchange="saveReportHeaderFromForm()"/></div>
+
+      <div class="subsec-title">📅 সময়কাল ও বিভাগ</div>
+      <div class="fg-row">
+        <div class="fg"><label>শুরুর তারিখ</label><input type="date" id="repStart" onchange="onReportContextChange()"/></div>
+        <div class="fg"><label>শেষ তারিখ</label><input type="date" id="repEnd" onchange="onReportContextChange()"/></div>
+      </div>
+      <div class="fg"><label>বিভাগ</label>
+        <select id="repDept" onchange="onReportContextChange()">
+          <option value="all">সকল বিভাগ</option>
+          <option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option>
+          <option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option>
+          <option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option>
+        </select>
+      </div>
+
+      <div class="subsec-title">🧩 টেবিলে অতিরিক্ত কলাম (ঐচ্ছিক)</div>
+      <div id="repColChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+      <div class="fg-row">
+        <input type="text" id="repNewColLabel" placeholder="নতুন কলামের নাম" style="flex:1;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-family:var(--f);font-size:13px;"/>
+        <button type="button" class="btn-p bp-purple" onclick="addReportColumn()">➕ যোগ</button>
+      </div>
+
+      <div class="subsec-title">📊 দৈনিক শ্রমিকদের কর্মদিবস</div>
+      <div class="log-wrap" style="margin-bottom:14px;">
+        <table class="log-table">
+          <thead><tr id="repTheadRow"></tr></thead>
+          <tbody id="repTbody"></tbody>
+        </table>
+      </div>
+
+      <div class="fg"><label>কাজের বিবরণ</label>
+        <textarea id="repDesc" rows="3" style="resize:vertical;" onchange="setReportDesc(document.getElementById('repDept').value, currentRangeKey(), this.value)"></textarea>
+      </div>
+
+      <button class="btn-sub" style="background:#334155;" onclick="printAttendanceReport()">🖨️ পূর্ণ টেমপ্লেট প্রিন্ট করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM FIELD MANAGER (মালামাল/জনবল/কার্যক্রম সব মডিউলের জন্য শেয়ার্ড) -->
+<div class="mo" id="modalCustomField">
+  <div class="modal">
+    <div class="mhdr"><h3>🧩 কাস্টম ফিল্ড ব্যবস্থাপনা</h3><button class="btn-x" onclick="closeModal('modalCustomField')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="cfModule"/>
+      <input type="hidden" id="cfRefreshTarget"/>
+      <div class="subsec-title">📋 বিদ্যমান কাস্টম ফিল্ড</div>
+      <div id="cfDefList" style="margin-bottom:16px;"></div>
+      <div class="subsec-title">➕ নতুন কাস্টম ফিল্ড</div>
+      <div class="fg"><label>ফিল্ডের নাম *</label><input type="text" id="cfLabel" placeholder="যেমন: গ্রেড / রক্তের গ্রুপ / ছবি"/></div>
+      <div class="fg"><label>ফিল্ডের ধরন *</label>
+        <select id="cfType" onchange="toggleCfOptionsField()">
+          <option value="text">টেক্সট</option>
+          <option value="dropdown">ড্রপডাউন</option>
+          <option value="image">ইমেজ</option>
+        </select>
+      </div>
+      <div class="fg" id="cfOptionsWrap" style="display:none;">
+        <label>ড্রপডাউন অপশনসমূহ (কমা দিয়ে আলাদা করুন) *</label>
+        <input type="text" id="cfOptions" placeholder="যেমন: A+, A-, B+, B-, O+, O-"/>
+      </div>
+      <button class="btn-sub" onclick="addCustomFieldDef()">✅ কাস্টম ফিল্ড যোগ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- USER MENU -->
+<div class="mo" id="modalUser">
+  <div class="modal" style="max-width:340px;">
+    <div class="mhdr"><h3>👤 আমার প্রোফাইল</h3><button class="btn-x" onclick="closeModal('modalUser')">✕</button></div>
+    <div class="mbody" id="userMenuBody"></div>
+  </div>
+</div>
+
+<!-- INSTALL BAR -->
+<div id="installBar">
+  <div class="ii">📱</div>
+  <div class="it"><h4>অ্যাপ হিসেবে ইনস্টল করুন</h4><p>অফলাইনেও ব্যবহার করুন</p></div>
+  <button id="btnIDismiss" onclick="dismissInstall()">পরে</button>
+  <button id="btnInstall">⬇️ ইনস্টল করুন</button>
+</div>
+
+<div id="loaderOv"><div class="lbox"><div class="spin"></div><p id="loaderTxt">লোড হচ্ছে...</p></div></div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════
+//  GLOBAL SAFETY NET — never allow a blank/white screen
+// ═══════════════════════════════════════════════════════
+window.addEventListener('error', function(ev){
+  console.error('Unhandled error:', ev.error || ev.message);
+  const authEl = document.getElementById('authScreen');
+  const appEl  = document.getElementById('appShell');
+  const authVisible = authEl && getComputedStyle(authEl).display !== 'none';
+  const appVisible  = appEl  && getComputedStyle(appEl).display  !== 'none';
+  if(!authVisible && !appVisible){
+    // Both hidden = white screen. Recover into whichever screen makes sense.
+    if(typeof currentUser !== 'undefined' && currentUser){
+      appEl.style.display='block';
+    } else {
+      authEl.style.display='flex';
+    }
+  }
+});
+window.addEventListener('unhandledrejection', function(ev){
+  console.error('Unhandled promise rejection:', ev.reason);
+});
+
+// ═══════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════
+const CFG = {
+  SUPER_ADMIN_EMAIL: 'atikuzzaman53@gmail.com',
+  TABLE_ITEMS:  'stock_items',
+  TABLE_LOGS:   'unload_logs',
+  TABLE_PROF:   'profiles',
+  TABLE_MANPOWER: 'manpower',
+  TABLE_ACTIVITIES: 'activities',
+  TABLE_ATTENDANCE: 'attendance',
+  URL: 'https://zakwweacdjgoevoszcmz.supabase.co',
+  KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpha3d3ZWFjZGpnb2V2b3N6Y216Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NTU2NjgsImV4cCI6MjA5ODIzMTY2OH0.AoZDRRP7kjZONB_I0tMPtRoNatGmuLqgFGw0o02lD_Q',
+};
+
+const DEPT = {
+  field:      {name:'ফিল্ড মেইনটেন্যান্স',  icon:'🔧', color:'#3B82F6', bg:'#DBEAFE'},
+  plant:      {name:'প্লান্ট মেইনটেন্যান্স', icon:'🏭', color:'#10B981', bg:'#D1FAE5'},
+  production: {name:'প্রোডাকশন',              icon:'⚗️', color:'#8B5CF6', bg:'#EDE9FE'},
+  compressor: {name:'কম্প্রেসর',              icon:'💨', color:'#F97316', bg:'#FFEDD5'},
+  security:   {name:'সিকিউরিটি',              icon:'🛡️', color:'#EF4444', bg:'#FEE2E2'},
+  admin:      {name:'প্রশাসন',                icon:'📋', color:'#F4A300', bg:'#FEF3C7'},
+  electric:   {name:'বিদ্যুৎ',                icon:'⚡', color:'#14B8A6', bg:'#CCFBF1'},
+};
+const MN = ['','জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let Y = new Date().getFullYear(), M = new Date().getMonth()+1;
+let filterDept = 'all', filterChart = 'bar';
+let currentTab = 'materials'; // 'materials' | 'manpower' | 'activities'
+let _pendingProfiles = []; // সুপার অ্যাডমিনের pending approval তালিকার ক্যাশ (নিরাপদ id-ভিত্তিক লুকআপের জন্য)
+let chartInst = null, deferredPrompt = null;
+let supaOk = false;
+let currentUser = null; // {id, email, role:'super'|'admin'|'viewer'|'pending', name, dept, reqDept}
+let supaSession = null;
+
+// ═══════════════════════════════════════════════════════
+//  LOCAL DATA
+// ═══════════════════════════════════════════════════════
+const SAMPLE_ITEMS = [
+  {id:'s1',dept:'field',name:'বল ভালভ ২ ইঞ্চি',qty:24,optimum:30,unit:'পিস',incoming:6,month:1,year:2025,note:''},
+  {id:'s2',dept:'field',name:'গেট ভালভ ৪ ইঞ্চি',qty:8,optimum:15,unit:'পিস',incoming:4,month:1,year:2025,note:''},
+  {id:'s3',dept:'plant',name:'লুব্রিকেটিং অয়েল SAE-40',qty:200,optimum:300,unit:'লিটার',incoming:100,month:1,year:2025,note:''},
+  {id:'s4',dept:'plant',name:'বেয়ারিং SKF 6205',qty:15,optimum:20,unit:'পিস',incoming:0,month:1,year:2025,note:''},
+  {id:'s5',dept:'production',name:'সিলিকা জেল',qty:150,optimum:200,unit:'কেজি',incoming:50,month:1,year:2025,note:''},
+  {id:'s6',dept:'compressor',name:'কম্প্রেসর ভালভ সেট',qty:4,optimum:8,unit:'সেট',incoming:2,month:1,year:2025,note:'ক্রিটিক্যাল'},
+  {id:'s7',dept:'security',name:'হেলমেট',qty:30,optimum:40,unit:'পিস',incoming:10,month:1,year:2025,note:''},
+  {id:'s8',dept:'admin',name:'A4 পেপার রিম',qty:20,optimum:30,unit:'রিম',incoming:10,month:1,year:2025,note:''},
+  {id:'s9',dept:'electric',name:'ক্যাবল ৪mm² কপার',qty:200,optimum:300,unit:'মিটার',incoming:100,month:1,year:2025,note:''},
+  {id:'s10',dept:'electric',name:'MCB ২৫A',qty:15,optimum:20,unit:'পিস',incoming:5,month:1,year:2025,note:''},
+];
+const SAMPLE_LOGS = [
+  {id:'l1',date:'2025-01-05',dept:'field',item:'বল ভালভ ২ ইঞ্চি',qty:12,unit:'পিস',location:'মেইন গেট গুদাম',supplier:'রহিম ট্রেডিং',month:1,year:2025},
+  {id:'l2',date:'2025-01-10',dept:'plant',item:'লুব্রিকেটিং অয়েল SAE-40',qty:200,unit:'লিটার',location:'প্লান্ট স্টোর',supplier:'তোতা এন্টারপ্রাইজ',month:1,year:2025},
+];
+function getItems(){ return JSON.parse(localStorage.getItem('bgfcl_items')||'null') || SAMPLE_ITEMS; }
+function getLogs(){  return JSON.parse(localStorage.getItem('bgfcl_logs')||'null')  || SAMPLE_LOGS; }
+function saveItems(d){ localStorage.setItem('bgfcl_items',JSON.stringify(d)); }
+function saveLogs(d){  localStorage.setItem('bgfcl_logs', JSON.stringify(d)); }
+function getManpower(){    return JSON.parse(localStorage.getItem('bgfcl_manpower')||'null')   || []; }
+function getActivities(){  return JSON.parse(localStorage.getItem('bgfcl_activities')||'null') || []; }
+function saveManpower(d){  localStorage.setItem('bgfcl_manpower', JSON.stringify(d)); }
+function saveActivities(d){localStorage.setItem('bgfcl_activities', JSON.stringify(d)); }
+
+// ── দৈনিক শ্রমিক উপস্থিতি (ATTENDANCE) ──
+function getAttendance(){ return JSON.parse(localStorage.getItem('bgfcl_attendance')||'null') || {}; }
+function saveAttendanceData(d){ localStorage.setItem('bgfcl_attendance', JSON.stringify(d)); }
+function setAttendance(workerId, date, status){
+  const att = getAttendance();
+  att[workerId] = att[workerId] || {};
+  att[workerId][date] = status;
+  saveAttendanceData(att);
+  if(supaOk) supa(CFG.TABLE_ATTENDANCE, 'POST', {id:`${workerId}_${date}`, worker_id:workerId, date, status}).catch(notifyCloudSyncFail);
+}
+function removeAttendance(workerId, date){
+  const att = getAttendance();
+  if(att[workerId]){ delete att[workerId][date]; saveAttendanceData(att); }
+  if(supaOk) supa(CFG.TABLE_ATTENDANCE+'?id=eq.'+`${workerId}_${date}`, 'DELETE').catch(notifyCloudSyncFail);
+}
+function countPresentDays(workerId, start, end){
+  const att = getAttendance()[workerId] || {};
+  let count=0;
+  for(const d in att){ if(att[d]==='P' && d>=start && d<=end) count++; }
+  return count;
+}
+
+// ── উপস্থিতি রিপোর্ট: অতিরিক্ত কর্মদিবস, অতিরিক্ত কলাম, কোম্পানি হেডার, বিবরণ ──
+function getExtraDaysMap(){ return JSON.parse(localStorage.getItem('bgfcl_extradays')||'null') || {}; }
+function saveExtraDaysMap(d){ localStorage.setItem('bgfcl_extradays', JSON.stringify(d)); }
+function getExtraDays(workerId, rangeKey){ const m=getExtraDaysMap(); return (m[workerId] && m[workerId][rangeKey]) || 0; }
+function setExtraDays(workerId, rangeKey, val){
+  const m=getExtraDaysMap(); m[workerId]=m[workerId]||{}; m[workerId][rangeKey]=val; saveExtraDaysMap(m);
+}
+
+function getReportExtraCols(){ return JSON.parse(localStorage.getItem('bgfcl_report_extracols')||'null') || []; }
+function saveReportExtraCols(d){ localStorage.setItem('bgfcl_report_extracols', JSON.stringify(d)); }
+
+function getReportExtraColVals(){ return JSON.parse(localStorage.getItem('bgfcl_report_extracol_vals')||'null') || {}; }
+function saveReportExtraColVals(d){ localStorage.setItem('bgfcl_report_extracol_vals', JSON.stringify(d)); }
+function getReportExtraColVal(workerId, rangeKey, colId){
+  const m=getReportExtraColVals();
+  return (m[workerId] && m[workerId][rangeKey] && m[workerId][rangeKey][colId]) || '';
+}
+function setReportExtraColVal(workerId, rangeKey, colId, val){
+  const m=getReportExtraColVals();
+  m[workerId]=m[workerId]||{}; m[workerId][rangeKey]=m[workerId][rangeKey]||{};
+  m[workerId][rangeKey][colId]=val; saveReportExtraColVals(m);
+}
+
+function getReportHeader(){ return JSON.parse(localStorage.getItem('bgfcl_report_header')||'null') || {
+  mainCompany:'বাখরাবাদ গ্যাস ফিল্ডস কোম্পানি লিমিটেড (BGFCL)',
+  subCompany:'', subAddress:'', title:'দৈনিক শ্রমিক উপস্থিতি ও কর্মদিবস প্রতিবেদন'
+}; }
+function saveReportHeader(d){ localStorage.setItem('bgfcl_report_header', JSON.stringify(d)); }
+
+function getReportDescMap(){ return JSON.parse(localStorage.getItem('bgfcl_report_desc')||'null') || {}; }
+function saveReportDescMap(d){ localStorage.setItem('bgfcl_report_desc', JSON.stringify(d)); }
+function getReportDesc(dept, rangeKey){ const m=getReportDescMap(); return (m[dept] && m[dept][rangeKey]) || ''; }
+function setReportDesc(dept, rangeKey, text){
+  const m=getReportDescMap(); m[dept]=m[dept]||{}; m[dept][rangeKey]=text; saveReportDescMap(m);
+}
+
+// ── কাস্টম ফিল্ড (মালামাল/জনবল/কার্যক্রম — সব মডিউলে) ──
+function getCustomDefs(){ return JSON.parse(localStorage.getItem('bgfcl_customfields')||'null') || {items:[],manpower:[],activities:[]}; }
+function saveCustomDefs(d){ localStorage.setItem('bgfcl_customfields', JSON.stringify(d)); }
+let _cfValueCache = {items:{}, manpower:{}, activities:{}}; // বর্তমানে খোলা ফর্মের কাস্টম ফিল্ড মান (ইমেজের জন্য দরকার)
+// নিরাপত্তা: ব্যবহারকারীর টাইপ করা যেকোনো টেক্সট HTML-এ বসানোর আগে escape করা
+// আবশ্যক, নাহলে কেউ নাম/বিবরণ ফিল্ডে script বসিয়ে অন্যদের ব্রাউজারে চালাতে পারবে (stored XSS)
+function escHtml(s){
+  if(s===null || s===undefined) return '';
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// নিরাপত্তা/নির্ভরযোগ্যতা: ক্লাউডে সেভ ব্যর্থ হলে ব্যবহারকারীকে জানানো হয়,
+// যাতে ডেটা "নীরবে" শুধু লোকালে আটকে না থেকে পরে বিভ্রান্তি তৈরি না করে।
+// (লোকাল কপি ঠিকই থাকবে — শুধু ক্লাউড সিঙ্ক নিয়ে সতর্ক করা হচ্ছে।)
+function notifyCloudSyncFail(e){
+  const reason = (e?.message || String(e) || 'অজানা কারণ').slice(0,120);
+  console.warn('ক্লাউড সিঙ্ক ব্যর্থ:', reason);
+  toast('⚠️ ক্লাউড সিঙ্ক ব্যর্থ: '+reason);
+}
+
+function readFileAsDataURL(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result);
+    r.onerror=()=>rej(new Error('ফাইল পড়া যায়নি'));
+    r.readAsDataURL(file);
+  });
+}
+
+function openCustomFieldManager(module, refreshTargetId){
+  document.getElementById('cfModule').value = module;
+  document.getElementById('cfRefreshTarget').value = refreshTargetId;
+  document.getElementById('cfLabel').value='';
+  document.getElementById('cfOptions').value='';
+  document.getElementById('cfType').value='text';
+  toggleCfOptionsField();
+  renderCfDefList();
+  openModal('modalCustomField');
+}
+
+function toggleCfOptionsField(){
+  document.getElementById('cfOptionsWrap').style.display = document.getElementById('cfType').value==='dropdown' ? '' : 'none';
+}
+
+function renderCfDefList(){
+  const module = document.getElementById('cfModule').value;
+  const defs = getCustomDefs()[module] || [];
+  const box = document.getElementById('cfDefList');
+  if(!defs.length){
+    box.innerHTML = `<p style="font-size:12px;color:#94A3B8;text-align:center;padding:8px;">এখনো কোনো কাস্টম ফিল্ড যোগ করা হয়নি</p>`;
+    return;
+  }
+  const typeLabel = {text:'টেক্সট', dropdown:'ড্রপডাউন', image:'ইমেজ'};
+  box.innerHTML = defs.map(d=>`
+    <div class="cf-row">
+      <div style="font-size:13px;"><strong>${escHtml(d.label)}</strong> <span style="color:#94A3B8;font-size:11px;">(${typeLabel[d.type]||d.type})</span></div>
+      <button class="btn-di" onclick="deleteCustomFieldDef('${module}','${d.id}')" title="মুছুন">🗑️</button>
+    </div>`).join('');
+}
+
+function addCustomFieldDef(){
+  const module = document.getElementById('cfModule').value;
+  const label  = document.getElementById('cfLabel').value.trim();
+  if(!label){ toast('⚠️ ফিল্ডের নাম দিন'); return; }
+  const type = document.getElementById('cfType').value;
+  const def = {id:crypto.randomUUID(), label, type};
+  if(type==='dropdown'){
+    const opts = document.getElementById('cfOptions').value.split(',').map(s=>s.trim()).filter(Boolean);
+    if(!opts.length){ toast('⚠️ অপশনগুলো কমা দিয়ে আলাদা করে লিখুন'); return; }
+    def.options = opts;
+  }
+  const defs = getCustomDefs();
+  defs[module] = defs[module] || [];
+  defs[module].push(def);
+  saveCustomDefs(defs);
+  document.getElementById('cfLabel').value='';
+  document.getElementById('cfOptions').value='';
+  renderCfDefList();
+  refreshOpenFormCustomFields();
+  renderCurrentTab(); // নতুন ফিল্ড টেবিলের কলামেও যোগ হোক
+  toast('✅ কাস্টম ফিল্ড যোগ হয়েছে');
+}
+
+function deleteCustomFieldDef(module, id){
+  if(!confirm('এই কাস্টম ফিল্ডটি ফর্ম থেকে সরিয়ে দেবেন? (আগের এন্ট্রিতে থাকা ডেটা মুছে যাবে না, শুধু আর দেখানো হবে না)')) return;
+  const defs = getCustomDefs();
+  defs[module] = (defs[module]||[]).filter(d=>d.id!==id);
+  saveCustomDefs(defs);
+  renderCfDefList();
+  refreshOpenFormCustomFields();
+  renderCurrentTab();
+  toast('🗑️ মুছে গেছে');
+}
+
+function refreshOpenFormCustomFields(){
+  const module = document.getElementById('cfModule').value;
+  const target = document.getElementById('cfRefreshTarget').value;
+  if(!target) return;
+  renderCustomFieldInputs(module, target, _cfValueCache[module]||{});
+}
+
+function renderCustomFieldInputs(module, containerId, values={}){
+  const defs = getCustomDefs()[module] || [];
+  const box = document.getElementById(containerId);
+  if(!box) return;
+  if(!defs.length){ box.innerHTML=''; return; }
+  box.innerHTML = defs.map(d=>{
+    const val = values[d.id];
+    if(d.type==='dropdown'){
+      const opts = (d.options||[]).map(o=>`<option value="${o}" ${o===val?'selected':''}>${o}</option>`).join('');
+      return `<div class="fg"><label>${d.label}</label><select data-cf-id="${d.id}"><option value="">-- নির্বাচন করুন --</option>${opts}</select></div>`;
+    }
+    if(d.type==='image'){
+      const preview = val ? `<img src="${val}" class="cf-preview-img"/>` : '';
+      return `<div class="fg"><label>${d.label}</label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${preview}
+          <input type="file" accept="image/*" data-cf-id="${d.id}" data-cf-type="image" style="flex:1;"/>
+        </div>
+        <input type="hidden" data-cf-id="${d.id}-current" value="${val||''}"/>
+      </div>`;
+    }
+    return `<div class="fg"><label>${d.label}</label><input type="text" data-cf-id="${d.id}" value="${val||''}"/></div>`;
+  }).join('');
+}
+
+async function collectCustomFieldValues(containerId, existingValues={}){
+  const box = document.getElementById(containerId);
+  const result = {...existingValues};
+  if(!box) return result;
+  const inputs = box.querySelectorAll('[data-cf-id]:not([data-cf-id$="-current"])');
+  for(const el of inputs){
+    const id = el.dataset.cfId;
+    if(el.dataset.cfType==='image'){
+      if(el.files && el.files[0]){
+        try{ result[id] = await readFileAsDataURL(el.files[0]); }catch(e){ /* keep old value */ }
+      }
+      // ফাইল না বদলালে existingValues এর মানই থেকে যাবে (উপরের spread থেকে)
+    } else {
+      result[id] = el.value;
+    }
+  }
+  return result;
+}
+if(!localStorage.getItem('bgfcl_items')) saveItems(SAMPLE_ITEMS);
+if(!localStorage.getItem('bgfcl_logs'))  saveLogs(SAMPLE_LOGS);
+
+// ═══════════════════════════════════════════════════════
+//  SUPABASE HELPERS
+// ═══════════════════════════════════════════════════════
+async function supa(path, method='GET', body=null, token=null){
+  if(!CFG.URL) throw new Error('no_config');
+  const h = {
+    'apikey': CFG.KEY,
+    'Authorization': 'Bearer '+(token || supaSession?.access_token || CFG.KEY),
+    'Content-Type': 'application/json',
+  };
+  if(method==='GET') h['Prefer']='return=representation';
+  if(method==='POST') h['Prefer']='return=representation';
+  if(method==='PATCH') h['Prefer']='return=representation';
+  let r;
+  try{
+    r = await fetch(CFG.URL+'/rest/v1/'+path, {method, headers:h, body:body?JSON.stringify(body):null});
+  }catch(netErr){
+    throw new Error('ইন্টারনেট সংযোগ সমস্যা — নেটওয়ার্ক চেক করুন');
+  }
+  if(!r.ok){
+    const t = await r.text();
+    let friendly = t;
+    try{
+      const j = JSON.parse(t);
+      if(j.message && /does not exist/i.test(j.message)){
+        friendly = `ডাটাবেজ টেবিল পাওয়া যায়নি (${j.message}). Supabase এ SQL Setup স্ক্রিপ্ট রান করা হয়েছে কিনা যাচাই করুন।`;
+      } else {
+        friendly = j.message || j.msg || j.hint || t;
+      }
+    }catch(parseErr){ /* not JSON, keep raw text */ }
+    throw new Error(friendly);
+  }
+  if(method==='DELETE') return true;
+  const txt = await r.text();
+  if(!txt) return true;
+  try{ return JSON.parse(txt); }
+  catch(parseErr){ return true; }
+}
+
+// Auth via Supabase Auth REST
+async function supaAuth(action, email, password){
+  if(!CFG.URL) throw new Error('no_config');
+  const url = CFG.URL+'/auth/v1/'+action;
+  let r;
+  try{
+    r = await fetch(url,{
+      method:'POST',
+      headers:{'apikey':CFG.KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({email,password}),
+    });
+  }catch(netErr){
+    throw new Error('ইন্টারনেট সংযোগ সমস্যা — আবার চেষ্টা করুন');
+  }
+  const raw = await r.text();
+  let d = {};
+  try{ d = raw ? JSON.parse(raw) : {}; }
+  catch(parseErr){ throw new Error('সার্ভার থেকে অপ্রত্যাশিত উত্তর এসেছে (status '+r.status+')'); }
+  if(!r.ok) throw new Error(d.error_description || d.msg || d.message || 'Auth error (status '+r.status+')');
+  return d;
+}
+
+async function supaAuthGet(path){
+  if(!CFG.URL || !supaSession) return null;
+  try{
+    const r = await fetch(CFG.URL+'/auth/v1/'+path,{
+      headers:{'apikey':CFG.KEY,'Authorization':'Bearer '+supaSession.access_token}
+    });
+    if(!r.ok) return null;
+    const raw = await r.text();
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+
+let lastSupaError = null;
+async function checkSupaConn(){
+  try{
+    await supa(CFG.TABLE_ITEMS+'?limit=1');
+    lastSupaError = null;
+    setSupaStatus(true);
+    return true;
+  }catch(e){
+    console.warn('Supabase connection check failed:', e.message);
+    lastSupaError = e.message || 'অজানা ত্রুটি';
+    setSupaStatus(false);
+    return false;
+  }
+}
+function setSupaStatus(ok){
+  supaOk=ok;
+  const dot = document.getElementById('connDot');
+  if(!dot) return;
+  dot.classList.toggle('offline', !ok);
+  dot.title = ok ? 'ক্লাউডের সাথে সংযুক্ত (Online / Synced)' : 'ক্লাউড সংযোগ নেই (Offline / Not Synced)';
+  dot.style.cursor = 'pointer';
+  dot.onclick = ok ? ()=>{ toast('🔄 ক্লাউড থেকে রিফ্রেশ হচ্ছে...'); fetchFromCloud().then(()=>toast('✅ রিফ্রেশ সম্পন্ন')).catch(()=>{}); } : showSupaDiagnostic;
+}
+async function showSupaDiagnostic(){
+  toast('🔄 আবার চেক করা হচ্ছে...');
+  const ok = await checkSupaConn();
+  if(ok){ toast('✅ এখন সংযুক্ত হয়েছে!'); return; }
+  toast('❌ কারণ: '+(lastSupaError||'অজানা ত্রুটি'));
+}
+
+// ═══════════════════════════════════════════════════════
+//  AUTH FLOW
+// ═══════════════════════════════════════════════════════
+function switchAuthTab(tab){
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>{
+    t.classList.toggle('active', ['login','signup','viewer'][i]===tab);
+  });
+  document.getElementById('loginForm').style.display   = tab==='login'   ? '' : 'none';
+  document.getElementById('signupForm').style.display  = tab==='signup'  ? '' : 'none';
+  document.getElementById('viewerForm').style.display  = tab==='viewer'  ? '' : 'none';
+  document.getElementById('pendingForm').style.display = 'none';
+}
+
+async function doLogin(){
+  const email = document.getElementById('liEmail').value.trim();
+  const pass  = document.getElementById('liPass').value;
+  if(!email||!pass){ toast('⚠️ ইমেইল ও পাসওয়ার্ড দিন'); return; }
+  showLoader('লগইন হচ্ছে...');
+  try{
+    // Try Supabase auth first
+    if(CFG.URL){
+      const d = await supaAuth('token?grant_type=password', email, pass);
+      supaSession = d;
+      // Load profile
+      const prof = await supa(CFG.TABLE_PROF+'?email=eq.'+encodeURIComponent(email)+'&limit=1');
+      const p = prof && prof[0];
+      if(p){
+        if(p.status==='pending'){
+          hideLoader();
+          setCurrentUser({id:p.id,email,role:'pending',name:p.name,dept:p.dept,reqDept:p.req_dept});
+          showPendingScreen(p);
+          return;
+        }
+        setCurrentUser({id:p.id,email,role:p.role,name:p.name,dept:p.dept,reqDept:p.req_dept});
+      } else {
+        // Super admin check
+        if(email===CFG.SUPER_ADMIN_EMAIL){
+          setCurrentUser({id:'super',email,role:'super',name:'সুপার অ্যাডমিন',dept:'all',reqDept:'all'});
+        } else {
+          setCurrentUser({id:'u',email,role:'viewer',name:email,dept:'',reqDept:''});
+        }
+      }
+    } else {
+      // Offline super admin
+      if(email===CFG.SUPER_ADMIN_EMAIL && pass==='bgfcl2025'){
+        setCurrentUser({id:'super',email,role:'super',name:'সুপার অ্যাডমিন',dept:'all',reqDept:'all'});
+      } else {
+        toast('⚠️ Supabase সংযুক্ত নেই। সুপার অ্যাডমিন ছাড়া লগইন সম্ভব নয়।'); hideLoader(); return;
+      }
+    }
+    hideLoader();
+    enterApp();
+  }catch(e){
+    hideLoader();
+    toast('❌ লগইন ব্যর্থ: '+(e.message||'ভুল তথ্য'));
+  }
+}
+
+async function doSignup(){
+  const name    = document.getElementById('suName').value.trim();
+  const desig   = document.getElementById('suDesig').value.trim();
+  const dept    = document.getElementById('suDept').value;
+  const reqDept = document.getElementById('suReqDept').value;
+  const email   = document.getElementById('suEmail').value.trim();
+  const pass    = document.getElementById('suPass').value;
+  const pass2   = document.getElementById('suPass2').value;
+  if(!name||!desig||!dept||!reqDept||!email||!pass){ toast('⚠️ সব তথ্য পূরণ করুন'); return; }
+  if(pass!==pass2){ toast('⚠️ পাসওয়ার্ড দুটো মিলছে না'); return; }
+  if(pass.length<6){ toast('⚠️ পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে'); return; }
+
+  showLoader('অ্যাকাউন্ট তৈরি হচ্ছে...');
+  try{
+    const d = await supaAuth('signup', email, pass);
+    const uid = d?.user?.id || d?.id;
+    if(!uid){ throw new Error('ব্যবহারকারী তৈরি হয়নি — সার্ভার থেকে সঠিক তথ্য আসেনি'); }
+    // Supabase returns HTTP 200 with a fake user (empty identities[]) instead of an
+    // error when the email is already registered, to prevent user enumeration.
+    if(Array.isArray(d?.user?.identities) && d.user.identities.length===0){
+      throw new Error('already registered');
+    }
+    if(d?.session){ supaSession = d.session; }
+
+    try{
+      await supa(CFG.TABLE_PROF,'POST',{
+        id: uid, email, name, designation:desig,
+        dept, req_dept:reqDept,
+        role:'pending', status:'pending',
+        created_at: new Date().toISOString(),
+      });
+    }catch(profErr){
+      if(!/duplicate|already exists|23505/i.test(profErr.message||'')){
+        throw new Error('প্রোফাইল সংরক্ষণ ব্যর্থ: '+(profErr.message||'অজানা কারণ'));
+      }
+    }
+
+    notifySuperAdmin(name, desig, DEPT[reqDept]?.name||reqDept, email);
+    hideLoader();
+    setCurrentUser({id:uid,email,role:'pending',name,dept,reqDept});
+    showPendingScreen({name,req_dept:reqDept});
+    toast('✅ সাইন-আপ সফল! ইমেইল ভেরিফাই করুন।');
+  }catch(e){
+    hideLoader();
+    const msg = e?.message || '';
+    if(/already registered|user already exists/i.test(msg)){
+      toast('⚠️ এই ইমেইল দিয়ে আগেই অ্যাকাউন্ট আছে — লগইন করুন');
+    } else if(/no_config/i.test(msg)){
+      toast('⚠️ Supabase কনফিগার করা হয়নি');
+    } else {
+      toast('❌ সাইন-আপ ব্যর্থ: '+(msg||'অজানা ত্রুটি — কনসোল চেক করুন'));
+    }
+    console.error('Signup error:', e);
+  }
+}
+
+function notifySuperAdmin(name, desig, deptName, email){
+  // Open mailto as fallback notification
+  const sub = encodeURIComponent(`[BGFCL Inventory] নতুন অ্যাডমিন অনুরোধ - ${name}`);
+  const body = encodeURIComponent(
+    `নাম: ${name}\nপদবী: ${desig}\nইমেইল: ${email}\nঅনুরোধকৃত বিভাগ: ${deptName}\n\n` +
+    `অনুগ্রহ করে অ্যাপে লগইন করে Pending Approvals থেকে অনুমোদন করুন।`
+  );
+  window.open(`mailto:${CFG.SUPER_ADMIN_EMAIL}?subject=${sub}&body=${body}`,'_blank');
+}
+
+function showPendingScreen(p){
+  document.getElementById('authTabs').style.display='none';
+  ['loginForm','signupForm','viewerForm'].forEach(id=>document.getElementById(id).style.display='none');
+  const pf = document.getElementById('pendingForm');
+  pf.style.display='';
+  document.getElementById('pendingMsg').textContent=
+    `${p.name} — ${DEPT[p.req_dept]?.name||p.req_dept} বিভাগের অ্যাডমিন অনুরোধ পাঠানো হয়েছে। সুপার অ্যাডমিন (${CFG.SUPER_ADMIN_EMAIL}) অনুমোদন করলে আপনি ইমেইলে জানবেন।`;
+}
+
+function doResetPass(){
+  const email = document.getElementById('liEmail').value.trim();
+  if(!email){ toast('⚠️ ইমেইল দিন'); return; }
+  if(!CFG.URL){ toast('⚠️ Supabase সংযুক্ত নেই'); return; }
+  fetch(CFG.URL+'/auth/v1/recover',{
+    method:'POST',
+    headers:{'apikey':CFG.KEY,'Content-Type':'application/json'},
+    body:JSON.stringify({email})
+  }).then(()=>toast('✅ রিসেট লিংক পাঠানো হয়েছে ইমেইলে'));
+}
+
+function enterAsViewer(){
+  setCurrentUser({id:'viewer',email:'',role:'viewer',name:'ভিউয়ার',dept:'',reqDept:''});
+  enterApp();
+}
+
+function setCurrentUser(u){
+  currentUser = u;
+  localStorage.setItem('bgfcl_user', JSON.stringify(u));
+}
+
+function enterApp(){
+  // Show the shell FIRST, unconditionally — nothing after this point can blank the screen
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('appShell').style.display='block';
+
+  try{ updateUserChip(); }catch(e){ console.error('updateUserChip failed:',e); }
+  try{ updateActionBar(); }catch(e){ console.error('updateActionBar failed:',e); }
+  try{ switchMainTab('materials'); }catch(e){ console.error('switchMainTab failed:',e); toast('⚠️ ডেটা লোডে সমস্যা হয়েছে'); }
+
+  try{
+    checkSupaConn().then(ok=>{
+      supaOk=ok;
+      if(ok){
+        fetchFromCloud().catch(e=>console.error('fetchFromCloud failed:',e));
+        initRealtime();
+      }
+      else toast('⚠️ ক্লাউড সিঙ্ক ব্যর্থ: '+(lastSupaError||'কারণ জানা যায়নি')+' (badge-এ ট্যাপ করুন)');
+    }).catch(()=>{ supaOk=false; });
+  }catch(e){ console.error('checkSupaConn call failed:',e); }
+
+  try{
+    if(currentUser?.role==='super') loadPendingApprovals();
+  }catch(e){ console.error('loadPendingApprovals failed:',e); }
+}
+
+function backToLogin(){
+  if(!confirm('লগইন স্ক্রিনে ফিরে যাবেন?')) return;
+  doLogout();
+}
+
+function restoreSession(){
+  const saved = localStorage.getItem('bgfcl_user');
+  if(saved){
+    try{
+      const parsed = JSON.parse(saved);
+      if(parsed && parsed.id){
+        currentUser = parsed;
+        if(CFG.URL){
+          try{ supaSession = JSON.parse(localStorage.getItem('supa_session')||'null'); }catch(e){ supaSession=null; }
+        }
+        enterApp();
+        return;
+      }
+    }catch(e){
+      console.warn('Session restore failed, clearing corrupt session', e);
+      localStorage.removeItem('bgfcl_user');
+    }
+  }
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('authScreen').style.display='flex';
+}
+
+// ═══════════════════════════════════════════════════════
+//  USER CHIP & MENU
+// ═══════════════════════════════════════════════════════
+const ROLE_LABEL = {
+  super:{full:'সুপার এডমিন', short:'সুপার'},
+  admin:{full:'শাখা এডমিন',  short:'এডমিন'},
+  viewer:{full:'ভিউয়ার',     short:'ভিউয়ার'},
+  pending:{full:'অনুমোদনের অপেক্ষায়', short:'পেন্ডিং'},
+};
+const DEPT_SHORT = {field:'ফিল্ড', plant:'পিএম', production:'প্রোডাকশন', compressor:'কম্প্রেসর', security:'সিকিউরিটি', admin:'প্রশাসন', electric:'বিদ্যুৎ'};
+
+function updateUserChip(){
+  if(!currentUser) return;
+  const n = currentUser.name || currentUser.email || 'ব্যবহারকারী';
+  const rm = ROLE_LABEL[currentUser.role] || ROLE_LABEL.viewer;
+  const deptKey = currentUser.reqDept || currentUser.dept;
+  const deptFull = DEPT[deptKey]?.name || '';
+  const deptShort = DEPT_SHORT[deptKey] || deptFull;
+  document.getElementById('officerName').textContent = n.length>18 ? n.slice(0,18)+'…' : n;
+  document.getElementById('officerRole').textContent = rm.full;
+  document.getElementById('officerDept').textContent = currentUser.role==='super' ? 'সকল বিভাগ' : deptFull;
+  document.getElementById('officerCompact').textContent = currentUser.role==='super' ? rm.short+', সকল বিভাগ' : `${rm.short}, ${deptShort}`;
+}
+
+function updateActionBar(){
+  const r = currentUser?.role;
+  const canWrite = r==='super' || r==='admin';
+  document.getElementById('actionBar').style.display = canWrite ? '' : 'none';
+  document.getElementById('logActCol').textContent = canWrite ? 'কার্যক্রম' : '';
+  document.getElementById('actionBarManpower').style.display   = canWrite ? '' : 'none';
+  document.getElementById('actionBarActivities').style.display = canWrite ? '' : 'none';
+  document.getElementById('dailyActCol').textContent    = canWrite ? 'একশন' : '';
+  document.getElementById('staffActCol').textContent    = canWrite ? 'একশন' : '';
+  document.getElementById('activityActCol').textContent = canWrite ? 'একশন' : '';
+}
+
+function showUserMenu(){
+  const u = currentUser;
+  const r = u?.role;
+  const deptName = DEPT[u?.dept]?.name || '—';
+  const reqDeptName = DEPT[u?.reqDept]?.name || '—';
+  let html = `
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="width:60px;height:60px;border-radius:50%;background:${r==='super'?'#F4A300':r==='admin'?'#3B82F6':'#64748B'};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:white;margin:0 auto 10px;">${escHtml((u?.name||'?')[0]?.toUpperCase())}</div>
+      <strong style="font-size:15px;">${escHtml(u?.name)||'অজ্ঞাত'}</strong><br/>
+      <span style="font-size:12px;color:#64748B;">${escHtml(u?.email)}</span>
+    </div>
+    <div style="background:#F8FAFC;border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:#64748B;">ভূমিকা</span><strong>${r==='super'?'👑 সুপার অ্যাডমিন':r==='admin'?'🔑 শাখা অ্যাডমিন':r==='pending'?'⏳ পেন্ডিং':'👁️ ভিউয়ার'}</strong></div>
+      ${r!=='viewer'&&r!=='pending'?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748B;">বিভাগ</span><strong>${r==='super'?'সকল বিভাগ':reqDeptName}</strong></div>`:''}
+    </div>
+  `;
+  html+=`<button onclick="doLogout()" style="width:100%;background:var(--red-l);border:1px solid #FECACA;border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:#DC2626;font-weight:600;cursor:pointer;">🚪 লগআউট</button>`;
+  document.getElementById('userMenuBody').innerHTML=html;
+  openModal('modalUser');
+}
+
+function doLogout(){
+  if(supaSession && CFG.URL){
+    fetch(CFG.URL+'/auth/v1/logout',{method:'POST',headers:{'apikey':CFG.KEY,'Authorization':'Bearer '+supaSession.access_token}}).catch(()=>{});
+  }
+  stopRealtime();
+  localStorage.removeItem('bgfcl_user');
+  localStorage.removeItem('supa_session');
+  currentUser=null; supaSession=null;
+  closeModal('modalUser');
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('authScreen').style.display='flex';
+  document.getElementById('authTabs').style.display='';
+  switchAuthTab('login');
+  toast('✅ লগআউট হয়েছে');
+}
+
+// ═══════════════════════════════════════════════════════
+//  PENDING APPROVALS
+// ═══════════════════════════════════════════════════════
+async function loadPendingApprovals(){
+  if(currentUser?.role!=='super') return;
+  if(!supaOk) return;
+  try{
+    const list = await supa(CFG.TABLE_PROF+'?status=eq.pending&order=created_at.asc');
+    _pendingProfiles = list; // নিরাপত্তা: onclick অ্যাট্রিবিউটে ইমেইল/নাম সরাসরি না বসিয়ে id দিয়ে এখান থেকে পরে লুকআপ করা হয়
+    const banner = document.getElementById('pendingBanner');
+    const plist  = document.getElementById('pendingList');
+    document.getElementById('pendingCount').textContent = list.length;
+    if(!list.length){ banner.style.display='none'; return; }
+    banner.style.display='block';
+    plist.innerHTML = list.map(p=>`
+      <div class="pending-card">
+        <div class="pending-info">
+          <strong>${escHtml(p.name)} — ${escHtml(p.designation)}</strong>
+          <span>${escHtml(DEPT[p.req_dept]?.name||p.req_dept)} বিভাগের অ্যাডমিন · ${escHtml(p.email)}</span>
+        </div>
+        <button class="btn-approve" onclick="approveUser('${p.id}')">✅ অনুমোদন</button>
+        <button class="btn-reject"  onclick="rejectUser('${p.id}')">❌ বাতিল</button>
+      </div>`).join('');
+  }catch(e){ console.log('pending load error',e); }
+}
+
+async function approveUser(id){
+  const p = _pendingProfiles.find(x=>x.id===id); if(!p) return;
+  showLoader('অনুমোদন করা হচ্ছে...');
+  try{
+    await supa(CFG.TABLE_PROF+'?id=eq.'+id,'PATCH',{role:'admin',status:'approved',req_dept:p.req_dept});
+    // Notify via mailto
+    const sub = encodeURIComponent(`[BGFCL Inventory] আপনার অ্যাডমিন অনুরোধ অনুমোদিত হয়েছে`);
+    const body= encodeURIComponent(`${p.name},\n\nআপনার ${DEPT[p.req_dept]?.name||p.req_dept} বিভাগের অ্যাডমিন অনুরোধ অনুমোদিত হয়েছে।\nএখন অ্যাপে লগইন করুন।`);
+    window.open(`mailto:${p.email}?subject=${sub}&body=${body}`,'_blank');
+    hideLoader();
+    toast('✅ অনুমোদন সম্পন্ন');
+    loadPendingApprovals();
+  }catch(e){ hideLoader(); toast('❌ ব্যর্থ: '+e.message); }
+}
+
+async function rejectUser(id){
+  const p = _pendingProfiles.find(x=>x.id===id); if(!p) return;
+  if(!confirm(`${p.name} এর অনুরোধ বাতিল করবেন?`)) return;
+  showLoader('বাতিল করা হচ্ছে...');
+  try{
+    await supa(CFG.TABLE_PROF+'?id=eq.'+id,'PATCH',{status:'rejected'});
+    hideLoader(); toast('🗑️ অনুরোধ বাতিল করা হয়েছে');
+    loadPendingApprovals();
+  }catch(e){ hideLoader(); toast('❌ ব্যর্থ: '+e.message); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  CLOUD SYNC
+// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  REALTIME — যেকোনো ডিভাইস/ট্যাব/উইন্ডো থেকে পরিবর্তন হলেই
+//  সাথে সাথে সব জায়গায় আপডেট হয়ে যাবে (Supabase Realtime)
+// ═══════════════════════════════════════════════════════
+let realtimeClient = null;
+let realtimeChannel = null;
+let _rtReloadTimers = {}; // প্রতি টেবিলের জন্য আলাদা ডিবাউন্স, বারবার দ্রুত event এলে একসাথে একবারই রিফ্রেশ হবে
+
+const RT_TABLES = [
+  { name: CFG.TABLE_ITEMS, reload: reloadItemsFromCloud },
+  { name: CFG.TABLE_LOGS,  reload: reloadLogsFromCloud },
+  { name: CFG.TABLE_MANPOWER,   reload: reloadManpowerFromCloud },
+  { name: CFG.TABLE_ACTIVITIES, reload: reloadActivitiesFromCloud },
+  { name: CFG.TABLE_ATTENDANCE, reload: reloadAttendanceFromCloud },
+];
+
+function scheduleRtReload(tableName, fn){
+  clearTimeout(_rtReloadTimers[tableName]);
+  _rtReloadTimers[tableName] = setTimeout(()=>{
+    fn().catch(e=>console.warn('realtime reload failed for', tableName, e.message));
+  }, 400); // 400ms ডিবাউন্স — একসাথে অনেক row পরিবর্তন হলেও একবারই রিফ্রেশ হবে
+}
+
+function initRealtime(){
+  if(realtimeChannel) return; // ইতিমধ্যে চালু আছে
+  if(typeof window.supabase==='undefined' || !window.supabase.createClient){
+    console.warn('supabase-js লোড হয়নি, Realtime বন্ধ থাকবে (সাধারণ fetch-ভিত্তিক সিঙ্ক চলবে)');
+    return;
+  }
+  if(!CFG.URL || !CFG.KEY) return;
+  try{
+    if(!realtimeClient){
+      realtimeClient = window.supabase.createClient(CFG.URL, CFG.KEY, {
+        auth: { persistSession:false, autoRefreshToken:false, detectSessionInUrl:false }
+      });
+    }
+    realtimeChannel = realtimeClient.channel('bgfcl-realtime-sync');
+    RT_TABLES.forEach(t=>{
+      realtimeChannel.on('postgres_changes',
+        { event:'*', schema:'public', table:t.name },
+        payload=>{
+          scheduleRtReload(t.name, t.reload);
+          // ব্যবহারকারী যে টেবিলটা এখন দেখছেন সেটাতে পরিবর্তন হলে হালকা toast দেখানো
+          const activeTable = currentTab==='materials' ? [CFG.TABLE_ITEMS,CFG.TABLE_LOGS]
+                             : currentTab==='manpower'  ? [CFG.TABLE_MANPOWER,CFG.TABLE_ATTENDANCE]
+                             : [CFG.TABLE_ACTIVITIES];
+          if(activeTable.includes(t.name)) toast('🔄 অন্য জায়গা থেকে আপডেট হয়েছে');
+        }
+      );
+    });
+    realtimeChannel.subscribe(status=>{
+      if(status==='SUBSCRIBED') console.log('✅ Realtime সংযুক্ত');
+      else if(status==='CHANNEL_ERROR' || status==='TIMED_OUT') console.warn('Realtime সংযোগ সমস্যা:', status);
+    });
+  }catch(e){ console.warn('Realtime চালু করা যায়নি:', e.message); }
+}
+
+function stopRealtime(){
+  try{ if(realtimeChannel){ realtimeClient?.removeChannel(realtimeChannel); realtimeChannel=null; } }catch(e){}
+}
+
+async function reloadItemsFromCloud(){
+  const items = await supa(CFG.TABLE_ITEMS+'?order=year,month');
+  if(items?.length) saveItems(items);
+  if(currentTab==='materials') renderAll();
+}
+async function reloadLogsFromCloud(){
+  const logs = await supa(CFG.TABLE_LOGS+'?order=date');
+  if(logs?.length) saveLogs(logs);
+  if(currentTab==='materials') renderAll();
+}
+async function reloadManpowerFromCloud(){
+  const manpower = await supa(CFG.TABLE_MANPOWER+'?order=name');
+  if(manpower?.length) saveManpower(manpower);
+  if(currentTab==='manpower') renderManpower();
+}
+async function reloadActivitiesFromCloud(){
+  const activities = await supa(CFG.TABLE_ACTIVITIES+'?order=date.desc');
+  if(activities?.length) saveActivities(activities);
+  if(currentTab==='activities') renderActivities();
+}
+async function reloadAttendanceFromCloud(){
+  const attendance = await supa(CFG.TABLE_ATTENDANCE+'?order=date');
+  if(attendance?.length){
+    const att = {};
+    attendance.forEach(r=>{ att[r.worker_id]=att[r.worker_id]||{}; att[r.worker_id][r.date]=r.status; });
+    saveAttendanceData(att);
+  }
+  if(currentTab==='manpower') renderManpower();
+}
+
+async function fetchFromCloud(){
+  try{
+    const items = await supa(CFG.TABLE_ITEMS+'?order=year,month');
+    const logs  = await supa(CFG.TABLE_LOGS+'?order=date');
+    if(items?.length) saveItems(items);
+    if(logs?.length)  saveLogs(logs);
+  }catch(e){ /* items/logs cloud fetch failed, keep local */ }
+  // মালামাল ছাড়া অন্য টেবিলগুলো (manpower/activities) supabase_setup.sql আপডেট না করা পর্যন্ত
+  // নাও থাকতে পারে, তাই আলাদাভাবে try/catch করা হলো যেন একটির অভাবে বাকিগুলো আটকে না যায়
+  //
+  // গুরুত্বপূর্ণ: cloud থেকে খালি লিস্ট (০টি এন্ট্রি) এলে তা দিয়ে লোকাল ডেটা
+  // ওভাররাইট করা হয় না (`?.length` চেক — খালি অ্যারে হলে বাদ)। কারণ ক্লাউডে
+  // insert ব্যর্থ হলেও (যেমন টেবিলে কোনো কলাম মিসিং থাকলে) SELECT সবসময় সফল
+  // হয়ে খালি লিস্ট ফেরত দেয় — আগে `Array.isArray()` চেক থাকায় এটি ভুলবশত
+  // "নতুন যোগ করা তথ্য মুছে যাওয়া" বাগ তৈরি করছিল।
+  try{
+    const manpower = await supa(CFG.TABLE_MANPOWER+'?order=name');
+    if(manpower?.length) saveManpower(manpower);
+  }catch(e){ console.warn('manpower cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
+  try{
+    const activities = await supa(CFG.TABLE_ACTIVITIES+'?order=date.desc');
+    if(activities?.length) saveActivities(activities);
+  }catch(e){ console.warn('activities cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
+  try{
+    const attendance = await supa(CFG.TABLE_ATTENDANCE+'?order=date');
+    if(attendance?.length){
+      const att = {};
+      attendance.forEach(r=>{ att[r.worker_id]=att[r.worker_id]||{}; att[r.worker_id][r.date]=r.status; });
+      saveAttendanceData(att);
+    }
+  }catch(e){ console.warn('attendance cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
+  renderCurrentTab();
+}
+
+async function syncNow(){
+  if(!supaOk){ toast('⚠️ ক্লাউড সংযোগ নেই — ইন্টারনেট চেক করুন'); checkSupaConn(); return; }
+  showLoader('ক্লাউডে সিঙ্ক হচ্ছে...');
+  try{
+    const items = getItems();
+    const logs  = getLogs();
+    await supa(CFG.TABLE_ITEMS,'DELETE',null);
+    for(const i of items) await supa(CFG.TABLE_ITEMS,'POST',i).catch(()=>{});
+    await supa(CFG.TABLE_LOGS,'DELETE',null);
+    for(const l of logs)  await supa(CFG.TABLE_LOGS,'POST',l).catch(()=>{});
+    try{
+      const manpower = getManpower();
+      await supa(CFG.TABLE_MANPOWER,'DELETE',null);
+      for(const m of manpower) await supa(CFG.TABLE_MANPOWER,'POST',m).catch(()=>{});
+    }catch(e){ console.warn('manpower sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
+    try{
+      const activities = getActivities();
+      await supa(CFG.TABLE_ACTIVITIES,'DELETE',null);
+      for(const a of activities) await supa(CFG.TABLE_ACTIVITIES,'POST',a).catch(()=>{});
+    }catch(e){ console.warn('activities sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
+    try{
+      const att = getAttendance();
+      const flat = [];
+      for(const workerId in att){ for(const date in att[workerId]){ flat.push({id:`${workerId}_${date}`, worker_id:workerId, date, status:att[workerId][date]}); } }
+      await supa(CFG.TABLE_ATTENDANCE,'DELETE',null);
+      for(const r of flat) await supa(CFG.TABLE_ATTENDANCE,'POST',r).catch(()=>{});
+    }catch(e){ console.warn('attendance sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
+    hideLoader(); toast('✅ ক্লাউডে সিঙ্ক সম্পন্ন');
+  }catch(e){ hideLoader(); toast('❌ সিঙ্ক ব্যর্থ: '+(e.message||'')); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  PERMISSION CHECK
+// ═══════════════════════════════════════════════════════
+function canEdit(dept){
+  const r = currentUser?.role;
+  if(r==='super') return true;
+  if(r==='admin' && currentUser.reqDept===dept) return true;
+  return false;
+}
+
+// ═══════════════════════════════════════════════════════
+//  EXPORT / IMPORT
+// ═══════════════════════════════════════════════════════
+function exportJSON(){
+  const blob = new Blob([JSON.stringify({items:getItems(),logs:getLogs(),manpower:getManpower(),activities:getActivities(),at:new Date().toISOString()},null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`bgfcl_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); toast('✅ Export হচ্ছে...');
+}
+function importJSON(e){
+  const f=e.target.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(d.items)      saveItems(d.items);
+      if(d.logs)       saveLogs(d.logs);
+      if(d.manpower)   saveManpower(d.manpower);
+      if(d.activities) saveActivities(d.activities);
+      renderCurrentTab(); toast('✅ Import সফল');
+    }catch{ toast('❌ ফাইল পড়তে সমস্যা'); }
+  };
+  rd.readAsText(f); e.target.value='';
+}
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+function initApp(){
+  const sel=document.getElementById('yearSel');
+  for(let y=2023;y<=2030;y++){
+    const o=document.createElement('option');
+    o.value=y;o.textContent=y;if(y===Y)o.selected=true;
+    sel.appendChild(o);
+  }
+  document.getElementById('monthSel').value=M;
+  document.getElementById('yearSel').addEventListener('change',e=>{Y=+e.target.value;renderCurrentTab();});
+  document.getElementById('monthSel').addEventListener('change',e=>{M=+e.target.value;renderCurrentTab();});
+  document.getElementById('deptFilter').addEventListener('click',e=>{
+    const b=e.target.closest('.filter-btn');if(!b)return;
+    document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active'); filterDept=b.dataset.dept; renderCurrentTab();
+  });
+  document.querySelectorAll('.chart-tab').forEach(t=>{
+    t.addEventListener('click',()=>{
+      document.querySelectorAll('.chart-tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active'); filterChart=t.dataset.chart; renderChart();
+    });
+  });
+  document.getElementById('mainTabs').addEventListener('click',e=>{
+    const b=e.target.closest('.main-tab'); if(!b) return;
+    switchMainTab(b.dataset.tab);
+  });
+  document.getElementById('btnAddItem').addEventListener('click',()=>{
+    document.getElementById('fDept').value = currentUser?.reqDept||'field';
+    _cfValueCache.items = {};
+    renderCustomFieldInputs('items','fCustomFields',{});
+    openModal('modalItem');
+  });
+  document.getElementById('btnAddLog').addEventListener('click',()=>{
+    document.getElementById('lDate').value=`${Y}-${String(M).padStart(2,'0')}-01`;
+    document.getElementById('lDept').value = currentUser?.reqDept||'field';
+    openModal('modalLog');
+  });
+  document.getElementById('btnAddManpower').addEventListener('click', openAddManpower);
+  document.getElementById('btnAddActivity').addEventListener('click', openAddActivity);
+  // PWA install
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault(); deferredPrompt=e;
+    if(!localStorage.getItem('install_dismissed'))
+      setTimeout(()=>document.getElementById('installBar').classList.add('visible'),2500);
+  });
+  document.getElementById('btnInstall').addEventListener('click',async()=>{
+    if(!deferredPrompt){toast('ব্রাউজার মেনু থেকে "Add to Home Screen" ব্যবহার করুন');return;}
+    deferredPrompt.prompt();
+    const{outcome}=await deferredPrompt.userChoice;
+    if(outcome==='accepted') toast('✅ ইনস্টল হচ্ছে...');
+    deferredPrompt=null;
+    document.getElementById('installBar').classList.remove('visible');
+  });
+  window.addEventListener('appinstalled',()=>toast('✅ অ্যাপ ইনস্টল সম্পন্ন!'));
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════════
+function getFI(){ return getItems().filter(i=>i.month==M&&i.year==Y&&(filterDept==='all'||i.dept===filterDept)); }
+function getFL(){ return getLogs().filter(l=>l.month==M&&l.year==Y&&(filterDept==='all'||l.dept===filterDept)); }
+
+// ═══════════════════════════════════════════════════════
+//  MAIN TAB SWITCHING (মালামাল / জনবল / কার্যক্রম)
+// ═══════════════════════════════════════════════════════
+function switchMainTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.main-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  document.getElementById('page-materials').style.display   = tab==='materials'  ? '' : 'none';
+  document.getElementById('page-manpower').style.display    = tab==='manpower'   ? '' : 'none';
+  document.getElementById('page-activities').style.display  = tab==='activities' ? '' : 'none';
+  // বছর/মাস ফিল্টার শুধু মালামাল ও কার্যক্রম ট্যাবের জন্য প্রাসঙ্গিক
+  document.getElementById('controlsRow').style.display = tab==='manpower' ? 'none' : '';
+  const tabLabel = tab==='materials'?'মালামাল':tab==='manpower'?'জনবল':'কার্যক্রম';
+  document.getElementById('printBannerTab').textContent = tabLabel;
+  document.getElementById('printBannerDate').textContent = 'তারিখ: ' + new Date().toLocaleDateString('bn-BD');
+  renderCurrentTab();
+}
+
+function printCurrentTab(){
+  // মোবাইল ব্রাউজারে <canvas> প্রায়ই প্রিন্টে ফাঁকা দেখায়, তাই প্রিন্টের ঠিক
+  // আগে চার্টটিকে ছবিতে রূপান্তর করে #chartPrintImg-এ বসানো হচ্ছে (শুধু মালামাল ট্যাবে প্রযোজ্য)
+  if(currentTab==='materials'){
+    try{
+      const canvas = document.getElementById('mainChart');
+      const img = document.getElementById('chartPrintImg');
+      if(canvas && canvas.width>0 && canvas.height>0){
+        img.src = canvas.toDataURL('image/png');
+      }
+    }catch(e){ console.warn('চার্ট প্রিন্ট-ইমেজ তৈরি করা যায়নি:', e.message); }
+  }
+  window.print();
+}
+
+function renderCurrentTab(){
+  if(currentTab==='materials')       renderAll();
+  else if(currentTab==='manpower')   renderManpower();
+  else if(currentTab==='activities') renderActivities();
+}
+
+function renderAll(){
+  const items=getFI(), logs=getFL();
+  document.getElementById('sumTotal').textContent    = items.length;
+  document.getElementById('sumIncoming').textContent = items.filter(i=>i.incoming>0).length;
+  document.getElementById('sumLow').textContent      = items.filter(i=>i.qty<i.optimum*.5).length;
+  document.getElementById('logLabel').textContent    = `${MN[M]} ${Y}`;
+  renderCards(items);
+  renderChart();
+  renderLog(logs);
+}
+
+function getSt(item){
+  const p=item.optimum>0?item.qty/item.optimum:1;
+  if(p>=.8) return{l:'পর্যাপ্ত',c:'ist-ok'};
+  if(p>=.5) return{l:'মধ্যম',c:'ist-mid'};
+  return{l:'সংকট',c:'ist-low'};
+}
+
+function renderCards(items){
+  const grid=document.getElementById('deptGrid');
+  const depts=filterDept==='all'?Object.keys(DEPT):[filterDept];
+  grid.innerHTML='';
+  depts.forEach(dk=>{
+    const cfg=DEPT[dk], di=items.filter(i=>i.dept===dk);
+    const tq=di.reduce((s,i)=>s+i.qty,0), to=di.reduce((s,i)=>s+i.optimum,0);
+    const pct=to>0?Math.min(100,Math.round(tq/to*100)):0;
+    const low=di.filter(i=>i.qty<i.optimum*.5).length;
+    const pc=pct>=80?'#10B981':pct>=50?'#F97316':'#EF4444';
+    const canE=canEdit(dk);
+    const card=document.createElement('div');
+    card.className='dept-card';
+    const more=di.length-5;
+    card.innerHTML=`
+      <div class="dept-hdr" style="background:${cfg.bg};">
+        <div class="dept-icon" style="background:${cfg.color}20;">${cfg.icon}</div>
+        <div><div class="dept-name" style="color:${cfg.color};">${cfg.name}</div><div class="dept-sub">${di.length} ধরনের মালামাল</div></div>
+        <span class="dept-badge" style="${low>0?'background:#FEE2E2;color:#DC2626':'background:#D1FAE5;color:#059669'}">${low>0?'⚠️ '+low+' সংকট':'✅ স্বাভাবিক'}</span>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-label"><span>স্টক মাত্রা</span><span style="font-weight:600;color:${pc};">${pct}%</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:0%;background:linear-gradient(90deg,${pc},${pc}88);" data-t="${pct}"></div></div>
+      </div>
+      <div class="dept-items">
+        ${di.length===0
+          ? `<div class="empty-st"><div class="ei">📭</div><p>এই মাসে কোনো মালামাল নেই</p></div>`
+          : `<ul class="items-list">${di.map((item,idx)=>{
+              const st=getSt(item);
+              const itag=item.incoming>0?`<span class="in-tag">🚚+${item.incoming}</span>`:'';
+              const acts=canE?`<button class="btn-ei" onclick="openEditItem('${item.id}')" title="সম্পাদনা">✏️</button><button class="btn-di" onclick="deleteItem('${item.id}')" title="মুছুন">🗑️</button>`:'';
+              return `<li class="item-row${idx>=5?' item-extra':''}">
+                <div class="item-dot" style="background:${cfg.color};"></div>
+                <span class="item-name">${escHtml(item.name)}</span>${itag}
+                <span class="item-qty">${item.qty}<small style="color:#94A3B8;font-weight:400;"> ${item.unit||''}</small></span>
+                <span class="ist ${st.c}">${st.l}</span>${acts}
+              </li>`;
+            }).join('')}</ul>
+            ${more>0?`<button class="btn-expand" onclick="const p=this.previousElementSibling.parentElement;const exp=p.classList.toggle('expanded');this.textContent=exp?'কম দেখুন ▴':'আরও ${more}টি দেখুন ▾';">আরও ${more}টি দেখুন ▾</button>`:''}`
+        }
+      </div>`;
+    grid.appendChild(card);
+  });
+  setTimeout(()=>{
+    document.querySelectorAll('.prog-fill[data-t]').forEach(b=>{b.style.width=b.dataset.t+'%';});
+  },100);
+}
+
+// ═══════════════════════════════════════════════════════
+//  CHART
+// ═══════════════════════════════════════════════════════
+function renderChart(){
+  const cv=document.getElementById('mainChart');
+  if(typeof Chart === 'undefined'){
+    console.error('Chart.js failed to load from CDN');
+    if(cv && cv.parentElement){
+      cv.parentElement.innerHTML = '<p style="text-align:center;padding:30px;color:#94A3B8;font-size:13px;">📊 চার্ট লোড করা যায়নি — ইন্টারনেট সংযোগ চেক করুন</p>';
+    }
+    return;
+  }
+  if(chartInst){chartInst.destroy();chartInst=null;}
+  const items=getItems();
+  const fnt={family:'Hind Siliguri',size:11};
+
+  if(filterChart==='bar'){
+    const depts=Object.keys(DEPT);
+    chartInst=new Chart(cv,{type:'bar',
+      data:{labels:depts.map(d=>DEPT[d].name.replace('মেইনটেন্যান্স','মেইন.')),
+        datasets:[
+          {label:'বর্তমান',data:depts.map(dk=>items.filter(i=>i.dept===dk&&i.month==M&&i.year==Y).reduce((s,i)=>s+i.qty,0)),backgroundColor:depts.map(dk=>DEPT[dk].color+'CC'),borderRadius:5,borderSkipped:false},
+          {label:'অপটিমাম',data:depts.map(dk=>items.filter(i=>i.dept===dk&&i.month==M&&i.year==Y).reduce((s,i)=>s+i.optimum,0)),backgroundColor:'#E2E8F0',borderRadius:5,borderSkipped:false},
+          {label:'আসন্ন',data:depts.map(dk=>items.filter(i=>i.dept===dk&&i.month==M&&i.year==Y).reduce((s,i)=>s+(i.incoming||0),0)),backgroundColor:'#3B82F688',borderRadius:5,borderSkipped:false},
+        ]},
+      options:{responsive:true,plugins:{legend:{position:'top',labels:{font:fnt}}},scales:{y:{beginAtZero:true,ticks:{font:fnt}},x:{ticks:{font:fnt}}}}
+    });
+  }else if(filterChart==='line'){
+    const ms=Array.from({length:12},(_,i)=>i+1);
+    const depts=filterDept==='all'?['field','plant','production']:[filterDept];
+    chartInst=new Chart(cv,{type:'line',
+      data:{labels:MN.slice(1),datasets:depts.map(dk=>({label:DEPT[dk].name,data:ms.map(m=>items.filter(i=>i.dept===dk&&i.month===m&&i.year===Y).reduce((s,i)=>s+i.qty,0)),borderColor:DEPT[dk].color,backgroundColor:DEPT[dk].color+'22',tension:.4,fill:true,pointRadius:3}))},
+      options:{responsive:true,plugins:{legend:{position:'top',labels:{font:fnt}}},scales:{y:{beginAtZero:true,ticks:{font:fnt}},x:{ticks:{font:fnt}}}}
+    });
+  }else if(filterChart==='pie'){
+    const depts=Object.keys(DEPT);
+    chartInst=new Chart(cv,{type:'doughnut',
+      data:{labels:depts.map(dk=>DEPT[dk].name),datasets:[{data:depts.map(dk=>items.filter(i=>i.dept===dk&&i.month==M&&i.year==Y).reduce((s,i)=>s+i.qty,0)),backgroundColor:depts.map(dk=>DEPT[dk].color),borderWidth:2,hoverOffset:8}]},
+      options:{responsive:true,cutout:'60%',plugins:{legend:{position:'right',labels:{font:fnt,padding:10}}}}
+    });
+  }else{
+    const f=getFI();
+    chartInst=new Chart(cv,{type:'bar',
+      data:{labels:['পর্যাপ্ত','মধ্যম','সংকট'],datasets:[{label:'আইটেম',data:[f.filter(i=>i.qty>=i.optimum*.8).length,f.filter(i=>i.qty>=i.optimum*.5&&i.qty<i.optimum*.8).length,f.filter(i=>i.qty<i.optimum*.5).length],backgroundColor:['#10B981CC','#F97316CC','#EF4444CC'],borderRadius:8,borderSkipped:false}]},
+      options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{font:fnt}},x:{ticks:{font:fnt}}}}
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  LOG TABLE
+// ═══════════════════════════════════════════════════════
+function renderLog(logs){
+  const tb=document.getElementById('logBody');
+  tb.innerHTML='';
+  if(!logs.length){
+    tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:28px;color:#94A3B8;">এই মাসে কোনো আনলোড লগ নেই</td></tr>`;
+    return;
+  }
+  logs.forEach(l=>{
+    const cfg=DEPT[l.dept]||{color:'#64748B',name:l.dept};
+    const canE=canEdit(l.dept);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${l.date}</td><td><strong>${escHtml(l.item)}</strong></td>
+      <td><span class="tag-dept" style="background:${cfg.color}22;color:${cfg.color};">${cfg.name}</span></td>
+      <td><strong>${l.qty}</strong> ${escHtml(l.unit)}</td>
+      <td>📍 ${escHtml(l.location)}</td><td>${escHtml(l.supplier)||'—'}</td>
+      <td>${canE?`<button class="btn-di" onclick="deleteLog('${l.id}')">🗑️</button>`:''}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  জনবল (MANPOWER)
+// ═══════════════════════════════════════════════════════
+function getFM(){ return getManpower().filter(m=>filterDept==='all'||m.dept===filterDept); }
+
+function renderManpower(){
+  const all = getFM();
+  const daily = all.filter(m=>m.type==='daily');
+  const staff = all.filter(m=>m.type==='staff');
+  document.getElementById('sumDaily').textContent    = daily.length;
+  document.getElementById('sumStaff').textContent    = staff.length;
+  document.getElementById('sumManTotal').textContent = all.length;
+  renderDailyTable(daily);
+  renderStaffTable(staff);
+}
+
+function cfThHtml(defs){ return defs.map(d=>`<th>${escHtml(d.label)}</th>`).join(''); }
+function cfTdHtml(defs, values={}){
+  return defs.map(d=>{
+    const v = values && values[d.id];
+    if(!v) return '<td>—</td>';
+    if(d.type==='image') return `<td><img src="${escHtml(v)}" class="cf-preview-img"/></td>`;
+    return `<td>${escHtml(v)}</td>`;
+  }).join('');
+}
+
+function renderDailyTable(list){
+  const tb=document.getElementById('dailyBody');
+  const defs = getCustomDefs().manpower || [];
+  document.getElementById('dailyTheadRow').innerHTML =
+    `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th>${cfThHtml(defs)}<th id="dailyActCol"></th>`;
+  updateActionBar();
+  tb.innerHTML='';
+  if(!list.length){
+    tb.innerHTML=`<tr><td colspan="${6+defs.length}" style="text-align:center;padding:28px;color:#94A3B8;">কোনো দৈনিক শ্রমিকের তথ্য নেই</td></tr>`;
+    return;
+  }
+  list.forEach(m=>{
+    const cfg=DEPT[m.dept]||{color:'#64748B',name:m.dept};
+    const canE=canEdit(m.dept);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><strong>${escHtml(m.name)}</strong></td>
+      <td>${escHtml(m.designation)||'—'}</td>
+      <td>${escHtml(m.phone)||'—'}</td>
+      <td>${escHtml(m.address)||'—'}</td>
+      <td><span class="tag-dept" style="background:${cfg.color}22;color:${cfg.color};">${cfg.name}</span></td>
+      ${cfTdHtml(defs, m.customFields)}
+      <td>${canE?`<button class="btn-ei" onclick="openAttendanceModal('${m.id}')" title="উপস্থিতি">📅</button><button class="btn-ei" onclick="openEditManpower('${m.id}')" title="সম্পাদনা">✏️</button><button class="btn-di" onclick="deleteManpower('${m.id}')" title="মুছুন">🗑️</button>`:''}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function renderStaffTable(list){
+  const tb=document.getElementById('staffBody');
+  const defs = getCustomDefs().manpower || [];
+  document.getElementById('staffTheadRow').innerHTML =
+    `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th>
+     <th>শেষ CL</th><th>CL বাকি</th><th>অন্য ছুটি (তারিখ)</th><th>অন্য ছুটি বাকি</th><th>AL নেয়া হয়েছে</th><th>AL নেয়ার তারিখ</th>
+     ${cfThHtml(defs)}<th id="staffActCol"></th>`;
+  updateActionBar();
+  tb.innerHTML='';
+  if(!list.length){
+    tb.innerHTML=`<tr><td colspan="${11+defs.length}" style="text-align:center;padding:28px;color:#94A3B8;">কোনো স্টাফের তথ্য নেই</td></tr>`;
+    return;
+  }
+  list.forEach(m=>{
+    const cfg=DEPT[m.dept]||{color:'#64748B',name:m.dept};
+    const canE=canEdit(m.dept);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><strong>${escHtml(m.name)}</strong></td>
+      <td>${escHtml(m.designation)||'—'}</td>
+      <td>${escHtml(m.phone)||'—'}</td>
+      <td>${escHtml(m.address)||'—'}</td>
+      <td><span class="tag-dept" style="background:${cfg.color}22;color:${cfg.color};">${cfg.name}</span></td>
+      <td>${m.clLastDate||'—'}</td>
+      <td>${m.clRemaining ?? '—'}</td>
+      <td>${m.otherLeaveLastDate||'—'}</td>
+      <td>${m.otherLeaveRemaining ?? '—'}</td>
+      <td>${m.alTaken==='yes'?'✅ হ্যাঁ':'❌ না'}</td>
+      <td>${m.alTaken==='yes' ? (m.alDate||'—') : '—'}</td>
+      ${cfTdHtml(defs, m.customFields)}
+      <td>${canE?`<button class="btn-ei" onclick="openEditManpower('${m.id}')" title="সম্পাদনা">✏️</button><button class="btn-di" onclick="deleteManpower('${m.id}')" title="মুছুন">🗑️</button>`:''}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  কার্যক্রম (ACTIVITIES)
+// ═══════════════════════════════════════════════════════
+function getFA(){
+  return getActivities().filter(a=>{
+    const d=new Date(a.date);
+    return (d.getMonth()+1)===M && d.getFullYear()===Y && (filterDept==='all'||a.dept===filterDept);
+  }).sort((a,b)=> b.date.localeCompare(a.date));
+}
+
+function renderActivities(){
+  const list=getFA();
+  const defs = getCustomDefs().activities || [];
+  document.getElementById('actLabel').textContent = `${MN[M]} ${Y}`;
+  document.getElementById('activityTheadRow').innerHTML =
+    `<th>তারিখ</th><th>বিভাগ</th><th>বিবরণ</th>${cfThHtml(defs)}<th id="activityActCol"></th>`;
+  updateActionBar();
+  const tb=document.getElementById('activityBody');
+  tb.innerHTML='';
+  if(!list.length){
+    tb.innerHTML=`<tr><td colspan="${4+defs.length}" style="text-align:center;padding:28px;color:#94A3B8;">এই মাসে কোনো কার্যক্রম যোগ করা হয়নি</td></tr>`;
+    return;
+  }
+  list.forEach(a=>{
+    const cfg=DEPT[a.dept]||{color:'#64748B',name:a.dept};
+    const canE=canEdit(a.dept);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${a.date}</td>
+      <td><span class="tag-dept" style="background:${cfg.color}22;color:${cfg.color};">${cfg.name}</span></td>
+      <td style="white-space:pre-wrap;">${escHtml(a.description)}</td>
+      ${cfTdHtml(defs, a.customFields)}
+      <td>${canE?`<button class="btn-ei" onclick="openEditActivity('${a.id}')" title="সম্পাদনা">✏️</button><button class="btn-di" onclick="deleteActivity('${a.id}')" title="মুছুন">🗑️</button>`:''}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  CRUD
+// ═══════════════════════════════════════════════════════
+async function saveItem(){
+  const dept=document.getElementById('fDept').value;
+  if(!canEdit(dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  const name=document.getElementById('fName').value.trim();
+  if(!name){ toast('⚠️ মালামালের নাম দিন'); return; }
+  const customFields = await collectCustomFieldValues('fCustomFields', {});
+  const ni={id:crypto.randomUUID(),dept,name,
+    qty:+document.getElementById('fQty').value||0,
+    optimum:+document.getElementById('fOptimum').value||0,
+    unit:document.getElementById('fUnit').value.trim(),
+    incoming:+document.getElementById('fIncoming').value||0,
+    note:document.getElementById('fNote').value.trim(),
+    month:M,year:Y, customFields};
+  const items=getItems(); items.push(ni); saveItems(items);
+  closeModal('modalItem');
+  ['fName','fQty','fOptimum','fUnit','fIncoming','fNote'].forEach(id=>document.getElementById(id).value='');
+  _cfValueCache.items = {};
+  renderCustomFieldInputs('items','fCustomFields',{});
+  renderAll(); toast('✅ মালামাল যোগ হয়েছে');
+  if(supaOk) supa(CFG.TABLE_ITEMS,'POST',ni).catch(notifyCloudSyncFail);
+}
+
+function openEditItem(id){
+  const item=getItems().find(i=>i.id===id); if(!item) return;
+  if(!canEdit(item.dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  document.getElementById('editItemId').value=id;
+  document.getElementById('efName').value=item.name;
+  document.getElementById('efQty').value=item.qty;
+  document.getElementById('efOptimum').value=item.optimum;
+  document.getElementById('efUnit').value=item.unit||'';
+  document.getElementById('efIncoming').value=item.incoming||0;
+  document.getElementById('efNote').value=item.note||'';
+  _cfValueCache.items = item.customFields||{};
+  renderCustomFieldInputs('items','efCustomFields', item.customFields||{});
+  openModal('modalEditItem');
+}
+
+async function updateItem(){
+  const id=document.getElementById('editItemId').value;
+  const items=getItems();
+  const idx=items.findIndex(i=>i.id===id); if(idx<0) return;
+  if(!canEdit(items[idx].dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  const customFields = await collectCustomFieldValues('efCustomFields', items[idx].customFields||{});
+  items[idx]={...items[idx],
+    name:document.getElementById('efName').value.trim(),
+    qty:+document.getElementById('efQty').value||0,
+    optimum:+document.getElementById('efOptimum').value||0,
+    unit:document.getElementById('efUnit').value.trim(),
+    incoming:+document.getElementById('efIncoming').value||0,
+    note:document.getElementById('efNote').value.trim(),
+    customFields,
+  };
+  saveItems(items);
+  closeModal('modalEditItem');
+  renderAll(); toast('✅ আপডেট হয়েছে');
+  if(supaOk) supa(CFG.TABLE_ITEMS+'?id=eq.'+id,'PATCH',items[idx]).catch(notifyCloudSyncFail);
+}
+
+function deleteItem(id){
+  const item=getItems().find(i=>i.id===id); if(!item) return;
+  if(!canEdit(item.dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  if(!confirm('এই মালামাল মুছে দেবেন?')) return;
+  saveItems(getItems().filter(i=>i.id!==id));
+  renderAll(); toast('🗑️ মুছে গেছে');
+  if(supaOk) supa(CFG.TABLE_ITEMS+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
+}
+
+function saveLog(){
+  const dept=document.getElementById('lDept').value;
+  if(!canEdit(dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  const date=document.getElementById('lDate').value;
+  const item=document.getElementById('lItem').value.trim();
+  const loc =document.getElementById('lLocation').value.trim();
+  if(!date||!item||!loc){ toast('⚠️ তারিখ, মালামাল ও স্থান দিন'); return; }
+  const d=new Date(date);
+  const nl={id:crypto.randomUUID(),date,dept,item,
+    qty:+document.getElementById('lQty').value||0,
+    unit:document.getElementById('lUnit').value.trim(),
+    location:loc,supplier:document.getElementById('lSupplier').value.trim(),
+    month:d.getMonth()+1,year:d.getFullYear()};
+  const logs=getLogs(); logs.push(nl); saveLogs(logs);
+  closeModal('modalLog');
+  ['lItem','lQty','lUnit','lLocation','lSupplier'].forEach(id=>document.getElementById(id).value='');
+  renderAll(); toast('✅ লগ যোগ হয়েছে');
+  if(supaOk) supa(CFG.TABLE_LOGS,'POST',nl).catch(notifyCloudSyncFail);
+}
+
+function deleteLog(id){
+  const log=getLogs().find(l=>l.id===id); if(!log) return;
+  if(!canEdit(log.dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  if(!confirm('এই লগ মুছে দেবেন?')) return;
+  saveLogs(getLogs().filter(l=>l.id!==id));
+  renderAll(); toast('🗑️ লগ মুছে গেছে');
+  if(supaOk) supa(CFG.TABLE_LOGS+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
+}
+
+// ═══════════════════════════════════════════════════════
+//  জনবল CRUD (MANPOWER)
+// ═══════════════════════════════════════════════════════
+function toggleManpowerFields(){
+  const type=document.getElementById('mpType').value;
+  document.getElementById('mpStaffFields').style.display = type==='staff' ? '' : 'none';
+}
+
+function toggleAlDateField(){
+  const taken = document.getElementById('mpAlTaken').value;
+  document.getElementById('mpAlDateWrap').style.display = taken==='yes' ? '' : 'none';
+}
+
+function resetManpowerForm(){
+  document.getElementById('mpId').value='';
+  document.getElementById('mpType').value='daily';
+  ['mpName','mpDesig','mpPhone','mpAddress','mpClDate','mpOtherDate','mpAlDate'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mpClRemain').value='';
+  document.getElementById('mpOtherRemain').value='';
+  document.getElementById('mpAlTaken').value='no';
+  toggleManpowerFields();
+  toggleAlDateField();
+}
+
+function openAddManpower(){
+  resetManpowerForm();
+  document.getElementById('mpDept').value = currentUser?.reqDept||'field';
+  document.getElementById('modalManpowerTitle').textContent='👷 নতুন জনবল যোগ';
+  _cfValueCache.manpower = {};
+  renderCustomFieldInputs('manpower','mpCustomFields',{});
+  openModal('modalManpower');
+}
+
+function openEditManpower(id){
+  const m=getManpower().find(x=>x.id===id); if(!m) return;
+  if(!canEdit(m.dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  document.getElementById('mpId').value=m.id;
+  document.getElementById('mpDept').value=m.dept;
+  document.getElementById('mpType').value=m.type;
+  document.getElementById('mpName').value=m.name;
+  document.getElementById('mpDesig').value=m.designation||'';
+  document.getElementById('mpPhone').value=m.phone||'';
+  document.getElementById('mpAddress').value=m.address||'';
+  document.getElementById('mpClDate').value=m.clLastDate||'';
+  document.getElementById('mpClRemain').value=m.clRemaining ?? '';
+  document.getElementById('mpOtherDate').value=m.otherLeaveLastDate||'';
+  document.getElementById('mpOtherRemain').value=m.otherLeaveRemaining ?? '';
+  document.getElementById('mpAlTaken').value=m.alTaken||'no';
+  document.getElementById('mpAlDate').value=m.alDate||'';
+  document.getElementById('modalManpowerTitle').textContent='✏️ জনবল সম্পাদনা';
+  toggleManpowerFields();
+  toggleAlDateField();
+  _cfValueCache.manpower = m.customFields||{};
+  renderCustomFieldInputs('manpower','mpCustomFields', m.customFields||{});
+  openModal('modalManpower');
+}
+
+async function saveManpowerForm(){
+  const id=document.getElementById('mpId').value;
+  const dept=document.getElementById('mpDept').value;
+  if(!canEdit(dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  const name=document.getElementById('mpName').value.trim();
+  if(!name){ toast('⚠️ নাম দিন'); return; }
+  const type=document.getElementById('mpType').value;
+  const list=getManpower();
+  const idx=list.findIndex(m=>m.id===id);
+  const existingCF = idx>=0 ? (list[idx].customFields||{}) : {};
+  const customFields = await collectCustomFieldValues('mpCustomFields', existingCF);
+  const rec={
+    id: id || crypto.randomUUID(),
+    dept, type, name,
+    designation: document.getElementById('mpDesig').value.trim(),
+    phone: document.getElementById('mpPhone').value.trim(),
+    address: document.getElementById('mpAddress').value.trim(),
+    clLastDate:'', clRemaining:0, otherLeaveLastDate:'', otherLeaveRemaining:0, alTaken:'no', alDate:'',
+    customFields,
+  };
+  if(type==='staff'){
+    rec.clLastDate = document.getElementById('mpClDate').value;
+    rec.clRemaining = +document.getElementById('mpClRemain').value || 0;
+    rec.otherLeaveLastDate = document.getElementById('mpOtherDate').value;
+    rec.otherLeaveRemaining = +document.getElementById('mpOtherRemain').value || 0;
+    rec.alTaken = document.getElementById('mpAlTaken').value;
+    rec.alDate = rec.alTaken==='yes' ? document.getElementById('mpAlDate').value : '';
+  }
+  if(idx>=0){
+    if(!canEdit(list[idx].dept)){ toast('⚠️ অনুমতি নেই'); return; }
+    list[idx]=rec;
+  } else {
+    list.push(rec);
+  }
+  saveManpower(list);
+  closeModal('modalManpower');
+  resetManpowerForm();
+  renderManpower();
+  toast(idx>=0 ? '✅ আপডেট হয়েছে (লোকালি)' : '✅ জনবল যোগ হয়েছে (লোকালি)');
+  if(supaOk){
+    try{
+      if(idx>=0) await supa(CFG.TABLE_MANPOWER+'?id=eq.'+rec.id,'PATCH',rec);
+      else        await supa(CFG.TABLE_MANPOWER,'POST',rec);
+      toast('☁️ ক্লাউডে সিঙ্ক সম্পন্ন');
+    }catch(e){ notifyCloudSyncFail(e); }
+  } else {
+    toast('⚠️ ক্লাউড সংযোগ নেই — শুধু এই ডিভাইসেই সংরক্ষিত আছে');
+  }
+}
+
+function deleteManpower(id){
+  const m=getManpower().find(x=>x.id===id); if(!m) return;
+  if(!canEdit(m.dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  if(!confirm('এই জনবলের তথ্য মুছে দেবেন?')) return;
+  saveManpower(getManpower().filter(x=>x.id!==id));
+  renderManpower(); toast('🗑️ মুছে গেছে');
+  if(supaOk) supa(CFG.TABLE_MANPOWER+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
+}
+
+// ═══════════════════════════════════════════════════════
+//  দৈনিক শ্রমিক উপস্থিতি (ATTENDANCE) মার্কিং
+// ═══════════════════════════════════════════════════════
+function openAttendanceModal(workerId){
+  const m=getManpower().find(x=>x.id===workerId); if(!m) return;
+  if(!canEdit(m.dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  document.getElementById('attWorkerId').value = workerId;
+  document.getElementById('attWorkerName').textContent = m.name;
+  document.getElementById('attDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('attPresent').value = 'yes';
+  renderAttendanceRecent(workerId);
+  openModal('modalAttendance');
+}
+
+function saveAttendanceEntry(){
+  const workerId = document.getElementById('attWorkerId').value;
+  const date = document.getElementById('attDate').value;
+  if(!date){ toast('⚠️ তারিখ দিন'); return; }
+  const status = document.getElementById('attPresent').value==='yes' ? 'P' : 'A';
+  setAttendance(workerId, date, status);
+  renderAttendanceRecent(workerId);
+  toast('✅ উপস্থিতি সংরক্ষিত হয়েছে');
+}
+
+function renderAttendanceRecent(workerId){
+  const att = getAttendance()[workerId] || {};
+  const dates = Object.keys(att).sort().reverse().slice(0,15);
+  const box = document.getElementById('attRecentList');
+  if(!dates.length){
+    box.innerHTML = `<p style="font-size:12px;color:#94A3B8;text-align:center;padding:8px;">কোনো এন্ট্রি নেই</p>`;
+    return;
+  }
+  box.innerHTML = dates.map(d=>`
+    <div class="cf-row">
+      <div style="font-size:13px;">${d} — <strong style="color:${att[d]==='P'?'#10B981':'#EF4444'};">${att[d]}</strong></div>
+      <button class="btn-di" onclick="deleteAttendanceEntry('${workerId}','${d}')" title="মুছুন">🗑️</button>
+    </div>`).join('');
+}
+
+function deleteAttendanceEntry(workerId, date){
+  removeAttendance(workerId, date);
+  renderAttendanceRecent(workerId);
+  toast('🗑️ মুছে গেছে');
+}
+
+// ═══════════════════════════════════════════════════════
+//  উপস্থিতি রিপোর্ট বিল্ডার (১৫-দিনের কর্মদিবস + প্রিন্ট)
+// ═══════════════════════════════════════════════════════
+function currentRangeKey(){
+  const s=document.getElementById('repStart').value;
+  const e=document.getElementById('repEnd').value;
+  return `${s}_${e}`;
+}
+
+function openAttendanceReport(){
+  const hdr = getReportHeader();
+  document.getElementById('repMainCompany').value = hdr.mainCompany;
+  document.getElementById('repSubCompany').value  = hdr.subCompany;
+  document.getElementById('repSubAddress').value   = hdr.subAddress;
+  document.getElementById('repTitle').value        = hdr.title;
+  document.getElementById('repDept').value = (currentUser?.role==='super') ? 'all' : (currentUser?.reqDept||'all');
+
+  const today = new Date();
+  const y=today.getFullYear(), mo=today.getMonth();
+  const dim = new Date(y, mo+1, 0).getDate(); // মাসের শেষ তারিখ
+  const startDefault = `${y}-${String(mo+1).padStart(2,'0')}-01`;
+  const endDefault    = `${y}-${String(mo+1).padStart(2,'0')}-${String(Math.min(15,dim)).padStart(2,'0')}`;
+  document.getElementById('repStart').value = startDefault;
+  document.getElementById('repEnd').value   = endDefault;
+
+  document.getElementById('repDesc').value = getReportDesc(document.getElementById('repDept').value, `${startDefault}_${endDefault}`);
+  renderReportColChips();
+  renderReportTable();
+  openModal('modalAttendanceReport');
+}
+
+function onReportContextChange(){
+  const dept = document.getElementById('repDept').value;
+  document.getElementById('repDesc').value = getReportDesc(dept, currentRangeKey());
+  renderReportTable();
+}
+
+function saveReportHeaderFromForm(){
+  saveReportHeader({
+    mainCompany: document.getElementById('repMainCompany').value,
+    subCompany:  document.getElementById('repSubCompany').value,
+    subAddress:  document.getElementById('repSubAddress').value,
+    title:       document.getElementById('repTitle').value,
+  });
+}
+
+function renderReportColChips(){
+  const cols = getReportExtraCols();
+  const box = document.getElementById('repColChips');
+  box.innerHTML = cols.length ? cols.map(c=>`
+    <span style="background:#F1F5F9;border-radius:20px;padding:5px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px;">
+      ${escHtml(c.label)} <span style="cursor:pointer;color:#EF4444;font-weight:700;" onclick="removeReportColumn('${c.id}')">✕</span>
+    </span>`).join('') : `<span style="font-size:12px;color:#94A3B8;">কোনো অতিরিক্ত কলাম নেই</span>`;
+}
+
+function addReportColumn(){
+  const label = document.getElementById('repNewColLabel').value.trim();
+  if(!label){ toast('⚠️ কলামের নাম দিন'); return; }
+  const cols = getReportExtraCols();
+  cols.push({id:crypto.randomUUID(), label});
+  saveReportExtraCols(cols);
+  document.getElementById('repNewColLabel').value='';
+  renderReportColChips();
+  renderReportTable();
+  toast('✅ কলাম যোগ হয়েছে');
+}
+
+function removeReportColumn(id){
+  if(!confirm('এই কলামটি সরিয়ে দেবেন?')) return;
+  saveReportExtraCols(getReportExtraCols().filter(c=>c.id!==id));
+  renderReportColChips();
+  renderReportTable();
+}
+
+function renderReportTable(){
+  const dept  = document.getElementById('repDept').value;
+  const start = document.getElementById('repStart').value;
+  const end   = document.getElementById('repEnd').value;
+  if(!start || !end) return;
+  const rangeKey = `${start}_${end}`;
+  const extraCols = getReportExtraCols();
+  const workers = getManpower().filter(w=>w.type==='daily' && (dept==='all'||w.dept===dept));
+
+  document.getElementById('repTheadRow').innerHTML =
+    `<th>দৈনিক শ্রমিকের নাম</th><th>সাধারণ কর্মদিবস</th><th>অতিরিক্ত কর্মদিবস</th>${extraCols.map(c=>`<th>${c.label}</th>`).join('')}<th>মোট কর্মদিবস</th>`;
+
+  const tbody = document.getElementById('repTbody');
+  if(!workers.length){
+    tbody.innerHTML = `<tr><td colspan="${4+extraCols.length}" style="text-align:center;padding:20px;color:#94A3B8;">এই বিভাগে কোনো দৈনিক শ্রমিক নেই</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = workers.map(w=>{
+    const regular = countPresentDays(w.id, start, end);
+    const extra = getExtraDays(w.id, rangeKey);
+    const total = regular + (+extra||0);
+    const extraTds = extraCols.map(c=>{
+      const v = getReportExtraColVal(w.id, rangeKey, c.id);
+      return `<td><input type="text" data-worker="${w.id}" data-col="${c.id}" value="${v}" onchange="onReportColInput(this)" style="width:100%;border:1px solid #E2E8F0;border-radius:6px;padding:4px 6px;font-family:var(--f);font-size:12px;"/></td>`;
+    }).join('');
+    return `<tr>
+      <td><strong>${escHtml(w.name)}</strong></td>
+      <td style="text-align:center;">${regular}</td>
+      <td><input type="number" min="0" data-worker="${w.id}" value="${extra}" onchange="onExtraDaysInput(this)" style="width:64px;border:1px solid #E2E8F0;border-radius:6px;padding:4px 6px;font-family:var(--f);font-size:12px;"/></td>
+      ${extraTds}
+      <td style="text-align:center;font-weight:700;" id="repTotal_${w.id}">${total}</td>
+    </tr>`;
+  }).join('');
+}
+
+function onExtraDaysInput(el){
+  const workerId = el.dataset.worker;
+  const rangeKey = currentRangeKey();
+  const val = +el.value || 0;
+  setExtraDays(workerId, rangeKey, val);
+  const start=document.getElementById('repStart').value, end=document.getElementById('repEnd').value;
+  const regular = countPresentDays(workerId, start, end);
+  const totalEl = document.getElementById('repTotal_'+workerId);
+  if(totalEl) totalEl.textContent = regular + val;
+}
+
+function onReportColInput(el){
+  setReportExtraColVal(el.dataset.worker, currentRangeKey(), el.dataset.col, el.value);
+}
+
+function fmtDateDisplay(dateStr){
+  if(!dateStr) return '';
+  const [y,mo,d] = dateStr.split('-').map(Number);
+  return `${d} ${MN[mo]} ${y}`;
+}
+
+function buildReportPrintHTML(){
+  const hdr = getReportHeader();
+  const dept = document.getElementById('repDept').value;
+  const deptLabel = dept==='all' ? 'সকল বিভাগ' : (DEPT[dept]?.name || dept);
+  const start = document.getElementById('repStart').value;
+  const end   = document.getElementById('repEnd').value;
+  const rangeKey = `${start}_${end}`;
+  const desc = document.getElementById('repDesc').value;
+  const extraCols = getReportExtraCols();
+  const workers = getManpower().filter(w=>w.type==='daily' && (dept==='all'||w.dept===dept));
+
+  const rowsHtml = workers.map(w=>{
+    const regular = countPresentDays(w.id, start, end);
+    const extra = getExtraDays(w.id, rangeKey);
+    const total = regular + (+extra||0);
+    const extraTds = extraCols.map(c=>`<td>${escHtml(getReportExtraColVal(w.id, rangeKey, c.id))||'—'}</td>`).join('');
+    return `<tr><td>${escHtml(w.name)}</td><td style="text-align:center;">${regular}</td><td style="text-align:center;">${extra}</td>${extraTds}<td style="text-align:center;font-weight:700;">${total}</td></tr>`;
+  }).join('') || `<tr><td colspan="${4+extraCols.length}" style="text-align:center;padding:16px;">কোনো তথ্য নেই</td></tr>`;
+
+  document.getElementById('reportPrintArea').innerHTML = `
+    <div class="rp-header">
+      <h1>${escHtml(hdr.mainCompany)}</h1>
+      ${hdr.subCompany?`<h2>${escHtml(hdr.subCompany)}</h2>`:''}
+      ${hdr.subAddress?`<p class="rp-address">${escHtml(hdr.subAddress)}</p>`:''}
+      <div class="rp-title">${escHtml(hdr.title)}</div>
+    </div>
+    <div class="rp-meta">
+      <div>সময়কাল: ${fmtDateDisplay(start)} — ${fmtDateDisplay(end)}</div>
+      <div>বিভাগ: ${deptLabel}</div>
+    </div>
+    <table class="rp-table">
+      <thead><tr>
+        <th>দৈনিক শ্রমিকের নাম</th><th>সাধারণ কর্মদিবস</th><th>অতিরিক্ত কর্মদিবস</th>
+        ${extraCols.map(c=>`<th>${escHtml(c.label)}</th>`).join('')}
+        <th>মোট কর্মদিবস</th>
+      </tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    ${desc ? `<div class="rp-desc"><strong>কাজের বিবরণ:</strong><p>${escHtml(desc).replace(/\n/g,'<br>')}</p></div>` : ''}
+    <div class="rp-sign">
+      <div><span>কাজ তদারককারীর স্বাক্ষর</span><span class="rp-dots">..........................</span></div>
+      <div><span>কাজ সুপারিশকারীর স্বাক্ষর</span><span class="rp-dots">..........................</span></div>
+      <div><span>কাজ অনুমোদনকারীর স্বাক্ষর</span><span class="rp-dots">..........................</span></div>
+    </div>
+  `;
+}
+
+function printAttendanceReport(){
+  buildReportPrintHTML();
+  document.body.classList.add('report-print-mode');
+  window.print();
+}
+window.addEventListener('afterprint', ()=>{ document.body.classList.remove('report-print-mode'); });
+
+// ═══════════════════════════════════════════════════════
+//  কার্যক্রম CRUD (ACTIVITIES)
+// ═══════════════════════════════════════════════════════
+function openAddActivity(){
+  document.getElementById('actId').value='';
+  document.getElementById('actDept').value = currentUser?.reqDept||'field';
+  document.getElementById('actDate').value = `${Y}-${String(M).padStart(2,'0')}-01`;
+  document.getElementById('actDesc').value = '';
+  document.getElementById('modalActivityTitle').textContent='📝 নতুন কার্যক্রম';
+  _cfValueCache.activities = {};
+  renderCustomFieldInputs('activities','actCustomFields',{});
+  openModal('modalActivity');
+}
+
+function openEditActivity(id){
+  const a=getActivities().find(x=>x.id===id); if(!a) return;
+  if(!canEdit(a.dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  document.getElementById('actId').value=a.id;
+  document.getElementById('actDept').value=a.dept;
+  document.getElementById('actDate').value=a.date;
+  document.getElementById('actDesc').value=a.description;
+  document.getElementById('modalActivityTitle').textContent='✏️ কার্যক্রম সম্পাদনা';
+  _cfValueCache.activities = a.customFields||{};
+  renderCustomFieldInputs('activities','actCustomFields', a.customFields||{});
+  openModal('modalActivity');
+}
+
+async function saveActivityForm(){
+  const id=document.getElementById('actId').value;
+  const dept=document.getElementById('actDept').value;
+  if(!canEdit(dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  const date=document.getElementById('actDate').value;
+  const description=document.getElementById('actDesc').value.trim();
+  if(!date||!description){ toast('⚠️ তারিখ ও বিবরণ দিন'); return; }
+  const list=getActivities();
+  const idx=list.findIndex(a=>a.id===id);
+  const existingCF = idx>=0 ? (list[idx].customFields||{}) : {};
+  const customFields = await collectCustomFieldValues('actCustomFields', existingCF);
+  const rec={id:id||crypto.randomUUID(), dept, date, description, customFields};
+  if(idx>=0){
+    if(!canEdit(list[idx].dept)){ toast('⚠️ অনুমতি নেই'); return; }
+    list[idx]=rec;
+  } else {
+    list.push(rec);
+  }
+  saveActivities(list);
+  closeModal('modalActivity');
+  renderActivities();
+  toast(idx>=0 ? '✅ আপডেট হয়েছে' : '✅ কার্যক্রম যোগ হয়েছে');
+  if(supaOk){
+    if(idx>=0) supa(CFG.TABLE_ACTIVITIES+'?id=eq.'+rec.id,'PATCH',rec).catch(notifyCloudSyncFail);
+    else        supa(CFG.TABLE_ACTIVITIES,'POST',rec).catch(notifyCloudSyncFail);
+  }
+}
+
+function deleteActivity(id){
+  const a=getActivities().find(x=>x.id===id); if(!a) return;
+  if(!canEdit(a.dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  if(!confirm('এই কার্যক্রম মুছে দেবেন?')) return;
+  saveActivities(getActivities().filter(x=>x.id!==id));
+  renderActivities(); toast('🗑️ মুছে গেছে');
+  if(supaOk) supa(CFG.TABLE_ACTIVITIES+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODAL / UI HELPERS
+// ═══════════════════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.mo').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);});});
+function showLoader(t='লোড হচ্ছে...'){document.getElementById('loaderTxt').textContent=t;document.getElementById('loaderOv').classList.add('show');}
+function hideLoader(){document.getElementById('loaderOv').classList.remove('show');}
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3200);
+}
+function dismissInstall(){
+  document.getElementById('installBar').classList.remove('visible');
+  localStorage.setItem('install_dismissed','1');
+}
+
+// ═══════════════════════════════════════════════════════
+//  ট্যাব আবার visible হলে ক্লাউড থেকে নতুন ডেটা রিফ্রেশ করা
+//  (অন্য ট্যাবে/ইনকগনিটোতে যোগ করা ডেটা ম্যানুয়াল রিলোড ছাড়াই দেখাতে সাহায্য করে)
+// ═══════════════════════════════════════════════════════
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible' && currentUser && currentUser.role!=='viewer' && supaOk){
+    fetchFromCloud().catch(()=>{});
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+//  SERVICE WORKER
+// ═══════════════════════════════════════════════════════
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+
+// ═══════════════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════════════
+initApp();
+restoreSession();
+</script>
+</body>
+</html>
