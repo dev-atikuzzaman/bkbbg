@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v1.1
-const CACHE_NAME = 'bgfcl-v9';
+// BGFCL Inventory Service Worker v1.2 — session persistence + manpower date-column fix
+const CACHE_NAME = 'bgfcl-v10';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

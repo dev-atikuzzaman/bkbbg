@@ -2107,12 +2107,12 @@ function renderStaffTable(list){
       <td>${escHtml(m.phone)||'—'}</td>
       <td>${escHtml(m.address)||'—'}</td>
       <td><span class="tag-dept" style="background:${cfg.color}22;color:${cfg.color};">${cfg.name}</span></td>
-      <td>${m.clLastDate||'—'}</td>
-      <td>${m.clRemaining ?? '—'}</td>
-      <td>${m.otherLeaveLastDate||'—'}</td>
-      <td>${m.otherLeaveRemaining ?? '—'}</td>
-      <td>${m.alTaken==='yes'?'✅ হ্যাঁ':'❌ না'}</td>
-      <td>${m.alTaken==='yes' ? (m.alDate||'—') : '—'}</td>
+      <td>${m.cl_last_date||'—'}</td>
+      <td>${m.cl_remaining ?? '—'}</td>
+      <td>${m.other_leave_last_date||'—'}</td>
+      <td>${m.other_leave_remaining ?? '—'}</td>
+      <td>${m.al_taken==='yes'?'✅ হ্যাঁ':'❌ না'}</td>
+      <td>${m.al_taken==='yes' ? (m.al_date||'—') : '—'}</td>
       ${cfTdHtml(defs, m.customFields)}
       <td>${canE?`<button class="btn-ei" onclick="openEditManpower('${m.id}')" title="সম্পাদনা">✏️</button><button class="btn-di" onclick="deleteManpower('${m.id}')" title="মুছুন">🗑️</button>`:''}</td>`;
     tb.appendChild(tr);
@@ -2298,12 +2298,12 @@ function openEditManpower(id){
   document.getElementById('mpDesig').value=m.designation||'';
   document.getElementById('mpPhone').value=m.phone||'';
   document.getElementById('mpAddress').value=m.address||'';
-  document.getElementById('mpClDate').value=m.clLastDate||'';
-  document.getElementById('mpClRemain').value=m.clRemaining ?? '';
-  document.getElementById('mpOtherDate').value=m.otherLeaveLastDate||'';
-  document.getElementById('mpOtherRemain').value=m.otherLeaveRemaining ?? '';
-  document.getElementById('mpAlTaken').value=m.alTaken||'no';
-  document.getElementById('mpAlDate').value=m.alDate||'';
+  document.getElementById('mpClDate').value=m.cl_last_date||'';
+  document.getElementById('mpClRemain').value=m.cl_remaining ?? '';
+  document.getElementById('mpOtherDate').value=m.other_leave_last_date||'';
+  document.getElementById('mpOtherRemain').value=m.other_leave_remaining ?? '';
+  document.getElementById('mpAlTaken').value=m.al_taken||'no';
+  document.getElementById('mpAlDate').value=m.al_date||'';
   document.getElementById('modalManpowerTitle').textContent='✏️ জনবল সম্পাদনা';
   toggleManpowerFields();
   toggleAlDateField();
@@ -2329,16 +2329,16 @@ async function saveManpowerForm(){
     designation: document.getElementById('mpDesig').value.trim(),
     phone: document.getElementById('mpPhone').value.trim(),
     address: document.getElementById('mpAddress').value.trim(),
-    clLastDate:'', clRemaining:0, otherLeaveLastDate:'', otherLeaveRemaining:0, alTaken:'no', alDate:'',
+    cl_last_date:null, cl_remaining:0, other_leave_last_date:null, other_leave_remaining:0, al_taken:'no', al_date:null,
     customFields,
   };
   if(type==='staff'){
-    rec.clLastDate = document.getElementById('mpClDate').value;
-    rec.clRemaining = +document.getElementById('mpClRemain').value || 0;
-    rec.otherLeaveLastDate = document.getElementById('mpOtherDate').value;
-    rec.otherLeaveRemaining = +document.getElementById('mpOtherRemain').value || 0;
-    rec.alTaken = document.getElementById('mpAlTaken').value;
-    rec.alDate = rec.alTaken==='yes' ? document.getElementById('mpAlDate').value : '';
+    rec.cl_last_date = document.getElementById('mpClDate').value || null;
+    rec.cl_remaining = +document.getElementById('mpClRemain').value || 0;
+    rec.other_leave_last_date = document.getElementById('mpOtherDate').value || null;
+    rec.other_leave_remaining = +document.getElementById('mpOtherRemain').value || 0;
+    rec.al_taken = document.getElementById('mpAlTaken').value;
+    rec.al_date = rec.al_taken==='yes' ? (document.getElementById('mpAlDate').value || null) : null;
   }
   if(idx>=0){
     if(!canEdit(list[idx].dept)){ toast('⚠️ অনুমতি নেই'); return; }
