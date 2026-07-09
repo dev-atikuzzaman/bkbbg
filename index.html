@@ -1113,8 +1113,11 @@ if(!localStorage.getItem('bgfcl_logs'))  saveLogs(SAMPLE_LOGS);
 // ═══════════════════════════════════════════════════════
 //  SUPABASE HELPERS
 // ═══════════════════════════════════════════════════════
-async function supa(path, method='GET', body=null, token=null){
+async function supa(path, method='GET', body=null, token=null, _retried=false){
   if(!CFG.URL) throw new Error('no_config');
+  // সেশনের মেয়াদ শেষ হওয়ার কাছাকাছি হলে রিকোয়েস্ট পাঠানোর আগেই রিফ্রেশ করে নেয়া হয়,
+  // যাতে "সুপার অ্যাডমিন রিফ্রেশ দিলেই এডিট/অনুমোদন কাজ করা বন্ধ হয়ে যায়" জাতীয় বাগ না হয়
+  if(supaSession && !token) await ensureFreshSession();
   const h = {
     'apikey': CFG.KEY,
     'Authorization': 'Bearer '+(token || supaSession?.access_token || CFG.KEY),
@@ -1128,6 +1131,11 @@ async function supa(path, method='GET', body=null, token=null){
     r = await fetch(CFG.URL+'/rest/v1/'+path, {method, headers:h, body:body?JSON.stringify(body):null});
   }catch(netErr){
     throw new Error('ইন্টারনেট সংযোগ সমস্যা — নেটওয়ার্ক চেক করুন');
+  }
+  // 401 মানে টোকেন এক্সপায়ার্ড/অবৈধ — একবার রিফ্রেশ করে আবার চেষ্টা করা হয়
+  if(r.status===401 && !token && supaSession?.refresh_token && !_retried){
+    const refreshed = await refreshSupaSession();
+    if(refreshed) return supa(path, method, body, token, true);
   }
   if(!r.ok){
     const t = await r.text();
@@ -1147,6 +1155,50 @@ async function supa(path, method='GET', body=null, token=null){
   if(!txt) return true;
   try{ return JSON.parse(txt); }
   catch(parseErr){ return true; }
+}
+
+// ═══════════════════════════════════════════════════════
+//  SESSION PERSISTENCE + REFRESH
+//  (আগে supaSession শুধু মেমোরিতে থাকতো, localStorage-এ সেভ হতো
+//   না — ফলে পেজ রিলোড করলেই এটা null হয়ে যেত, আর তখন সব
+//   authenticated রিকোয়েস্ট (super admin approve/reject, dept-wise
+//   insert/update/delete) নীরবে anon key দিয়ে পাঠানো শুরু করতো, যা
+//   RLS পলিসিতে আটকে যায়। এখানে সেশন সেভ + এক্সপায়ারিতে অটো-রিফ্রেশ
+//   দুটোই যোগ করা হলো)
+// ═══════════════════════════════════════════════════════
+function persistSupaSession(session){
+  supaSession = session;
+  if(session) localStorage.setItem('supa_session', JSON.stringify(session));
+  else localStorage.removeItem('supa_session');
+}
+
+async function ensureFreshSession(){
+  if(!supaSession?.expires_at) return; // পুরোনো ফরম্যাটের সেশন হলে স্কিপ
+  const nowSec = Math.floor(Date.now()/1000);
+  if(supaSession.expires_at - nowSec < 60){ // ৬০ সেকেন্ডের কম বাকি থাকলে আগেই রিফ্রেশ
+    await refreshSupaSession();
+  }
+}
+
+async function refreshSupaSession(){
+  if(!supaSession?.refresh_token || !CFG.URL) return false;
+  try{
+    const r = await fetch(CFG.URL+'/auth/v1/token?grant_type=refresh_token',{
+      method:'POST',
+      headers:{'apikey':CFG.KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({refresh_token: supaSession.refresh_token}),
+    });
+    if(!r.ok){
+      // refresh token নিজেই অকেজো হয়ে গেলে সেশন মুছে ফেলা হয়, ব্যবহারকারীকে
+      // আবার লগইন করতে হবে — কিন্তু currentUser/UI অপরিবর্তিত থাকবে যতক্ষণ
+      // না তারা কিছু লিখতে/এডিট করতে যায়
+      persistSupaSession(null);
+      return false;
+    }
+    const d = await r.json();
+    persistSupaSession(d);
+    return true;
+  }catch(e){ return false; }
 }
 
 // Auth via Supabase Auth REST
@@ -1232,36 +1284,32 @@ async function doLogin(){
   if(!email||!pass){ toast('⚠️ ইমেইল ও পাসওয়ার্ড দিন'); return; }
   showLoader('লগইন হচ্ছে...');
   try{
-    // Try Supabase auth first
-    if(CFG.URL){
-      const d = await supaAuth('token?grant_type=password', email, pass);
-      supaSession = d;
-      // Load profile
-      const prof = await supa(CFG.TABLE_PROF+'?email=eq.'+encodeURIComponent(email)+'&limit=1');
-      const p = prof && prof[0];
-      if(p){
-        if(p.status==='pending'){
-          hideLoader();
-          setCurrentUser({id:p.id,email,role:'pending',name:p.name,dept:p.dept,reqDept:p.req_dept});
-          showPendingScreen(p);
-          return;
-        }
-        setCurrentUser({id:p.id,email,role:p.role,name:p.name,dept:p.dept,reqDept:p.req_dept});
-      } else {
-        // Super admin check
-        if(email===CFG.SUPER_ADMIN_EMAIL){
-          setCurrentUser({id:'super',email,role:'super',name:'সুপার অ্যাডমিন',dept:'all',reqDept:'all'});
-        } else {
-          setCurrentUser({id:'u',email,role:'viewer',name:email,dept:'',reqDept:''});
-        }
+    if(!CFG.URL){
+      // Supabase কনফিগার করা না থাকলে কোনো হার্ডকোড করা পাসওয়ার্ড/ব্যাকডোর
+      // দিয়ে লগইন করা যাবে না — নিরাপত্তার জন্য এখানে থেমে যাওয়া হয়
+      toast('⚠️ Supabase সংযুক্ত নেই — লগইন সম্ভব নয়।'); hideLoader(); return;
+    }
+    const d = await supaAuth('token?grant_type=password', email, pass);
+    persistSupaSession(d);
+    // Load profile
+    const prof = await supa(CFG.TABLE_PROF+'?email=eq.'+encodeURIComponent(email)+'&limit=1');
+    const p = prof && prof[0];
+    // সুপার অ্যাডমিনের ইমেইল ম্যাচ করলে প্রোফাইল টেবিলের অবস্থা যাই থাকুক
+    // (pending/admin/অনুপস্থিত) — সবসময় super হিসেবেই ঢুকবে, যাতে কোনোভাবে
+    // প্রোফাইল টেবিলের একটা ভুল/পুরনো row-এর কারণে আসল super admin লক
+    // আউট হয়ে না যায়
+    if(email===CFG.SUPER_ADMIN_EMAIL){
+      setCurrentUser({id:p?.id||'super',email,role:'super',name:'সুপার অ্যাডমিন',dept:'all',reqDept:'all'});
+    } else if(p){
+      if(p.status==='pending'){
+        hideLoader();
+        setCurrentUser({id:p.id,email,role:'pending',name:p.name,dept:p.dept,reqDept:p.req_dept});
+        showPendingScreen(p);
+        return;
       }
+      setCurrentUser({id:p.id,email,role:p.role,name:p.name,dept:p.dept,reqDept:p.req_dept});
     } else {
-      // Offline super admin
-      if(email===CFG.SUPER_ADMIN_EMAIL && pass==='bgfcl2025'){
-        setCurrentUser({id:'super',email,role:'super',name:'সুপার অ্যাডমিন',dept:'all',reqDept:'all'});
-      } else {
-        toast('⚠️ Supabase সংযুক্ত নেই। সুপার অ্যাডমিন ছাড়া লগইন সম্ভব নয়।'); hideLoader(); return;
-      }
+      setCurrentUser({id:'u',email,role:'viewer',name:email,dept:'',reqDept:''});
     }
     hideLoader();
     enterApp();
@@ -1293,7 +1341,7 @@ async function doSignup(){
     if(Array.isArray(d?.user?.identities) && d.user.identities.length===0){
       throw new Error('already registered');
     }
-    if(d?.session){ supaSession = d.session; }
+    if(d?.session){ persistSupaSession(d.session); }
 
     try{
       await supa(CFG.TABLE_PROF,'POST',{
@@ -1406,6 +1454,9 @@ function restoreSession(){
         currentUser = parsed;
         if(CFG.URL){
           try{ supaSession = JSON.parse(localStorage.getItem('supa_session')||'null'); }catch(e){ supaSession=null; }
+          // পুরনো (এক্সপায়ার্ড) টোকেন নিয়ে ফিরে এলে ব্যাকগ্রাউন্ডে রিফ্রেশ চেষ্টা করা হয়,
+          // যাতে প্রথম লেখা/এডিট রিকোয়েস্ট আসার আগেই টোকেন সতেজ থাকে
+          if(supaSession) refreshSupaSession().catch(()=>{});
         }
         enterApp();
         return;
