@@ -480,33 +480,43 @@ end $$;
 --  (snake_case) — এটাও কখনো মেলেনি, তাই AL-এর তারিখ কোনোদিন cloud-এ
 --  সিঙ্ক হয়নি।
 --
---  এই স্ক্রিপ্টটা সম্পূর্ণ idempotent ও দ্বিমুখী-নিরাপদ (bidirectionally
---  safe): camelCase অবস্থায় থাকলে snake_case-এ ফিরিয়ে আনবে, আগে
---  থেকেই snake_case থাকলে কিছু করবে না, কোনো ডেটা মুছবে না — শুধু
---  কলামের নাম ঠিক করবে।
+--  এই স্ক্রিপ্টটা সম্পূর্ণ idempotent, দ্বিমুখী-নিরাপদ, এবং এখন
+--  "দুইটা কলামই (camelCase ও snake_case) একসাথে আগে থেকে আছে" এই
+--  অবস্থাতেও নিরাপদ — সেক্ষেত্রে camelCase কলামের ডেটা snake_case
+--  কলামে কপি করে camelCase কলামটা drop করে দেবে (কোনো ডেটা হারাবে
+--  না)। কোনো ডেটা মুছে না — শুধু কলামের নাম/সংখ্যা ঠিক করে।
 -- ═══════════════════════════════════════════════════════════════
 do $$
+declare
+  pairs text[][] := array[
+    array['clLastDate','cl_last_date'],
+    array['clRemaining','cl_remaining'],
+    array['otherLeaveLastDate','other_leave_last_date'],
+    array['otherLeaveRemaining','other_leave_remaining'],
+    array['alTaken','al_taken'],
+    array['alDate','al_date']
+  ];
+  p text[];
+  camel_exists boolean;
+  snake_exists boolean;
 begin
-  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='clLastDate') then
-    alter table public.manpower rename column "clLastDate" to cl_last_date;
-  end if;
-  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='clRemaining') then
-    alter table public.manpower rename column "clRemaining" to cl_remaining;
-  end if;
-  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='otherLeaveLastDate') then
-    alter table public.manpower rename column "otherLeaveLastDate" to other_leave_last_date;
-  end if;
-  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='otherLeaveRemaining') then
-    alter table public.manpower rename column "otherLeaveRemaining" to other_leave_remaining;
-  end if;
-  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='alTaken') then
-    alter table public.manpower rename column "alTaken" to al_taken;
-  end if;
-  -- ৬ নং অংশে "alDate" camelCase-এ তৈরি হয়েছিল — অ্যাপ পাঠায় al_date
-  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='alDate') then
-    alter table public.manpower rename column "alDate" to al_date;
-  end if;
-  -- কলামটা এখনো একদমই না থাকলে (নতুন প্রজেক্টে) সরাসরি সঠিক নামে তৈরি করে দেয়া হচ্ছে
+  foreach p slice 1 in array pairs loop
+    camel_exists := exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name=p[1]);
+    snake_exists := exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name=p[2]);
+
+    if camel_exists and snake_exists then
+      -- দুইটা কলামই আছে — camelCase-এর ডেটা snake_case-এ কপি করে camelCase ফেলে দেয়া হচ্ছে
+      execute format('update public.manpower set %I = coalesce(%I, %I)', p[2], p[2], p[1]);
+      execute format('alter table public.manpower drop column %I', p[1]);
+    elsif camel_exists and not snake_exists then
+      -- শুধু camelCase আছে — সরাসরি rename
+      execute format('alter table public.manpower rename column %I to %I', p[1], p[2]);
+    end if;
+    -- দুইটার একটাও camelCase নেই (snake_case ছিল বা both missing) হলে কিছু করার দরকার নেই
+  end loop;
+
+  -- al_date কলামটা কোনোভাবেই (camelCase বা snake_case) একদমই না থাকলে
+  -- (একদম নতুন প্রজেক্টে) সরাসরি সঠিক নামে তৈরি করে দেয়া হচ্ছে
   if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='al_date') then
     alter table public.manpower add column al_date date;
   end if;
