@@ -373,15 +373,16 @@ notify pgrst, 'reload schema';
 -- ═══════════════════════════════════════════════════════════════
 
 -- ═══════════════════════════════════════════════════════════════
---  10) 🎯 আসল কারণ পাওয়া গেছে ও ফিক্স (৪ নং অংশে তৈরি manpower
---      টেবিলের ৫টা কলাম snake_case-এ ছিল, কিন্তু অ্যাপ camelCase
---      নামে ডেটা পাঠায় — তাই "Could not find the 'alTaken' column"
---      এই এররটা আসছিল)
+--  ⚠️⚠️⚠️ এই অংশ (১০) আর রান করবেন না — এটা ভুল দিক নির্ণয়ের
+--  ভিত্তিতে বানানো, এবং বর্তমান অ্যাপ কোডের (index.html) সাথে
+--  সাংঘর্ষিক। বর্তমান অ্যাপ কোড সবসময় snake_case নামে ডেটা পাঠায়
+--  (cl_last_date, other_leave_last_date, al_taken, al_date) —
+--  camelCase (alTaken, clLastDate ইত্যাদি) কখনোই পাঠায় না।
 --
---  এই কমান্ডগুলো শুধু কলামের নাম বদলায় (rename), কোনো ডেটা মোছে না
---  — আপনার আগের ৬টা জনবলের তথ্য (জাকির, জালাল, অলি ইত্যাদি) অক্ষত
---  থাকবে। বারবার রান করলেও সমস্যা নেই (idempotent — কলাম আগেই
---  রিনেম হয়ে থাকলে স্কিপ করে যাবে)।
+--  এই অংশ যদি ইতিমধ্যে রান করা হয়ে থাকে (কলামগুলো এখন camelCase-এ
+--  আছে), তাহলে নিচে ১২ নং অংশ রান করুন — সেটা কলামগুলো আবার সঠিক
+--  snake_case-এ ফিরিয়ে আনবে (এখনো camelCase-এ রান না করা থাকলেও
+--  ১২ নং অংশ নিরাপদে/idempotent-ভাবে কাজ করবে, কোনো ক্ষতি হবে না)।
 -- ═══════════════════════════════════════════════════════════════
 do $$
 begin
@@ -464,3 +465,75 @@ end $$;
 --  attendance) তালিকায় দেখা উচিত। Supabase Dashboard → Database →
 --  Replication পেজে গেলেও এখন এই ৫টার পাশে টগল "ON" দেখাবে।
 -- ───────────────────────────────────────────────
+
+-- ═══════════════════════════════════════════════════════════════
+--  12) 🎯 চূড়ান্ত ফিক্স — manpower কলামের নাম নিশ্চিতভাবে snake_case
+--      (index.html যা পাঠায় তার সাথে হুবহু মিলিয়ে)
+--
+--  কেন এই অংশটা দরকার: ১০ নং অংশ (উপরে, এখন বাতিল/⚠️ চিহ্নিত) যদি
+--  কখনো রান করা হয়ে থাকে, তাহলে DB-এর কলাম camelCase হয়ে গেছে
+--  ("clLastDate", "otherLeaveLastDate", "alTaken" ইত্যাদি), অথচ
+--  index.html সবসময় snake_case পাঠায়/পড়ে (cl_last_date,
+--  other_leave_last_date, al_taken, al_date) — ফলে সিঙ্ক ব্যর্থ হয়
+--  ("Could not find the '...' column" এরর)। আবার ৬ নং অংশে তৈরি
+--  "alDate" কলামটা শুরু থেকেই camelCase, কিন্তু অ্যাপ পাঠায় al_date
+--  (snake_case) — এটাও কখনো মেলেনি, তাই AL-এর তারিখ কোনোদিন cloud-এ
+--  সিঙ্ক হয়নি।
+--
+--  এই স্ক্রিপ্টটা সম্পূর্ণ idempotent ও দ্বিমুখী-নিরাপদ (bidirectionally
+--  safe): camelCase অবস্থায় থাকলে snake_case-এ ফিরিয়ে আনবে, আগে
+--  থেকেই snake_case থাকলে কিছু করবে না, কোনো ডেটা মুছবে না — শুধু
+--  কলামের নাম ঠিক করবে।
+-- ═══════════════════════════════════════════════════════════════
+do $$
+begin
+  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='clLastDate') then
+    alter table public.manpower rename column "clLastDate" to cl_last_date;
+  end if;
+  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='clRemaining') then
+    alter table public.manpower rename column "clRemaining" to cl_remaining;
+  end if;
+  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='otherLeaveLastDate') then
+    alter table public.manpower rename column "otherLeaveLastDate" to other_leave_last_date;
+  end if;
+  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='otherLeaveRemaining') then
+    alter table public.manpower rename column "otherLeaveRemaining" to other_leave_remaining;
+  end if;
+  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='alTaken') then
+    alter table public.manpower rename column "alTaken" to al_taken;
+  end if;
+  -- ৬ নং অংশে "alDate" camelCase-এ তৈরি হয়েছিল — অ্যাপ পাঠায় al_date
+  if exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='alDate') then
+    alter table public.manpower rename column "alDate" to al_date;
+  end if;
+  -- কলামটা এখনো একদমই না থাকলে (নতুন প্রজেক্টে) সরাসরি সঠিক নামে তৈরি করে দেয়া হচ্ছে
+  if not exists (select 1 from information_schema.columns where table_schema='public' and table_name='manpower' and column_name='al_date') then
+    alter table public.manpower add column al_date date;
+  end if;
+end $$;
+
+-- কলামের নাম বদলানোর পর PostgREST-কে অবশ্যই জানাতে হবে যে স্কিমা বদলেছে,
+-- নাহলে পুরনো (ক্যাশড) স্কিমা দিয়েই রিকোয়েস্ট প্রসেস করার চেষ্টা করবে
+notify pgrst, 'reload schema';
+
+-- ───────────────────────────────────────────────
+--  যাচাই করুন কলামগুলো এখন ঠিক আছে কিনা:
+--
+--  select column_name, data_type from information_schema.columns
+--  where table_schema='public' and table_name='manpower'
+--  order by ordinal_position;
+--
+--  cl_last_date, cl_remaining, other_leave_last_date,
+--  other_leave_remaining, al_taken, al_date — এই ৬টা নাম (ছোট হাতের,
+--  আন্ডারস্কোরসহ) snake_case-এ দেখা উচিত, camelCase/quoted নামে না।
+-- ───────────────────────────────────────────────
+
+-- ═══════════════════════════════════════════════════════════════
+--  ১৩) 🛡️ এক্সট্রা সুরক্ষা (ঐচ্ছিক): "date" কলামগুলোতে খালি স্ট্রিং
+--      ('') কখনো পৌঁছালে সাথে সাথে বোঝা যাবে (Postgres নিজেই আটকাবে,
+--      যেহেতু '' কোনোভাবেই date টাইপে কাস্ট হয় না — এটাই আসল এররের
+--      উৎস ছিল)। index.html-এর supa() ফাংশনে এখন client-side-এ
+--      sanitizeForSupabase() যোগ করা হয়েছে যা '' কে পাঠানোর আগেই
+--      null বানিয়ে দেয় — তাই এই এরর ভবিষ্যতে আর হওয়ার কথা না।
+--      এই SQL অংশে আলাদা কিছু করার দরকার নেই, শুধু মনে রাখার নোট।
+-- ═══════════════════════════════════════════════════════════════
