@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v1.2 — session persistence + manpower date-column fix
-const CACHE_NAME = 'bgfcl-v10';
+// BGFCL Inventory Service Worker v1.3 — manpower date-column mismatch + '' -> null sanitizer fix
+const CACHE_NAME = 'bgfcl-v11';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

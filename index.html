@@ -1113,8 +1113,31 @@ if(!localStorage.getItem('bgfcl_logs'))  saveLogs(SAMPLE_LOGS);
 // ═══════════════════════════════════════════════════════
 //  SUPABASE HELPERS
 // ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  🛡️ SUPABASE PAYLOAD SANITIZER
+//  HTML <input type="date"> খালি থাকলে .value = '' (empty string) হয়,
+//  কখনো null হয় না। কিন্তু Postgres-এর nullable "date" (বা numeric/uuid)
+//  কলামে '' পাঠালে "invalid input syntax for type date: ''" এররে
+//  ইনসার্ট/আপডেট পুরোটাই ব্যর্থ হয়ে যায় — null হলে কোনো সমস্যা নেই।
+//  এখানে top-level-এর প্রতিটা key-তে '' পেলে তা null-এ বদলে দেয়া হয়,
+//  যাতে ভবিষ্যতে কোনো নতুন ফর্ম/ফিল্ডেও এই বাগ আর ফিরে আসতে না পারে।
+//  (customFields-এর মতো নেস্টেড অবজেক্ট/jsonb-এর ভেতরে হাত দেয়া হয় না,
+//  যাতে ব্যবহারকারীর নিজের কাস্টম টেক্সট মান অপরিবর্তিত থাকে।)
+// ═══════════════════════════════════════════════════════
+function sanitizeForSupabase(body){
+  if(body===null || typeof body!=='object' || Array.isArray(body)) return body;
+  const out={};
+  for(const k in body){
+    const v=body[k];
+    out[k] = (v==='') ? null : v;
+  }
+  return out;
+}
+
 async function supa(path, method='GET', body=null, token=null, _retried=false){
   if(!CFG.URL) throw new Error('no_config');
+  body = sanitizeForSupabase(body);
+
   // সেশনের মেয়াদ শেষ হওয়ার কাছাকাছি হলে রিকোয়েস্ট পাঠানোর আগেই রিফ্রেশ করে নেয়া হয়,
   // যাতে "সুপার অ্যাডমিন রিফ্রেশ দিলেই এডিট/অনুমোদন কাজ করা বন্ধ হয়ে যায়" জাতীয় বাগ না হয়
   if(supaSession && !token) await ensureFreshSession();
