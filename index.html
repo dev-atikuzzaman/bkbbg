@@ -438,8 +438,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
   <div id="page-materials" class="page-section">
     <!-- ACTION BAR (hidden for viewer) -->
     <div class="action-bar" id="actionBar" style="display:none;">
-      <button class="btn-p bp-amber" id="btnAddItem">➕ মালামাল যোগ</button>
-      <button class="btn-p bp-blue" id="btnAddLog">📦 আনলোড লগ</button>
+      <button class="btn-p bp-amber" id="btnAddTxn">➕ লেনদেন যোগ (ইন/আউট)</button>
       <div class="btn-io-wrap">
         <button class="btn-p bp-green" onclick="exportJSON()">📤 Export</button>
         <label class="btn-p bp-purple" style="cursor:pointer;">📥 Import<input type="file" accept=".json" id="importFileMaterials" style="display:none" onchange="importJSON(event)"/></label>
@@ -449,9 +448,9 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 
     <!-- SUMMARY -->
     <div class="sum-grid">
-      <div class="sum-card sc-blue"><div class="si">📦</div><div class="sv" id="sumTotal">0</div><div class="sl">মোট আইটেম ধরন</div></div>
-      <div class="sum-card sc-green"><div class="si">🚚</div><div class="sv" id="sumIncoming">0</div><div class="sl">আসন্ন মালামাল</div></div>
-      <div class="sum-card sc-red"><div class="si">⚠️</div><div class="sv" id="sumLow">0</div><div class="sl">সংকটজনক স্টক</div></div>
+      <div class="sum-card sc-blue"><div class="si">📦</div><div class="sv" id="sumTotal">0</div><div class="sl">মোট প্রোডাক্ট ধরন</div></div>
+      <div class="sum-card sc-green"><div class="si">➕</div><div class="sv" id="sumIncoming">0</div><div class="sl">এই মাসে যুক্ত (ইন)</div></div>
+      <div class="sum-card sc-red"><div class="si">➖</div><div class="sv" id="sumLow">0</div><div class="sl">এই মাসে ব্যবহার (আউট)</div></div>
       <div class="sum-card sc-amber"><div class="si">🏢</div><div class="sv" id="sumDepts">7</div><div class="sl">মোট বিভাগ</div></div>
     </div>
 
@@ -472,14 +471,19 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <img id="chartPrintImg" style="display:none;width:100%;border-radius:8px;"/>
     </div>
 
-    <!-- UNLOAD LOG -->
+    <!-- লেনদেন লগ (একীভূত — ইন + আউট) -->
     <div class="chart-sec">
-      <div class="sec-title">🚚 আনলোড লগ — <span id="logLabel"></span></div>
+      <div class="sec-title">🧾 লেনদেন লগ — <span id="logLabel"></span></div>
+      <div id="logProductFilterBox" style="display:none;margin-bottom:10px;">
+        <span class="tag-dept" style="background:#EDE9FE;color:#7C3AED;">🔎 ফিল্টার: <span id="logProductFilterName"></span>
+          <button onclick="filterProduct=null;renderTxnLog();" style="border:none;background:none;color:#7C3AED;cursor:pointer;font-weight:700;margin-left:6px;">✕</button>
+        </span>
+      </div>
       <div class="log-wrap">
         <table class="log-table">
           <thead><tr>
-            <th>তারিখ</th><th>মালামাল</th><th>বিভাগ</th>
-            <th>পরিমাণ</th><th>স্থান</th><th>সরবরাহকারী</th>
+            <th>তারিখ</th><th>প্রোডাক্ট</th><th>বিভাগ</th><th>ধরন</th>
+            <th>পরিমাণ</th><th>উৎস / কাজ</th><th>ছবি</th>
             <th id="logActCol"></th>
           </tr></thead>
           <tbody id="logBody"></tbody>
@@ -564,73 +568,77 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 
 <!-- ══════════ MODALS ══════════ -->
 
-<!-- ADD ITEM -->
-<div class="mo" id="modalItem">
+<!-- ADD TRANSACTION (ইন/আউট) -->
+<div class="mo" id="modalTxn">
   <div class="modal">
-    <div class="mhdr"><h3>📦 নতুন মালামাল</h3><button class="btn-x" onclick="closeModal('modalItem')">✕</button></div>
-    <div class="mbody">
-      <div class="fg"><label>বিভাগ *</label>
-        <select id="fDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
-      </div>
-      <div class="fg"><label>মালামালের নাম *</label><input type="text" id="fName" placeholder="যেমন: বল ভালভ ২ ইঞ্চি"/></div>
-      <div class="fg-row">
-        <div class="fg"><label>বর্তমান পরিমাণ *</label><input type="number" id="fQty" placeholder="0" min="0"/></div>
-        <div class="fg"><label>অপটিমাম পরিমাণ *</label><input type="number" id="fOptimum" placeholder="0" min="0"/></div>
-      </div>
-      <div class="fg-row">
-        <div class="fg"><label>একক</label><input type="text" id="fUnit" placeholder="পিস / কেজি / লিটার"/></div>
-        <div class="fg"><label>আসন্ন পরিমাণ</label><input type="number" id="fIncoming" placeholder="0" min="0"/></div>
-      </div>
-      <div class="fg"><label>মন্তব্য</label><textarea id="fNote" rows="2" style="resize:vertical;"></textarea></div>
-      <div id="fCustomFields"></div>
-      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('items','fCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
-      <button class="btn-sub" onclick="saveItem()">✅ সংরক্ষণ করুন</button>
-    </div>
-  </div>
-</div>
-
-<!-- EDIT ITEM -->
-<div class="mo" id="modalEditItem">
-  <div class="modal">
-    <div class="mhdr"><h3>✏️ মালামাল সম্পাদনা</h3><button class="btn-x" onclick="closeModal('modalEditItem')">✕</button></div>
-    <div class="mbody">
-      <input type="hidden" id="editItemId"/>
-      <div class="fg"><label>মালামালের নাম *</label><input type="text" id="efName"/></div>
-      <div class="fg-row">
-        <div class="fg"><label>বর্তমান পরিমাণ *</label><input type="number" id="efQty" min="0"/></div>
-        <div class="fg"><label>অপটিমাম পরিমাণ *</label><input type="number" id="efOptimum" min="0"/></div>
-      </div>
-      <div class="fg-row">
-        <div class="fg"><label>একক</label><input type="text" id="efUnit"/></div>
-        <div class="fg"><label>আসন্ন পরিমাণ</label><input type="number" id="efIncoming" min="0"/></div>
-      </div>
-      <div class="fg"><label>মন্তব্য</label><textarea id="efNote" rows="2" style="resize:vertical;"></textarea></div>
-      <div id="efCustomFields"></div>
-      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('items','efCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
-      <button class="btn-sub" onclick="updateItem()">✅ আপডেট করুন</button>
-    </div>
-  </div>
-</div>
-
-<!-- ADD LOG -->
-<div class="mo" id="modalLog">
-  <div class="modal">
-    <div class="mhdr"><h3>🚚 আনলোড লগ</h3><button class="btn-x" onclick="closeModal('modalLog')">✕</button></div>
+    <div class="mhdr"><h3>🧾 নতুন লেনদেন</h3><button class="btn-x" onclick="closeModal('modalTxn')">✕</button></div>
     <div class="mbody">
       <div class="fg-row">
-        <div class="fg"><label>তারিখ *</label><input type="date" id="lDate"/></div>
         <div class="fg"><label>বিভাগ *</label>
-          <select id="lDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
+          <select id="txDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
+        </div>
+        <div class="fg"><label>ধরন *</label>
+          <select id="txType" onchange="toggleTxnType('tx')"><option value="in">➕ যুক্ত হলো (ইন)</option><option value="out">➖ ব্যবহার হলো (আউট)</option></select>
         </div>
       </div>
-      <div class="fg"><label>মালামালের নাম *</label><input type="text" id="lItem" placeholder="যেমন: পাইপ ফিটিং"/></div>
-      <div class="fg-row">
-        <div class="fg"><label>পরিমাণ *</label><input type="number" id="lQty" min="0"/></div>
-        <div class="fg"><label>একক</label><input type="text" id="lUnit" placeholder="পিস / কেজি"/></div>
+      <div class="fg"><label>তারিখ *</label><input type="date" id="txDate"/></div>
+      <div class="fg"><label>প্রোডাক্টের নাম *</label>
+        <input type="text" id="txProduct" list="txProductList" placeholder="যেমন: বল ভালভ ২ ইঞ্চি"/>
+        <datalist id="txProductList"></datalist>
       </div>
-      <div class="fg"><label>আনলোড স্থান *</label><input type="text" id="lLocation" placeholder="মেইন গেট গুদাম"/></div>
-      <div class="fg"><label>সরবরাহকারী</label><input type="text" id="lSupplier"/></div>
-      <button class="btn-sub" onclick="saveLog()">✅ লগ সংরক্ষণ</button>
+      <div class="fg-row">
+        <div class="fg"><label>পরিমাণ *</label><input type="number" id="txQty" placeholder="0" min="0"/></div>
+        <div class="fg"><label>একক</label><input type="text" id="txUnit" placeholder="পিস / কেজি / লিটার"/></div>
+      </div>
+      <div id="txInWrap" class="fg"><label>উৎস (সরবরাহকারী)</label><input type="text" id="txSource" placeholder="যেমন: রহিম ট্রেডিং"/></div>
+      <div id="txOutWrap">
+        <div class="fg"><label>কোন কাজে ব্যবহৃত হয়েছে *</label><input type="text" id="txPurpose" placeholder="যেমন: পাইপলাইন মেরামত"/></div>
+        <div class="fg"><label>ওয়ার্ক অর্ডার নং</label><input type="text" id="txWorkOrder" placeholder="যেমন: WO-2026-014"/></div>
+      </div>
+      <div class="fg"><label>মন্তব্য</label><textarea id="txNote" rows="2" style="resize:vertical;"></textarea></div>
+      <div class="fg"><label>ছবি (ঐচ্ছিক)</label><input type="file" accept="image/*" id="txImage" onchange="previewTxnImage('tx')"/>
+        <img id="txImagePreview" style="display:none;margin-top:8px;max-width:100%;max-height:160px;border-radius:8px;"/>
+      </div>
+      <div id="txCustomFields"></div>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('items','txCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
+      <button class="btn-sub" onclick="saveTxn()">✅ সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT TRANSACTION -->
+<div class="mo" id="modalEditTxn">
+  <div class="modal">
+    <div class="mhdr"><h3>✏️ লেনদেন সম্পাদনা</h3><button class="btn-x" onclick="closeModal('modalEditTxn')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="etxId"/>
+      <input type="hidden" id="etxImageCurrent"/>
+      <div class="fg-row">
+        <div class="fg"><label>বিভাগ *</label>
+          <select id="etxDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
+        </div>
+        <div class="fg"><label>ধরন *</label>
+          <select id="etxType" onchange="toggleTxnType('etx')"><option value="in">➕ যুক্ত হলো (ইন)</option><option value="out">➖ ব্যবহার হলো (আউট)</option></select>
+        </div>
+      </div>
+      <div class="fg"><label>তারিখ *</label><input type="date" id="etxDate"/></div>
+      <div class="fg"><label>প্রোডাক্টের নাম *</label><input type="text" id="etxProduct" list="txProductList"/></div>
+      <div class="fg-row">
+        <div class="fg"><label>পরিমাণ *</label><input type="number" id="etxQty" min="0"/></div>
+        <div class="fg"><label>একক</label><input type="text" id="etxUnit"/></div>
+      </div>
+      <div id="etxInWrap" class="fg"><label>উৎস (সরবরাহকারী)</label><input type="text" id="etxSource"/></div>
+      <div id="etxOutWrap">
+        <div class="fg"><label>কোন কাজে ব্যবহৃত হয়েছে *</label><input type="text" id="etxPurpose"/></div>
+        <div class="fg"><label>ওয়ার্ক অর্ডার নং</label><input type="text" id="etxWorkOrder"/></div>
+      </div>
+      <div class="fg"><label>মন্তব্য</label><textarea id="etxNote" rows="2" style="resize:vertical;"></textarea></div>
+      <div class="fg"><label>ছবি (ঐচ্ছিক — পাল্টাতে না চাইলে খালি রাখুন)</label><input type="file" accept="image/*" id="etxImage" onchange="previewTxnImage('etx')"/>
+        <img id="etxImagePreview" style="display:none;margin-top:8px;max-width:100%;max-height:160px;border-radius:8px;"/>
+      </div>
+      <div id="etxCustomFields"></div>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('items','etxCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
+      <button class="btn-sub" onclick="updateTxn()">✅ আপডেট করুন</button>
     </div>
   </div>
 </div>
@@ -842,8 +850,7 @@ window.addEventListener('unhandledrejection', function(ev){
 // ═══════════════════════════════════════════════════════
 const CFG = {
   SUPER_ADMIN_EMAIL: 'atikuzzaman53@gmail.com',
-  TABLE_ITEMS:  'stock_items',
-  TABLE_LOGS:   'unload_logs',
+  TABLE_TXN:    'stock_transactions', // 🆕 একীভূত লেনদেন টেবিল (stock_items + unload_logs-এর জায়গায়)
   TABLE_PROF:   'profiles',
   TABLE_MANPOWER: 'manpower',
   TABLE_ACTIVITIES: 'activities',
@@ -878,26 +885,13 @@ let supaSession = null;
 // ═══════════════════════════════════════════════════════
 //  LOCAL DATA
 // ═══════════════════════════════════════════════════════
-const SAMPLE_ITEMS = [
-  {id:'s1',dept:'field',name:'বল ভালভ ২ ইঞ্চি',qty:24,optimum:30,unit:'পিস',incoming:6,month:1,year:2025,note:''},
-  {id:'s2',dept:'field',name:'গেট ভালভ ৪ ইঞ্চি',qty:8,optimum:15,unit:'পিস',incoming:4,month:1,year:2025,note:''},
-  {id:'s3',dept:'plant',name:'লুব্রিকেটিং অয়েল SAE-40',qty:200,optimum:300,unit:'লিটার',incoming:100,month:1,year:2025,note:''},
-  {id:'s4',dept:'plant',name:'বেয়ারিং SKF 6205',qty:15,optimum:20,unit:'পিস',incoming:0,month:1,year:2025,note:''},
-  {id:'s5',dept:'production',name:'সিলিকা জেল',qty:150,optimum:200,unit:'কেজি',incoming:50,month:1,year:2025,note:''},
-  {id:'s6',dept:'compressor',name:'কম্প্রেসর ভালভ সেট',qty:4,optimum:8,unit:'সেট',incoming:2,month:1,year:2025,note:'ক্রিটিক্যাল'},
-  {id:'s7',dept:'security',name:'হেলমেট',qty:30,optimum:40,unit:'পিস',incoming:10,month:1,year:2025,note:''},
-  {id:'s8',dept:'admin',name:'A4 পেপার রিম',qty:20,optimum:30,unit:'রিম',incoming:10,month:1,year:2025,note:''},
-  {id:'s9',dept:'electric',name:'ক্যাবল ৪mm² কপার',qty:200,optimum:300,unit:'মিটার',incoming:100,month:1,year:2025,note:''},
-  {id:'s10',dept:'electric',name:'MCB ২৫A',qty:15,optimum:20,unit:'পিস',incoming:5,month:1,year:2025,note:''},
+// 🆕 একীভূত লেনদেন ডেটা (stock_items + unload_logs-এর জায়গায়)
+const SAMPLE_TXNS = [
+  {id:'t1',dept:'field',product_name:'বল ভালভ ২ ইঞ্চি',txn_type:'in',qty:24,unit:'পিস',source:'রহিম ট্রেডিং',purpose:null,work_order:null,note:'',image_data:null,txn_date:'2025-01-05',month:1,year:2025},
+  {id:'t2',dept:'plant',product_name:'লুব্রিকেটিং অয়েল SAE-40',txn_type:'in',qty:200,unit:'লিটার',source:'তোতা এন্টারপ্রাইজ',purpose:null,work_order:null,note:'',image_data:null,txn_date:'2025-01-10',month:1,year:2025},
 ];
-const SAMPLE_LOGS = [
-  {id:'l1',date:'2025-01-05',dept:'field',item:'বল ভালভ ২ ইঞ্চি',qty:12,unit:'পিস',location:'মেইন গেট গুদাম',supplier:'রহিম ট্রেডিং',month:1,year:2025},
-  {id:'l2',date:'2025-01-10',dept:'plant',item:'লুব্রিকেটিং অয়েল SAE-40',qty:200,unit:'লিটার',location:'প্লান্ট স্টোর',supplier:'তোতা এন্টারপ্রাইজ',month:1,year:2025},
-];
-function getItems(){ return JSON.parse(localStorage.getItem('bgfcl_items')||'null') || SAMPLE_ITEMS; }
-function getLogs(){  return JSON.parse(localStorage.getItem('bgfcl_logs')||'null')  || SAMPLE_LOGS; }
-function saveItems(d){ localStorage.setItem('bgfcl_items',JSON.stringify(d)); }
-function saveLogs(d){  localStorage.setItem('bgfcl_logs', JSON.stringify(d)); }
+function getTxns(){ return JSON.parse(localStorage.getItem('bgfcl_txns')||'null') || SAMPLE_TXNS; }
+function saveTxns(d){ localStorage.setItem('bgfcl_txns',JSON.stringify(d)); }
 function getManpower(){    return JSON.parse(localStorage.getItem('bgfcl_manpower')||'null')   || []; }
 function getActivities(){  return JSON.parse(localStorage.getItem('bgfcl_activities')||'null') || []; }
 function saveManpower(d){  localStorage.setItem('bgfcl_manpower', JSON.stringify(d)); }
@@ -1107,8 +1101,7 @@ async function collectCustomFieldValues(containerId, existingValues={}){
   }
   return result;
 }
-if(!localStorage.getItem('bgfcl_items')) saveItems(SAMPLE_ITEMS);
-if(!localStorage.getItem('bgfcl_logs'))  saveLogs(SAMPLE_LOGS);
+if(!localStorage.getItem('bgfcl_txns')) saveTxns(SAMPLE_TXNS);
 
 // ═══════════════════════════════════════════════════════
 //  SUPABASE HELPERS
@@ -1261,7 +1254,7 @@ async function supaAuthGet(path){
 let lastSupaError = null;
 async function checkSupaConn(){
   try{
-    await supa(CFG.TABLE_ITEMS+'?limit=1');
+    await supa(CFG.TABLE_TXN+'?limit=1');
     lastSupaError = null;
     setSupaStatus(true);
     return true;
@@ -1630,8 +1623,7 @@ let realtimeChannel = null;
 let _rtReloadTimers = {}; // প্রতি টেবিলের জন্য আলাদা ডিবাউন্স, বারবার দ্রুত event এলে একসাথে একবারই রিফ্রেশ হবে
 
 const RT_TABLES = [
-  { name: CFG.TABLE_ITEMS, reload: reloadItemsFromCloud },
-  { name: CFG.TABLE_LOGS,  reload: reloadLogsFromCloud },
+  { name: CFG.TABLE_TXN, reload: reloadTxnsFromCloud },
   { name: CFG.TABLE_MANPOWER,   reload: reloadManpowerFromCloud },
   { name: CFG.TABLE_ACTIVITIES, reload: reloadActivitiesFromCloud },
   { name: CFG.TABLE_ATTENDANCE, reload: reloadAttendanceFromCloud },
@@ -1664,7 +1656,7 @@ function initRealtime(){
         payload=>{
           scheduleRtReload(t.name, t.reload);
           // ব্যবহারকারী যে টেবিলটা এখন দেখছেন সেটাতে পরিবর্তন হলে হালকা toast দেখানো
-          const activeTable = currentTab==='materials' ? [CFG.TABLE_ITEMS,CFG.TABLE_LOGS]
+          const activeTable = currentTab==='materials' ? [CFG.TABLE_TXN]
                              : currentTab==='manpower'  ? [CFG.TABLE_MANPOWER,CFG.TABLE_ATTENDANCE]
                              : [CFG.TABLE_ACTIVITIES];
           if(activeTable.includes(t.name)) toast('🔄 অন্য জায়গা থেকে আপডেট হয়েছে');
@@ -1682,14 +1674,9 @@ function stopRealtime(){
   try{ if(realtimeChannel){ realtimeClient?.removeChannel(realtimeChannel); realtimeChannel=null; } }catch(e){}
 }
 
-async function reloadItemsFromCloud(){
-  const items = await supa(CFG.TABLE_ITEMS+'?order=year,month');
-  if(items?.length) saveItems(items);
-  if(currentTab==='materials') renderAll();
-}
-async function reloadLogsFromCloud(){
-  const logs = await supa(CFG.TABLE_LOGS+'?order=date');
-  if(logs?.length) saveLogs(logs);
+async function reloadTxnsFromCloud(){
+  const txns = await supa(CFG.TABLE_TXN+'?order=txn_date.desc');
+  if(txns?.length) saveTxns(txns);
   if(currentTab==='materials') renderAll();
 }
 async function reloadManpowerFromCloud(){
@@ -1714,11 +1701,9 @@ async function reloadAttendanceFromCloud(){
 
 async function fetchFromCloud(){
   try{
-    const items = await supa(CFG.TABLE_ITEMS+'?order=year,month');
-    const logs  = await supa(CFG.TABLE_LOGS+'?order=date');
-    if(items?.length) saveItems(items);
-    if(logs?.length)  saveLogs(logs);
-  }catch(e){ /* items/logs cloud fetch failed, keep local */ }
+    const txns = await supa(CFG.TABLE_TXN+'?order=txn_date.desc');
+    if(txns?.length) saveTxns(txns);
+  }catch(e){ /* transactions cloud fetch failed, keep local */ }
   // মালামাল ছাড়া অন্য টেবিলগুলো (manpower/activities) supabase_setup.sql আপডেট না করা পর্যন্ত
   // নাও থাকতে পারে, তাই আলাদাভাবে try/catch করা হলো যেন একটির অভাবে বাকিগুলো আটকে না যায়
   //
@@ -1750,12 +1735,9 @@ async function syncNow(){
   if(!supaOk){ toast('⚠️ ক্লাউড সংযোগ নেই — ইন্টারনেট চেক করুন'); checkSupaConn(); return; }
   showLoader('ক্লাউডে সিঙ্ক হচ্ছে...');
   try{
-    const items = getItems();
-    const logs  = getLogs();
-    await supa(CFG.TABLE_ITEMS,'DELETE',null);
-    for(const i of items) await supa(CFG.TABLE_ITEMS,'POST',i).catch(()=>{});
-    await supa(CFG.TABLE_LOGS,'DELETE',null);
-    for(const l of logs)  await supa(CFG.TABLE_LOGS,'POST',l).catch(()=>{});
+    const txns = getTxns();
+    await supa(CFG.TABLE_TXN,'DELETE',null);
+    for(const t of txns) await supa(CFG.TABLE_TXN,'POST',t).catch(()=>{});
     try{
       const manpower = getManpower();
       await supa(CFG.TABLE_MANPOWER,'DELETE',null);
@@ -1791,7 +1773,7 @@ function canEdit(dept){
 //  EXPORT / IMPORT
 // ═══════════════════════════════════════════════════════
 function exportJSON(){
-  const blob = new Blob([JSON.stringify({items:getItems(),logs:getLogs(),manpower:getManpower(),activities:getActivities(),at:new Date().toISOString()},null,2)],{type:'application/json'});
+  const blob = new Blob([JSON.stringify({txns:getTxns(),manpower:getManpower(),activities:getActivities(),at:new Date().toISOString()},null,2)],{type:'application/json'});
   const a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
   a.download=`bgfcl_backup_${new Date().toISOString().slice(0,10)}.json`;
@@ -1803,8 +1785,7 @@ function importJSON(e){
   rd.onload=ev=>{
     try{
       const d=JSON.parse(ev.target.result);
-      if(d.items)      saveItems(d.items);
-      if(d.logs)       saveLogs(d.logs);
+      if(d.txns)       saveTxns(d.txns);
       if(d.manpower)   saveManpower(d.manpower);
       if(d.activities) saveActivities(d.activities);
       renderCurrentTab(); toast('✅ Import সফল');
@@ -1841,16 +1822,18 @@ function initApp(){
     const b=e.target.closest('.main-tab'); if(!b) return;
     switchMainTab(b.dataset.tab);
   });
-  document.getElementById('btnAddItem').addEventListener('click',()=>{
-    document.getElementById('fDept').value = currentUser?.reqDept||'field';
+  document.getElementById('btnAddTxn').addEventListener('click',()=>{
+    document.getElementById('txDept').value = currentUser?.reqDept||'field';
+    document.getElementById('txType').value = 'in';
+    document.getElementById('txDate').value = new Date().toISOString().slice(0,10);
+    ['txProduct','txQty','txUnit','txSource','txPurpose','txWorkOrder','txNote'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('txImage').value='';
+    document.getElementById('txImagePreview').style.display='none';
     _cfValueCache.items = {};
-    renderCustomFieldInputs('items','fCustomFields',{});
-    openModal('modalItem');
-  });
-  document.getElementById('btnAddLog').addEventListener('click',()=>{
-    document.getElementById('lDate').value=`${Y}-${String(M).padStart(2,'0')}-01`;
-    document.getElementById('lDept').value = currentUser?.reqDept||'field';
-    openModal('modalLog');
+    renderCustomFieldInputs('items','txCustomFields',{});
+    refreshProductDatalist();
+    toggleTxnType('tx');
+    openModal('modalTxn');
   });
   document.getElementById('btnAddManpower').addEventListener('click', openAddManpower);
   document.getElementById('btnAddActivity').addEventListener('click', openAddActivity);
@@ -1874,8 +1857,28 @@ function initApp(){
 // ═══════════════════════════════════════════════════════
 //  RENDER
 // ═══════════════════════════════════════════════════════
-function getFI(){ return getItems().filter(i=>i.month==M&&i.year==Y&&(filterDept==='all'||i.dept===filterDept)); }
-function getFL(){ return getLogs().filter(l=>l.month==M&&l.year==Y&&(filterDept==='all'||l.dept===filterDept)); }
+// এই মাসে যত লেনদেন হয়েছে — লেনদেন লগ টেবিলের জন্য (কালানুক্রমিক, নতুন আগে)
+function getFT(){
+  return getTxns()
+    .filter(t=>t.month==M&&t.year==Y&&(filterDept==='all'||t.dept===filterDept))
+    .sort((a,b)=> (b.txn_date||'').localeCompare(a.txn_date||''));
+}
+// নির্বাচিত মাস পর্যন্ত (cumulative) প্রতিটা প্রোডাক্টের বর্তমান স্টক —
+// dept + product_name অনুযায়ী গ্রুপ করে সব 'in' যোগ ও সব 'out' বিয়োগ করে বের করা হয়
+function getCurrentStock(deptFilter){
+  deptFilter = deptFilter===undefined ? filterDept : deptFilter;
+  const upto = getTxns().filter(t=> (t.year<Y) || (t.year==Y && t.month<=M) )
+                        .filter(t=> deptFilter==='all'||t.dept===deptFilter);
+  const map={};
+  upto.forEach(t=>{
+    const key=t.dept+'||'+t.product_name;
+    if(!map[key]) map[key]={dept:t.dept, product_name:t.product_name, unit:t.unit||'', qty:0, lastDate:t.txn_date};
+    map[key].qty += (t.txn_type==='in' ? +t.qty : -t.qty);
+    if(t.unit) map[key].unit = t.unit;
+    if((t.txn_date||'') > (map[key].lastDate||'')) map[key].lastDate = t.txn_date;
+  });
+  return Object.values(map).sort((a,b)=> a.product_name.localeCompare(b.product_name,'bn'));
+}
 
 // ═══════════════════════════════════════════════════════
 //  MAIN TAB SWITCHING (মালামাল / জনবল / কার্যক্রম)
@@ -1916,33 +1919,23 @@ function renderCurrentTab(){
 }
 
 function renderAll(){
-  const items=getFI(), logs=getFL();
-  document.getElementById('sumTotal').textContent    = items.length;
-  document.getElementById('sumIncoming').textContent = items.filter(i=>i.incoming>0).length;
-  document.getElementById('sumLow').textContent      = items.filter(i=>i.qty<i.optimum*.5).length;
+  const stock = getCurrentStock();      // এই মাস পর্যন্ত cumulative বর্তমান স্টক (নির্বাচিত বিভাগ অনুযায়ী)
+  const monthTxns = getFT();            // শুধু এই মাসের লেনদেন
+  document.getElementById('sumTotal').textContent    = stock.length;
+  document.getElementById('sumIncoming').textContent = monthTxns.filter(t=>t.txn_type==='in').length;
+  document.getElementById('sumLow').textContent      = monthTxns.filter(t=>t.txn_type==='out').length;
   document.getElementById('logLabel').textContent    = `${MN[M]} ${Y}`;
-  renderCards(items);
+  renderCards(stock);
   renderChart();
-  renderLog(logs);
+  renderTxnLog(monthTxns);
 }
 
-function getSt(item){
-  const p=item.optimum>0?item.qty/item.optimum:1;
-  if(p>=.8) return{l:'পর্যাপ্ত',c:'ist-ok'};
-  if(p>=.5) return{l:'মধ্যম',c:'ist-mid'};
-  return{l:'সংকট',c:'ist-low'};
-}
-
-function renderCards(items){
+function renderCards(stock){
   const grid=document.getElementById('deptGrid');
   const depts=filterDept==='all'?Object.keys(DEPT):[filterDept];
   grid.innerHTML='';
   depts.forEach(dk=>{
-    const cfg=DEPT[dk], di=items.filter(i=>i.dept===dk);
-    const tq=di.reduce((s,i)=>s+i.qty,0), to=di.reduce((s,i)=>s+i.optimum,0);
-    const pct=to>0?Math.min(100,Math.round(tq/to*100)):0;
-    const low=di.filter(i=>i.qty<i.optimum*.5).length;
-    const pc=pct>=80?'#10B981':pct>=50?'#F97316':'#EF4444';
+    const cfg=DEPT[dk], di=stock.filter(i=>i.dept===dk);
     const canE=canEdit(dk);
     const card=document.createElement('div');
     card.className='dept-card';
@@ -1950,25 +1943,18 @@ function renderCards(items){
     card.innerHTML=`
       <div class="dept-hdr" style="background:${cfg.bg};">
         <div class="dept-icon" style="background:${cfg.color}20;">${cfg.icon}</div>
-        <div><div class="dept-name" style="color:${cfg.color};">${cfg.name}</div><div class="dept-sub">${di.length} ধরনের মালামাল</div></div>
-        <span class="dept-badge" style="${low>0?'background:#FEE2E2;color:#DC2626':'background:#D1FAE5;color:#059669'}">${low>0?'⚠️ '+low+' সংকট':'✅ স্বাভাবিক'}</span>
-      </div>
-      <div class="prog-wrap">
-        <div class="prog-label"><span>স্টক মাত্রা</span><span style="font-weight:600;color:${pc};">${pct}%</span></div>
-        <div class="prog-bar"><div class="prog-fill" style="width:0%;background:linear-gradient(90deg,${pc},${pc}88);" data-t="${pct}"></div></div>
+        <div><div class="dept-name" style="color:${cfg.color};">${cfg.name}</div><div class="dept-sub">${di.length} ধরনের প্রোডাক্ট</div></div>
       </div>
       <div class="dept-items">
         ${di.length===0
-          ? `<div class="empty-st"><div class="ei">📭</div><p>এই মাসে কোনো মালামাল নেই</p></div>`
+          ? `<div class="empty-st"><div class="ei">📭</div><p>এখনো কোনো স্টক নেই</p></div>`
           : `<ul class="items-list">${di.map((item,idx)=>{
-              const st=getSt(item);
-              const itag=item.incoming>0?`<span class="in-tag">🚚+${item.incoming}</span>`:'';
-              const acts=canE?`<button class="btn-ei" onclick="openEditItem('${item.id}')" title="সম্পাদনা">✏️</button><button class="btn-di" onclick="deleteItem('${item.id}')" title="মুছুন">🗑️</button>`:'';
+              const lowQty = item.qty<=0;
               return `<li class="item-row${idx>=5?' item-extra':''}">
                 <div class="item-dot" style="background:${cfg.color};"></div>
-                <span class="item-name">${escHtml(item.name)}</span>${itag}
-                <span class="item-qty">${item.qty}<small style="color:#94A3B8;font-weight:400;"> ${item.unit||''}</small></span>
-                <span class="ist ${st.c}">${st.l}</span>${acts}
+                <span class="item-name" style="cursor:pointer;" onclick="filterProduct='${escHtml(item.product_name)}';renderTxnLog();document.getElementById('logLabel').scrollIntoView({behavior:'smooth'});" title="এই প্রোডাক্টের লেনদেন ইতিহাস দেখুন">${escHtml(item.product_name)}</span>
+                <span class="item-qty">${item.qty}<small style="color:#94A3B8;font-weight:400;"> ${escHtml(item.unit)||''}</small></span>
+                <span class="ist ${lowQty?'ist-low':'ist-ok'}">${lowQty?'শেষ':'আছে'}</span>
               </li>`;
             }).join('')}</ul>
             ${more>0?`<button class="btn-expand" onclick="const p=this.previousElementSibling.parentElement;const exp=p.classList.toggle('expanded');this.textContent=exp?'কম দেখুন ▴':'আরও ${more}টি দেখুন ▾';">আরও ${more}টি দেখুন ▾</button>`:''}`
@@ -1976,9 +1962,6 @@ function renderCards(items){
       </div>`;
     grid.appendChild(card);
   });
-  setTimeout(()=>{
-    document.querySelectorAll('.prog-fill[data-t]').forEach(b=>{b.style.width=b.dataset.t+'%';});
-  },100);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1994,62 +1977,95 @@ function renderChart(){
     return;
   }
   if(chartInst){chartInst.destroy();chartInst=null;}
-  const items=getItems();
+  const txns=getTxns();
   const fnt={family:'Hind Siliguri',size:11};
 
   if(filterChart==='bar'){
+    // বিভাগভিত্তিক তুলনা: বর্তমান প্রোডাক্ট-ধরন সংখ্যা + এই মাসে ইন/আউট লেনদেন সংখ্যা (সব গণনা-ভিত্তিক, একক ভিন্ন হলেও তুলনাযোগ্য)
     const depts=Object.keys(DEPT);
+    const stockAll=getCurrentStock('all');
     chartInst=new Chart(cv,{type:'bar',
       data:{labels:depts.map(d=>DEPT[d].name.replace('মেইনটেন্যান্স','মেইন.')),
         datasets:[
-          {label:'বর্তমান',data:depts.map(dk=>items.filter(i=>i.dept===dk&&i.month==M&&i.year==Y).reduce((s,i)=>s+i.qty,0)),backgroundColor:depts.map(dk=>DEPT[dk].color+'CC'),borderRadius:5,borderSkipped:false},
-          {label:'অপটিমাম',data:depts.map(dk=>items.filter(i=>i.dept===dk&&i.month==M&&i.year==Y).reduce((s,i)=>s+i.optimum,0)),backgroundColor:'#E2E8F0',borderRadius:5,borderSkipped:false},
-          {label:'আসন্ন',data:depts.map(dk=>items.filter(i=>i.dept===dk&&i.month==M&&i.year==Y).reduce((s,i)=>s+(i.incoming||0),0)),backgroundColor:'#3B82F688',borderRadius:5,borderSkipped:false},
+          {label:'প্রোডাক্ট ধরন',data:depts.map(dk=>stockAll.filter(i=>i.dept===dk).length),backgroundColor:depts.map(dk=>DEPT[dk].color+'CC'),borderRadius:5,borderSkipped:false},
+          {label:'এই মাসে ইন',data:depts.map(dk=>txns.filter(t=>t.dept===dk&&t.month==M&&t.year==Y&&t.txn_type==='in').length),backgroundColor:'#10B981AA',borderRadius:5,borderSkipped:false},
+          {label:'এই মাসে আউট',data:depts.map(dk=>txns.filter(t=>t.dept===dk&&t.month==M&&t.year==Y&&t.txn_type==='out').length),backgroundColor:'#EF4444AA',borderRadius:5,borderSkipped:false},
         ]},
       options:{responsive:true,plugins:{legend:{position:'top',labels:{font:fnt}}},scales:{y:{beginAtZero:true,ticks:{font:fnt}},x:{ticks:{font:fnt}}}}
     });
   }else if(filterChart==='line'){
+    // মাসভিত্তিক ট্রেন্ড: সারা বছরের প্রতি মাসে মোট ইন-পরিমাণ বনাম আউট-পরিমাণ (নির্বাচিত বিভাগ অনুযায়ী)
     const ms=Array.from({length:12},(_,i)=>i+1);
-    const depts=filterDept==='all'?['field','plant','production']:[filterDept];
+    const inData  = ms.map(m=>txns.filter(t=>t.month===m&&t.year===Y&&t.txn_type==='in' &&(filterDept==='all'||t.dept===filterDept)).reduce((s,t)=>s+ (+t.qty||0),0));
+    const outData = ms.map(m=>txns.filter(t=>t.month===m&&t.year===Y&&t.txn_type==='out'&&(filterDept==='all'||t.dept===filterDept)).reduce((s,t)=>s+ (+t.qty||0),0));
     chartInst=new Chart(cv,{type:'line',
-      data:{labels:MN.slice(1),datasets:depts.map(dk=>({label:DEPT[dk].name,data:ms.map(m=>items.filter(i=>i.dept===dk&&i.month===m&&i.year===Y).reduce((s,i)=>s+i.qty,0)),borderColor:DEPT[dk].color,backgroundColor:DEPT[dk].color+'22',tension:.4,fill:true,pointRadius:3}))},
+      data:{labels:MN.slice(1),datasets:[
+        {label:'যুক্ত হয়েছে (ইন)',data:inData, borderColor:'#10B981',backgroundColor:'#10B98122',tension:.4,fill:true,pointRadius:3},
+        {label:'ব্যবহার হয়েছে (আউট)',data:outData,borderColor:'#EF4444',backgroundColor:'#EF444422',tension:.4,fill:true,pointRadius:3},
+      ]},
       options:{responsive:true,plugins:{legend:{position:'top',labels:{font:fnt}}},scales:{y:{beginAtZero:true,ticks:{font:fnt}},x:{ticks:{font:fnt}}}}
     });
   }else if(filterChart==='pie'){
+    // স্টক বিতরণ: বিভাগ অনুযায়ী প্রোডাক্ট-ধরন সংখ্যার ভাগ
     const depts=Object.keys(DEPT);
+    const stockAll=getCurrentStock('all');
     chartInst=new Chart(cv,{type:'doughnut',
-      data:{labels:depts.map(dk=>DEPT[dk].name),datasets:[{data:depts.map(dk=>items.filter(i=>i.dept===dk&&i.month==M&&i.year==Y).reduce((s,i)=>s+i.qty,0)),backgroundColor:depts.map(dk=>DEPT[dk].color),borderWidth:2,hoverOffset:8}]},
+      data:{labels:depts.map(dk=>DEPT[dk].name),datasets:[{data:depts.map(dk=>stockAll.filter(i=>i.dept===dk).length),backgroundColor:depts.map(dk=>DEPT[dk].color),borderWidth:2,hoverOffset:8}]},
       options:{responsive:true,cutout:'60%',plugins:{legend:{position:'right',labels:{font:fnt,padding:10}}}}
     });
   }else{
-    const f=getFI();
+    // ইন বনাম আউট (এই মাস, নির্বাচিত বিভাগ) — মোট লেনদেন-সংখ্যা
+    const f=getFT();
     chartInst=new Chart(cv,{type:'bar',
-      data:{labels:['পর্যাপ্ত','মধ্যম','সংকট'],datasets:[{label:'আইটেম',data:[f.filter(i=>i.qty>=i.optimum*.8).length,f.filter(i=>i.qty>=i.optimum*.5&&i.qty<i.optimum*.8).length,f.filter(i=>i.qty<i.optimum*.5).length],backgroundColor:['#10B981CC','#F97316CC','#EF4444CC'],borderRadius:8,borderSkipped:false}]},
+      data:{labels:['যুক্ত হয়েছে (ইন)','ব্যবহার হয়েছে (আউট)'],datasets:[{label:'লেনদেন সংখ্যা',data:[f.filter(t=>t.txn_type==='in').length,f.filter(t=>t.txn_type==='out').length],backgroundColor:['#10B981CC','#EF4444CC'],borderRadius:8,borderSkipped:false}]},
       options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{font:fnt}},x:{ticks:{font:fnt}}}}
     });
   }
 }
 
 // ═══════════════════════════════════════════════════════
-//  LOG TABLE
+//  লেনদেন লগ (একীভূত — আগের "আনলোড লগ")
 // ═══════════════════════════════════════════════════════
-function renderLog(logs){
+let filterProduct = null; // প্রোডাক্ট-নাম ধরে লগ ফিল্টার (dept card-এ ক্লিক করলে সেট হয়)
+
+function renderTxnLog(monthTxns){
   const tb=document.getElementById('logBody');
+  const filterBox=document.getElementById('logProductFilterBox');
+  let list = monthTxns || getFT();
+  if(filterProduct){
+    list = list.filter(t=>t.product_name===filterProduct);
+    filterBox.style.display='';
+    document.getElementById('logProductFilterName').textContent = filterProduct;
+  } else {
+    filterBox.style.display='none';
+  }
   tb.innerHTML='';
-  if(!logs.length){
-    tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:28px;color:#94A3B8;">এই মাসে কোনো আনলোড লগ নেই</td></tr>`;
+  if(!list.length){
+    tb.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:28px;color:#94A3B8;">এই মাসে কোনো লেনদেন নেই</td></tr>`;
     return;
   }
-  logs.forEach(l=>{
-    const cfg=DEPT[l.dept]||{color:'#64748B',name:l.dept};
-    const canE=canEdit(l.dept);
+  list.forEach(t=>{
+    const cfg=DEPT[t.dept]||{color:'#64748B',name:t.dept};
+    const canE=canEdit(t.dept);
+    const isIn = t.txn_type==='in';
+    const typeBadge = isIn
+      ? `<span class="tag-dept" style="background:#D1FAE5;color:#059669;">➕ ইন</span>`
+      : `<span class="tag-dept" style="background:#FEE2E2;color:#DC2626;">➖ আউট</span>`;
+    const detail = isIn
+      ? `উৎস: ${escHtml(t.source)||'—'}`
+      : `কাজ: ${escHtml(t.purpose)||'—'}${t.work_order?` (WO: ${escHtml(t.work_order)})`:''}`;
+    const imgCell = t.image_data
+      ? `<img src="${t.image_data}" style="width:36px;height:36px;object-fit:cover;border-radius:6px;cursor:pointer;" onclick="window.open(this.src,'_blank')"/>`
+      : '—';
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td>${l.date}</td><td><strong>${escHtml(l.item)}</strong></td>
+      <td>${t.txn_date}</td><td><strong>${escHtml(t.product_name)}</strong></td>
       <td><span class="tag-dept" style="background:${cfg.color}22;color:${cfg.color};">${cfg.name}</span></td>
-      <td><strong>${l.qty}</strong> ${escHtml(l.unit)}</td>
-      <td>📍 ${escHtml(l.location)}</td><td>${escHtml(l.supplier)||'—'}</td>
-      <td>${canE?`<button class="btn-di" onclick="deleteLog('${l.id}')">🗑️</button>`:''}</td>`;
+      <td>${typeBadge}</td>
+      <td><strong>${isIn?'+':'−'}${t.qty}</strong> ${escHtml(t.unit)||''}</td>
+      <td style="font-size:12px;">${detail}</td>
+      <td>${imgCell}</td>
+      <td>${canE?`<button class="btn-ei" onclick="openEditTxn('${t.id}')" title="সম্পাদনা">✏️</button><button class="btn-di" onclick="deleteTxn('${t.id}')" title="মুছুন">🗑️</button>`:''}</td>`;
     tb.appendChild(tr);
   });
 }
@@ -2182,100 +2198,140 @@ function renderActivities(){
 // ═══════════════════════════════════════════════════════
 //  CRUD
 // ═══════════════════════════════════════════════════════
-async function saveItem(){
-  const dept=document.getElementById('fDept').value;
+async function saveTxn(){
+  const dept=document.getElementById('txDept').value;
   if(!canEdit(dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
-  const name=document.getElementById('fName').value.trim();
-  if(!name){ toast('⚠️ মালামালের নাম দিন'); return; }
-  const customFields = await collectCustomFieldValues('fCustomFields', {});
-  const ni={id:crypto.randomUUID(),dept,name,
-    qty:+document.getElementById('fQty').value||0,
-    optimum:+document.getElementById('fOptimum').value||0,
-    unit:document.getElementById('fUnit').value.trim(),
-    incoming:+document.getElementById('fIncoming').value||0,
-    note:document.getElementById('fNote').value.trim(),
-    month:M,year:Y, customFields};
-  const items=getItems(); items.push(ni); saveItems(items);
-  closeModal('modalItem');
-  ['fName','fQty','fOptimum','fUnit','fIncoming','fNote'].forEach(id=>document.getElementById(id).value='');
-  _cfValueCache.items = {};
-  renderCustomFieldInputs('items','fCustomFields',{});
-  renderAll(); toast('✅ মালামাল যোগ হয়েছে');
-  if(supaOk) supa(CFG.TABLE_ITEMS,'POST',ni).catch(notifyCloudSyncFail);
-}
-
-function openEditItem(id){
-  const item=getItems().find(i=>i.id===id); if(!item) return;
-  if(!canEdit(item.dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
-  document.getElementById('editItemId').value=id;
-  document.getElementById('efName').value=item.name;
-  document.getElementById('efQty').value=item.qty;
-  document.getElementById('efOptimum').value=item.optimum;
-  document.getElementById('efUnit').value=item.unit||'';
-  document.getElementById('efIncoming').value=item.incoming||0;
-  document.getElementById('efNote').value=item.note||'';
-  _cfValueCache.items = item.customFields||{};
-  renderCustomFieldInputs('items','efCustomFields', item.customFields||{});
-  openModal('modalEditItem');
-}
-
-async function updateItem(){
-  const id=document.getElementById('editItemId').value;
-  const items=getItems();
-  const idx=items.findIndex(i=>i.id===id); if(idx<0) return;
-  if(!canEdit(items[idx].dept)){ toast('⚠️ অনুমতি নেই'); return; }
-  const customFields = await collectCustomFieldValues('efCustomFields', items[idx].customFields||{});
-  items[idx]={...items[idx],
-    name:document.getElementById('efName').value.trim(),
-    qty:+document.getElementById('efQty').value||0,
-    optimum:+document.getElementById('efOptimum').value||0,
-    unit:document.getElementById('efUnit').value.trim(),
-    incoming:+document.getElementById('efIncoming').value||0,
-    note:document.getElementById('efNote').value.trim(),
+  const txn_type=document.getElementById('txType').value;
+  const date=document.getElementById('txDate').value;
+  const product_name=document.getElementById('txProduct').value.trim();
+  const qty=+document.getElementById('txQty').value||0;
+  if(!date||!product_name||qty<=0){ toast('⚠️ তারিখ, প্রোডাক্টের নাম ও পরিমাণ (০-এর বেশি) দিন'); return; }
+  if(txn_type==='out' && !document.getElementById('txPurpose').value.trim()){
+    toast('⚠️ কোন কাজে ব্যবহৃত হয়েছে তা দিন'); return;
+  }
+  const fileInput=document.getElementById('txImage');
+  let image_data=null;
+  if(fileInput.files && fileInput.files[0]){
+    try{ image_data = await readFileAsDataURL(fileInput.files[0]); }catch(e){ /* ছবি ছাড়াই সংরক্ষণ হবে */ }
+  }
+  const customFields = await collectCustomFieldValues('txCustomFields', {});
+  const d=new Date(date);
+  const nt={
+    id:crypto.randomUUID(), dept, product_name, txn_type,
+    qty, unit:document.getElementById('txUnit').value.trim(),
+    source:     txn_type==='in'  ? document.getElementById('txSource').value.trim()    : null,
+    purpose:    txn_type==='out' ? document.getElementById('txPurpose').value.trim()   : null,
+    work_order: txn_type==='out' ? document.getElementById('txWorkOrder').value.trim() : null,
+    note: document.getElementById('txNote').value.trim(),
+    image_data,
+    txn_date:date, month:d.getMonth()+1, year:d.getFullYear(),
     customFields,
   };
-  saveItems(items);
-  closeModal('modalEditItem');
-  renderAll(); toast('✅ আপডেট হয়েছে');
-  if(supaOk) supa(CFG.TABLE_ITEMS+'?id=eq.'+id,'PATCH',items[idx]).catch(notifyCloudSyncFail);
+  const txns=getTxns(); txns.push(nt); saveTxns(txns);
+  closeModal('modalTxn');
+  ['txProduct','txQty','txUnit','txSource','txPurpose','txWorkOrder','txNote'].forEach(id=>document.getElementById(id).value='');
+  fileInput.value=''; document.getElementById('txImagePreview').style.display='none';
+  _cfValueCache.items = {};
+  renderCustomFieldInputs('items','txCustomFields',{});
+  renderAll();
+  toast(txn_type==='in' ? '✅ মালামাল যুক্ত হয়েছে' : '✅ ব্যবহারের হিসাব যুক্ত হয়েছে');
+  if(supaOk) supa(CFG.TABLE_TXN,'POST',nt).catch(notifyCloudSyncFail);
 }
 
-function deleteItem(id){
-  const item=getItems().find(i=>i.id===id); if(!item) return;
-  if(!canEdit(item.dept)){ toast('⚠️ অনুমতি নেই'); return; }
-  if(!confirm('এই মালামাল মুছে দেবেন?')) return;
-  saveItems(getItems().filter(i=>i.id!==id));
-  renderAll(); toast('🗑️ মুছে গেছে');
-  if(supaOk) supa(CFG.TABLE_ITEMS+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
+function openEditTxn(id){
+  const t=getTxns().find(x=>x.id===id); if(!t) return;
+  if(!canEdit(t.dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  document.getElementById('etxId').value=id;
+  document.getElementById('etxDept').value=t.dept;
+  document.getElementById('etxType').value=t.txn_type;
+  document.getElementById('etxDate').value=t.txn_date;
+  document.getElementById('etxProduct').value=t.product_name;
+  document.getElementById('etxQty').value=t.qty;
+  document.getElementById('etxUnit').value=t.unit||'';
+  document.getElementById('etxSource').value=t.source||'';
+  document.getElementById('etxPurpose').value=t.purpose||'';
+  document.getElementById('etxWorkOrder').value=t.work_order||'';
+  document.getElementById('etxNote').value=t.note||'';
+  document.getElementById('etxImageCurrent').value = t.image_data||'';
+  document.getElementById('etxImage').value='';
+  const prev=document.getElementById('etxImagePreview');
+  if(t.image_data){ prev.src=t.image_data; prev.style.display=''; } else { prev.style.display='none'; }
+  _cfValueCache.items = t.customFields||{};
+  renderCustomFieldInputs('items','etxCustomFields', t.customFields||{});
+  toggleTxnType('etx');
+  openModal('modalEditTxn');
 }
 
-function saveLog(){
-  const dept=document.getElementById('lDept').value;
-  if(!canEdit(dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
-  const date=document.getElementById('lDate').value;
-  const item=document.getElementById('lItem').value.trim();
-  const loc =document.getElementById('lLocation').value.trim();
-  if(!date||!item||!loc){ toast('⚠️ তারিখ, মালামাল ও স্থান দিন'); return; }
+async function updateTxn(){
+  const id=document.getElementById('etxId').value;
+  const txns=getTxns();
+  const idx=txns.findIndex(x=>x.id===id); if(idx<0) return;
+  if(!canEdit(txns[idx].dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  const txn_type=document.getElementById('etxType').value;
+  const date=document.getElementById('etxDate').value;
+  const product_name=document.getElementById('etxProduct').value.trim();
+  const qty=+document.getElementById('etxQty').value||0;
+  if(!date||!product_name||qty<=0){ toast('⚠️ তারিখ, প্রোডাক্টের নাম ও পরিমাণ (০-এর বেশি) দিন'); return; }
+  if(txn_type==='out' && !document.getElementById('etxPurpose').value.trim()){
+    toast('⚠️ কোন কাজে ব্যবহৃত হয়েছে তা দিন'); return;
+  }
+  const fileInput=document.getElementById('etxImage');
+  let image_data = document.getElementById('etxImageCurrent').value || null;
+  if(fileInput.files && fileInput.files[0]){
+    try{ image_data = await readFileAsDataURL(fileInput.files[0]); }catch(e){ /* পুরনো ছবিই থেকে যাবে */ }
+  }
+  const customFields = await collectCustomFieldValues('etxCustomFields', txns[idx].customFields||{});
   const d=new Date(date);
-  const nl={id:crypto.randomUUID(),date,dept,item,
-    qty:+document.getElementById('lQty').value||0,
-    unit:document.getElementById('lUnit').value.trim(),
-    location:loc,supplier:document.getElementById('lSupplier').value.trim(),
-    month:d.getMonth()+1,year:d.getFullYear()};
-  const logs=getLogs(); logs.push(nl); saveLogs(logs);
-  closeModal('modalLog');
-  ['lItem','lQty','lUnit','lLocation','lSupplier'].forEach(id=>document.getElementById(id).value='');
-  renderAll(); toast('✅ লগ যোগ হয়েছে');
-  if(supaOk) supa(CFG.TABLE_LOGS,'POST',nl).catch(notifyCloudSyncFail);
+  txns[idx]={...txns[idx],
+    dept:document.getElementById('etxDept').value,
+    txn_type, product_name, qty,
+    unit:document.getElementById('etxUnit').value.trim(),
+    source:     txn_type==='in'  ? document.getElementById('etxSource').value.trim()    : null,
+    purpose:    txn_type==='out' ? document.getElementById('etxPurpose').value.trim()   : null,
+    work_order: txn_type==='out' ? document.getElementById('etxWorkOrder').value.trim() : null,
+    note: document.getElementById('etxNote').value.trim(),
+    image_data,
+    txn_date:date, month:d.getMonth()+1, year:d.getFullYear(),
+    customFields,
+  };
+  saveTxns(txns);
+  closeModal('modalEditTxn');
+  renderAll(); toast('✅ আপডেট হয়েছে');
+  if(supaOk) supa(CFG.TABLE_TXN+'?id=eq.'+id,'PATCH',txns[idx]).catch(notifyCloudSyncFail);
 }
 
-function deleteLog(id){
-  const log=getLogs().find(l=>l.id===id); if(!log) return;
-  if(!canEdit(log.dept)){ toast('⚠️ অনুমতি নেই'); return; }
-  if(!confirm('এই লগ মুছে দেবেন?')) return;
-  saveLogs(getLogs().filter(l=>l.id!==id));
-  renderAll(); toast('🗑️ লগ মুছে গেছে');
-  if(supaOk) supa(CFG.TABLE_LOGS+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
+function deleteTxn(id){
+  const t=getTxns().find(x=>x.id===id); if(!t) return;
+  if(!canEdit(t.dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  if(!confirm('এই লেনদেন মুছে দেবেন? (এতে প্রোডাক্টের বর্তমান স্টক হিসাবও বদলে যাবে)')) return;
+  saveTxns(getTxns().filter(x=>x.id!==id));
+  renderAll(); toast('🗑️ মুছে গেছে');
+  if(supaOk) supa(CFG.TABLE_TXN+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
+}
+
+// ধরন (ইন/আউট) অনুযায়ী ফর্মের প্রাসঙ্গিক অংশ দেখানো/লুকানো — prefix: 'tx' (নতুন) | 'etx' (এডিট)
+function toggleTxnType(prefix){
+  prefix = prefix || 'tx';
+  const type = document.getElementById(prefix+'Type').value;
+  document.getElementById(prefix+'InWrap').style.display  = type==='in'  ? '' : 'none';
+  document.getElementById(prefix+'OutWrap').style.display = type==='out' ? '' : 'none';
+}
+
+// ছবি সিলেক্ট করলে সাথে সাথে প্রিভিউ দেখানো — prefix: 'tx' | 'etx'
+function previewTxnImage(prefix){
+  const fileInput=document.getElementById(prefix+'Image');
+  const prev=document.getElementById(prefix+'ImagePreview');
+  if(fileInput.files && fileInput.files[0]){
+    readFileAsDataURL(fileInput.files[0]).then(url=>{ prev.src=url; prev.style.display=''; }).catch(()=>{});
+  }
+}
+
+// প্রোডাক্টের নাম টাইপ করার সময় আগের প্রোডাক্টের তালিকা সাজেশনে দেখানোর জন্য datalist রিফ্রেশ
+function refreshProductDatalist(){
+  const dl=document.getElementById('txProductList');
+  if(!dl) return;
+  const names=[...new Set(getTxns().map(t=>t.product_name))].sort((a,b)=>a.localeCompare(b,'bn'));
+  dl.innerHTML = names.map(n=>`<option value="${escHtml(n)}"></option>`).join('');
 }
 
 // ═══════════════════════════════════════════════════════

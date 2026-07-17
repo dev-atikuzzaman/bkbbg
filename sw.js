@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v1.3 — manpower date-column mismatch + '' -> null sanitizer fix
-const CACHE_NAME = 'bgfcl-v11';
+// BGFCL Inventory Service Worker v1.4 — unified stock transaction (in/out ledger) system
+const CACHE_NAME = 'bgfcl-v12';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
