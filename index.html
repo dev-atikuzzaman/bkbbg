@@ -84,9 +84,8 @@ header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,#1E3
 .role-admin{background:rgba(59,130,246,.3);color:#93C5FD;}
 .role-viewer{background:rgba(148,163,184,.2);color:var(--muted);}
 
-.main-tabs{display:flex;gap:6px;padding:8px 14px 4px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.08);}
-.main-tabs::-webkit-scrollbar{display:none;}
-.main-tab{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.75);font-family:var(--f);font-size:13px;font-weight:700;padding:9px 16px;border-radius:10px 10px 0 0;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;transition:all .2s;}
+.main-tabs{display:flex;gap:4px;padding:8px 8px 4px;border-bottom:1px solid rgba(255,255,255,.08);}
+.main-tab{flex:1 1 0;min-width:0;justify-content:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.75);font-family:var(--f);font-size:clamp(10px,3.2vw,13px);font-weight:700;padding:9px 4px;border-radius:10px 10px 0 0;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px;transition:all .2s;}
 .main-tab.active{background:var(--amber);border-color:var(--amber);color:var(--navy);box-shadow:0 -2px 10px rgba(244,163,0,.3);}
 
 .filter-bar{display:flex;gap:6px;padding:6px 14px 10px;overflow-x:auto;scrollbar-width:none;}
@@ -280,6 +279,65 @@ canvas#mainChart{width:100%!important;max-height:300px;}
   .header-text h1{font-size:14px;}
   .action-bar{gap:6px;}
 }
+
+/* ═══════════════════════════════════════════════════════
+   🆕 ফাইল/ডকুমেন্টস ম্যানেজার
+   ═══════════════════════════════════════════════════════ */
+.doc-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;}
+.doc-search{flex:1 1 160px;padding:9px 12px;border:1px solid var(--bd);border-radius:10px;font-family:var(--f);font-size:13px;}
+.doc-view-toggle{display:flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
+.doc-view-btn{background:#fff;border:none;padding:8px 12px;cursor:pointer;font-size:15px;color:var(--muted);}
+.doc-view-btn.active{background:var(--amber);color:#fff;}
+.doc-breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:10px;font-size:13px;}
+.doc-crumb{background:none;border:none;color:var(--navy);font-family:var(--f);font-size:13px;font-weight:600;cursor:pointer;padding:4px 6px;border-radius:6px;}
+.doc-crumb:hover{background:#F1F5F9;}
+.doc-crumb.current{color:var(--muted);font-weight:400;cursor:default;}
+.doc-crumb.current:hover{background:none;}
+.doc-crumb-sep{color:#CBD5E1;}
+.doc-crumb.drag-over{background:#FFFBEB;outline:2px dashed var(--amber);outline-offset:-2px;}
+.doc-tagbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.doc-tag-chip{background:#F1F5F9;border:1px solid var(--bd);color:#475569;font-family:var(--f);font-size:12px;padding:5px 11px;border-radius:20px;cursor:pointer;}
+.doc-tag-chip.active{background:#EDE9FE;border-color:#7C3AED;color:#7C3AED;font-weight:700;}
+
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+.doc-card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;user-select:none;transition:box-shadow .15s,transform .1s;position:relative;}
+.doc-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.doc-card.drag-over{outline:2px dashed var(--amber);outline-offset:-2px;background:#FFFBEB;}
+.doc-card.dragging{opacity:.4;}
+.doc-thumb{width:100%;aspect-ratio:1;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#F8FAFC;font-size:34px;margin-bottom:6px;}
+.doc-thumb img{width:100%;height:100%;object-fit:cover;}
+.doc-name{font-size:12px;font-weight:600;color:var(--navy);word-break:break-word;line-height:1.3;max-height:2.6em;overflow:hidden;}
+.doc-meta{font-size:10px;color:var(--muted);margin-top:2px;}
+.doc-card-menu-btn{position:absolute;top:2px;right:2px;background:rgba(255,255,255,.9);border:1px solid var(--bd);border-radius:50%;width:24px;height:24px;font-size:14px;line-height:1;cursor:pointer;color:var(--muted);}
+
+.doc-list{display:flex;flex-direction:column;gap:2px;}
+.doc-list-row{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:8px;cursor:pointer;user-select:none;}
+.doc-list-row:hover{background:#F8FAFC;}
+.doc-list-row.drag-over{outline:2px dashed var(--amber);outline-offset:-2px;background:#FFFBEB;}
+.doc-list-row.dragging{opacity:.4;}
+.doc-list-icon{width:34px;height:34px;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#F8FAFC;font-size:18px;flex-shrink:0;}
+.doc-list-icon img{width:100%;height:100%;object-fit:cover;}
+.doc-list-name{flex:1;font-size:13px;font-weight:600;color:var(--navy);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.doc-list-meta{font-size:11px;color:var(--muted);flex-shrink:0;}
+.doc-list-menu-btn{background:none;border:none;font-size:17px;color:var(--muted);cursor:pointer;padding:4px 8px;flex-shrink:0;}
+
+.doc-ctx-menu{position:fixed;z-index:400;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:170px;overflow:hidden;}
+.doc-ctx-item{display:block;width:100%;text-align:right;background:none;border:none;padding:10px 14px;font-family:var(--f);font-size:13px;text-align:left;cursor:pointer;color:var(--navy);}
+.doc-ctx-item:hover{background:#F1F5F9;}
+.doc-ctx-item.danger{color:#DC2626;}
+
+.doc-tree-item{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:8px;border:1px solid var(--bd);margin-bottom:6px;}
+.doc-tree-btn{background:var(--amber);color:#fff;border:none;font-family:var(--f);font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer;}
+
+.doc-drag-ghost{position:fixed;z-index:999;pointer-events:none;background:#fff;border:2px solid var(--amber);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:.95;}
+
+.doc-upload-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #F1F5F9;font-size:12px;}
+.doc-upload-row .dur{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.doc-upload-row .sz{color:var(--muted);flex-shrink:0;}
+
+@media(max-width:600px){
+  .doc-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));}
+}
 </style>
 </head>
 <body>
@@ -394,6 +452,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     <button class="main-tab active" data-tab="materials">📦 মালামাল</button>
     <button class="main-tab" data-tab="manpower">👷 জনবল</button>
     <button class="main-tab" data-tab="activities">📝 কার্যক্রম</button>
+    <button class="main-tab" data-tab="docs">📁 ফাইল</button>
   </div>
   <div class="filter-bar" id="deptFilter">
     <button class="filter-btn active" data-dept="all">🔍 সব বিভাগ</button>
@@ -560,8 +619,36 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       </div>
     </div>
   </div>
+
+  <!-- 🆕 ফাইল/ডকুমেন্টস ট্যাব -->
+  <div id="page-docs" class="page-section" style="display:none;">
+    <div class="action-bar" id="actionBarDocs" style="display:none;">
+      <button class="btn-p bp-amber" id="btnNewFolder">📁 নতুন ফোল্ডার</button>
+      <label class="btn-p bp-blue" style="cursor:pointer;">⬆️ ফাইল আপলোড
+        <input type="file" id="docFileInput" multiple style="display:none"/>
+      </label>
+    </div>
+
+    <div class="doc-toolbar">
+      <input type="text" class="doc-search" id="docSearchInput" placeholder="🔎 নাম দিয়ে খুঁজুন..." oninput="docSearchQuery=this.value;renderDocs();"/>
+      <div class="doc-view-toggle">
+        <button class="doc-view-btn" id="docViewGridBtn" onclick="setDocViewMode('grid')" title="গ্রিড ভিউ">▦</button>
+        <button class="doc-view-btn" id="docViewListBtn" onclick="setDocViewMode('list')" title="লিস্ট ভিউ">☰</button>
+      </div>
+    </div>
+
+    <div class="doc-breadcrumb" id="docBreadcrumb"></div>
+    <div class="doc-tagbar" id="docTagBar"></div>
+
+    <div id="docGridWrap" class="doc-grid"></div>
+    <div id="docListWrap" class="doc-list" style="display:none;"></div>
+  </div>
 </main>
 </div><!-- /appShell -->
+<!-- ড্র্যাগের সময় আঙুল/মাউস অনুসরণকারী ভাসমান ছায়া (মোবাইল টাচ-ড্র্যাগের জন্য) -->
+<div id="docDragGhost" class="doc-drag-ghost" style="display:none;"></div>
+<!-- ফাইল/ফোল্ডার কার্ডের "⋮" মেনু -->
+<div id="docCtxMenu" class="doc-ctx-menu" style="display:none;"></div>
 
 <!-- পূর্ণ টেমপ্লেট প্রিন্ট এরিয়া (স্ক্রিনে অদৃশ্য, printAttendanceReport() কল হলে JS দিয়ে পূরণ ও দৃশ্যমান হবে) -->
 <div id="reportPrintArea"></div>
@@ -640,6 +727,72 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('items','etxCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
       <button class="btn-sub" onclick="updateTxn()">✅ আপডেট করুন</button>
     </div>
+  </div>
+</div>
+
+<!-- 🆕 নতুন ফোল্ডার -->
+<div class="mo" id="modalNewFolder">
+  <div class="modal">
+    <div class="mhdr"><h3>📁 নতুন ফোল্ডার</h3><button class="btn-x" onclick="closeModal('modalNewFolder')">✕</button></div>
+    <div class="mbody">
+      <div class="fg"><label>ফোল্ডারের নাম *</label><input type="text" id="folderName" placeholder="যেমন: ইনভয়েস ২০২৬"/></div>
+      <div class="fg"><label>ক্যাটাগরি ট্যাগ (কমা দিয়ে আলাদা, ঐচ্ছিক)</label><input type="text" id="folderTags" placeholder="যেমন: হিসাব, জরুরি"/></div>
+      <button class="btn-sub" onclick="createFolder()">✅ তৈরি করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🆕 আপলোড স্টেজিং (একাধিক ফাইল, ট্যাগ দিয়ে আপলোড) -->
+<div class="mo" id="modalUploadStage">
+  <div class="modal">
+    <div class="mhdr"><h3>⬆️ ফাইল আপলোড</h3><button class="btn-x" onclick="closeModal('modalUploadStage')">✕</button></div>
+    <div class="mbody">
+      <div id="uploadFileList" style="max-height:180px;overflow-y:auto;margin-bottom:10px;"></div>
+      <div class="fg"><label>ক্যাটাগরি ট্যাগ (কমা দিয়ে আলাদা — সবগুলো ফাইলে যুক্ত হবে)</label><input type="text" id="uploadTags" placeholder="যেমন: ইনভয়েস, জানুয়ারি"/></div>
+      <p style="font-size:12px;color:var(--muted);margin:4px 0 12px;">🎥 ভিডিও ফাইল সর্বোচ্চ ১ মিনিট দৈর্ঘ্যের হতে পারবে।</p>
+      <button class="btn-sub" id="uploadConfirmBtn" onclick="startUpload()">✅ আপলোড শুরু করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🆕 রিনেম -->
+<div class="mo" id="modalRenameDoc">
+  <div class="modal">
+    <div class="mhdr"><h3>✏️ নাম পরিবর্তন</h3><button class="btn-x" onclick="closeModal('modalRenameDoc')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="renameDocId"/>
+      <div class="fg"><label>নতুন নাম *</label><input type="text" id="renameDocName"/></div>
+      <div class="fg"><label>ক্যাটাগরি ট্যাগ (কমা দিয়ে আলাদা)</label><input type="text" id="renameDocTags"/></div>
+      <button class="btn-sub" onclick="confirmRenameDoc()">✅ সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🆕 মুভ / কপি (ফোল্ডার পিকার) -->
+<div class="mo" id="modalMoveDoc">
+  <div class="modal">
+    <div class="mhdr"><h3 id="moveDocTitle">📂 সরান</h3><button class="btn-x" onclick="closeModal('modalMoveDoc')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="moveDocId"/>
+      <input type="hidden" id="moveDocMode"/>
+      <div id="moveDocTree"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 🆕 ডিটেইলস -->
+<div class="mo" id="modalDocDetails">
+  <div class="modal">
+    <div class="mhdr"><h3>ℹ️ বিস্তারিত</h3><button class="btn-x" onclick="closeModal('modalDocDetails')">✕</button></div>
+    <div class="mbody" id="docDetailsBody"></div>
+  </div>
+</div>
+
+<!-- 🆕 প্রিভিউ (ছবি/ভিডিও/অন্যান্য) -->
+<div class="mo" id="modalDocPreview">
+  <div class="modal" style="max-width:520px;">
+    <div class="mhdr"><h3 id="docPreviewTitle">প্রিভিউ</h3><button class="btn-x" onclick="closeModal('modalDocPreview')">✕</button></div>
+    <div class="mbody" id="docPreviewBody" style="text-align:center;"></div>
   </div>
 </div>
 
@@ -855,6 +1008,9 @@ const CFG = {
   TABLE_MANPOWER: 'manpower',
   TABLE_ACTIVITIES: 'activities',
   TABLE_ATTENDANCE: 'attendance',
+  TABLE_DOCS: 'doc_items',              // 🆕 ফাইল/ডকুমেন্টস ট্যাব
+  STORAGE_BUCKET: 'documents',          // 🆕 Supabase Storage বাকেট (ফাইলের বাইট এখানে)
+  MAX_VIDEO_SECONDS: 60,                // 🆕 ভিডিওর সর্বোচ্চ দৈর্ঘ্য
   URL: 'https://tqixslcjpeqbsoumnblo.supabase.co',
   KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxaXhzbGNqcGVxYnNvdW1uYmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MTgzMjQsImV4cCI6MjA5OTA5NDMyNH0.0Sv4-WMsxK4kFDXUL5b1LF6LGNYR0ti5niAEmzHWb8M',
 };
@@ -892,6 +1048,10 @@ const SAMPLE_TXNS = [
 ];
 function getTxns(){ return JSON.parse(localStorage.getItem('bgfcl_txns')||'null') || SAMPLE_TXNS; }
 function saveTxns(d){ localStorage.setItem('bgfcl_txns',JSON.stringify(d)); }
+
+// 🆕 ফাইল/ডকুমেন্টস (ফোল্ডার + ফাইল, একই টেবিলে গাছ-আকারে parent_id দিয়ে)
+function getDocs(){ return JSON.parse(localStorage.getItem('bgfcl_docs')||'null') || []; }
+function saveDocs(d){ localStorage.setItem('bgfcl_docs',JSON.stringify(d)); }
 function getManpower(){    return JSON.parse(localStorage.getItem('bgfcl_manpower')||'null')   || []; }
 function getActivities(){  return JSON.parse(localStorage.getItem('bgfcl_activities')||'null') || []; }
 function saveManpower(d){  localStorage.setItem('bgfcl_manpower', JSON.stringify(d)); }
@@ -1171,6 +1331,49 @@ async function supa(path, method='GET', body=null, token=null, _retried=false){
   if(!txt) return true;
   try{ return JSON.parse(txt); }
   catch(parseErr){ return true; }
+}
+
+// ═══════════════════════════════════════════════════════
+//  🆕 SUPABASE STORAGE (ফাইল/ডকুমেন্টস ট্যাবের আসল ফাইল-বাইট এখানে জমা হয়)
+//  bucket পাবলিক, তাই দেখা/ডাউনলোডের জন্য টোকেন লাগে না — শুধু
+//  আপলোড/মুছা/কপির জন্য লগইন-করা ইউজারের টোকেন দরকার।
+// ═══════════════════════════════════════════════════════
+async function supaStorageUpload(path, file){
+  if(supaSession) await ensureFreshSession();
+  const h = {
+    'apikey': CFG.KEY,
+    'Authorization': 'Bearer '+(supaSession?.access_token || CFG.KEY),
+    'Content-Type': file.type || 'application/octet-stream',
+    'x-upsert': 'true',
+  };
+  let r;
+  try{
+    r = await fetch(`${CFG.URL}/storage/v1/object/${CFG.STORAGE_BUCKET}/${encodeURIComponent(path)}`, {method:'POST', headers:h, body:file});
+  }catch(netErr){ throw new Error('ইন্টারনেট সংযোগ সমস্যা — আপলোড ব্যর্থ'); }
+  if(!r.ok){
+    const t=await r.text();
+    let msg=t; try{ msg=JSON.parse(t).message||t; }catch{}
+    throw new Error(msg);
+  }
+  return true;
+}
+function supaStoragePublicUrl(path){
+  return `${CFG.URL}/storage/v1/object/public/${CFG.STORAGE_BUCKET}/${encodeURIComponent(path)}`;
+}
+async function supaStorageRemove(paths){ // paths: array of storage_path
+  if(!paths.length) return true;
+  if(supaSession) await ensureFreshSession();
+  const h = {'apikey':CFG.KEY,'Authorization':'Bearer '+(supaSession?.access_token||CFG.KEY),'Content-Type':'application/json'};
+  const r = await fetch(`${CFG.URL}/storage/v1/object/${CFG.STORAGE_BUCKET}`, {method:'DELETE', headers:h, body:JSON.stringify({prefixes:paths})});
+  if(!r.ok){ const t=await r.text(); throw new Error(t); }
+  return true;
+}
+async function supaStorageCopy(fromPath, toPath){
+  if(supaSession) await ensureFreshSession();
+  const h = {'apikey':CFG.KEY,'Authorization':'Bearer '+(supaSession?.access_token||CFG.KEY),'Content-Type':'application/json'};
+  const r = await fetch(`${CFG.URL}/storage/v1/object/copy`, {method:'POST', headers:h, body:JSON.stringify({bucketId:CFG.STORAGE_BUCKET, sourceKey:fromPath, destinationKey:toPath})});
+  if(!r.ok){ const t=await r.text(); throw new Error(t); }
+  return true;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1517,6 +1720,7 @@ function updateActionBar(){
   document.getElementById('logActCol').textContent = canWrite ? 'কার্যক্রম' : '';
   document.getElementById('actionBarManpower').style.display   = canWrite ? '' : 'none';
   document.getElementById('actionBarActivities').style.display = canWrite ? '' : 'none';
+  document.getElementById('actionBarDocs').style.display       = canWrite ? '' : 'none';
   document.getElementById('dailyActCol').textContent    = canWrite ? 'একশন' : '';
   document.getElementById('staffActCol').textContent    = canWrite ? 'একশন' : '';
   document.getElementById('activityActCol').textContent = canWrite ? 'একশন' : '';
@@ -1627,6 +1831,7 @@ const RT_TABLES = [
   { name: CFG.TABLE_MANPOWER,   reload: reloadManpowerFromCloud },
   { name: CFG.TABLE_ACTIVITIES, reload: reloadActivitiesFromCloud },
   { name: CFG.TABLE_ATTENDANCE, reload: reloadAttendanceFromCloud },
+  { name: CFG.TABLE_DOCS,       reload: reloadDocsFromCloud },
 ];
 
 function scheduleRtReload(tableName, fn){
@@ -1679,6 +1884,11 @@ async function reloadTxnsFromCloud(){
   if(txns?.length) saveTxns(txns);
   if(currentTab==='materials') renderAll();
 }
+async function reloadDocsFromCloud(){
+  const docs = await supa(CFG.TABLE_DOCS+'?order=created_at.desc');
+  if(docs) saveDocs(docs);
+  if(currentTab==='docs') renderDocs();
+}
 async function reloadManpowerFromCloud(){
   const manpower = await supa(CFG.TABLE_MANPOWER+'?order=name');
   if(manpower?.length) saveManpower(manpower);
@@ -1728,6 +1938,10 @@ async function fetchFromCloud(){
       saveAttendanceData(att);
     }
   }catch(e){ console.warn('attendance cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
+  try{
+    const docs = await supa(CFG.TABLE_DOCS+'?order=created_at.desc');
+    if(docs) saveDocs(docs); // খালি তালিকাও বৈধ (নতুন ফিচার, sample data নেই)
+  }catch(e){ console.warn('doc_items cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
   renderCurrentTab();
 }
 
@@ -1837,6 +2051,15 @@ function initApp(){
   });
   document.getElementById('btnAddManpower').addEventListener('click', openAddManpower);
   document.getElementById('btnAddActivity').addEventListener('click', openAddActivity);
+  // 🆕 ফাইল/ডকুমেন্টস
+  document.getElementById('btnNewFolder').addEventListener('click',()=>{
+    document.getElementById('folderName').value='';
+    document.getElementById('folderTags').value='';
+    openModal('modalNewFolder');
+  });
+  document.getElementById('docFileInput').addEventListener('change',function(){
+    if(this.files && this.files.length) stageUploadFiles(this.files);
+  });
   // PWA install
   window.addEventListener('beforeinstallprompt',e=>{
     e.preventDefault(); deferredPrompt=e;
@@ -1889,9 +2112,10 @@ function switchMainTab(tab){
   document.getElementById('page-materials').style.display   = tab==='materials'  ? '' : 'none';
   document.getElementById('page-manpower').style.display    = tab==='manpower'   ? '' : 'none';
   document.getElementById('page-activities').style.display  = tab==='activities' ? '' : 'none';
+  document.getElementById('page-docs').style.display        = tab==='docs'       ? '' : 'none';
   // বছর/মাস ফিল্টার শুধু মালামাল ও কার্যক্রম ট্যাবের জন্য প্রাসঙ্গিক
-  document.getElementById('controlsRow').style.display = tab==='manpower' ? 'none' : '';
-  const tabLabel = tab==='materials'?'মালামাল':tab==='manpower'?'জনবল':'কার্যক্রম';
+  document.getElementById('controlsRow').style.display = (tab==='manpower'||tab==='docs') ? 'none' : '';
+  const tabLabel = tab==='materials'?'মালামাল':tab==='manpower'?'জনবল':tab==='docs'?'ফাইল/ডকুমেন্টস':'কার্যক্রম';
   document.getElementById('printBannerTab').textContent = tabLabel;
   document.getElementById('printBannerDate').textContent = 'তারিখ: ' + new Date().toLocaleDateString('bn-BD');
   renderCurrentTab();
@@ -1916,6 +2140,7 @@ function renderCurrentTab(){
   if(currentTab==='materials')       renderAll();
   else if(currentTab==='manpower')   renderManpower();
   else if(currentTab==='activities') renderActivities();
+  else if(currentTab==='docs')       renderDocs();
 }
 
 function renderAll(){
@@ -2332,6 +2557,472 @@ function refreshProductDatalist(){
   if(!dl) return;
   const names=[...new Set(getTxns().map(t=>t.product_name))].sort((a,b)=>a.localeCompare(b,'bn'));
   dl.innerHTML = names.map(n=>`<option value="${escHtml(n)}"></option>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  🆕 ফাইল/ডকুমেন্টস ম্যানেজার
+// ═══════════════════════════════════════════════════════
+let docCurrentFolder = null;
+let docViewMode = localStorage.getItem('bgfcl_doc_view') || 'grid';
+let docTagFilter = null;
+let docSearchQuery = '';
+let docDragId = null;      // PC (HTML5 DnD) — বর্তমানে ধরে থাকা আইটেমের id
+let _stagedFiles = [];     // আপলোড-স্টেজিং এ থাকা ফাইলগুলো
+let _touchState = null;    // মোবাইল টাচ-ড্র্যাগের অবস্থা
+
+function docIconFor(mime){
+  if(!mime) return '📄';
+  if(mime.startsWith('image/')) return '🖼️';
+  if(mime.startsWith('video/')) return '🎥';
+  if(mime.startsWith('audio/')) return '🎵';
+  if(mime==='application/pdf') return '📕';
+  if(mime.includes('word')||mime.includes('document')) return '📝';
+  if(mime.includes('sheet')||mime.includes('excel')||mime.includes('csv')) return '📊';
+  if(mime.includes('presentation')||mime.includes('powerpoint')) return '📽️';
+  if(mime.includes('zip')||mime.includes('compressed')||mime.includes('rar')) return '🗜️';
+  return '📄';
+}
+function humanSize(bytes){
+  if(bytes===null||bytes===undefined) return '';
+  if(bytes<1024) return bytes+' B';
+  if(bytes<1024*1024) return (bytes/1024).toFixed(1)+' KB';
+  if(bytes<1024*1024*1024) return (bytes/1024/1024).toFixed(1)+' MB';
+  return (bytes/1024/1024/1024).toFixed(2)+' GB';
+}
+
+function getDocChildren(){
+  let list;
+  if(docSearchQuery.trim()){
+    const q=docSearchQuery.trim().toLowerCase();
+    list = getDocs().filter(d=>d.name.toLowerCase().includes(q)); // সার্চের সময় সব ফোল্ডার জুড়ে খোঁজা হয়
+  }else{
+    list = getDocs().filter(d=>(d.parent_id||null)===(docCurrentFolder||null));
+  }
+  if(docTagFilter) list = list.filter(d=>(d.tags||[]).includes(docTagFilter));
+  return list.sort((a,b)=>{
+    if(a.item_type!==b.item_type) return a.item_type==='folder'?-1:1;
+    return a.name.localeCompare(b.name,'bn');
+  });
+}
+function docBreadcrumbChain(){
+  const chain=[]; const all=getDocs();
+  let cur=docCurrentFolder;
+  while(cur){
+    const node=all.find(d=>d.id===cur); if(!node) break;
+    chain.unshift(node); cur=node.parent_id;
+  }
+  return chain;
+}
+function docFolderPathLabel(id){
+  if(!id) return '';
+  const chain=[]; let cur=getDocs().find(d=>d.id===id);
+  while(cur){ chain.unshift(cur.name); cur = cur.parent_id ? getDocs().find(d=>d.id===cur.parent_id) : null; }
+  return chain.join(' / ');
+}
+function isDocDescendant(ancestorId, checkId){
+  let cur=getDocs().find(d=>d.id===checkId);
+  while(cur && cur.parent_id){
+    if(cur.parent_id===ancestorId) return true;
+    cur=getDocs().find(d=>d.id===cur.parent_id);
+  }
+  return false;
+}
+
+function docNavigateTo(id){
+  docCurrentFolder=id; docSearchQuery='';
+  const si=document.getElementById('docSearchInput'); if(si) si.value='';
+  renderDocs();
+}
+function setDocViewMode(mode){
+  docViewMode=mode; localStorage.setItem('bgfcl_doc_view',mode); renderDocs();
+}
+
+function renderDocs(){
+  renderDocBreadcrumb();
+  renderDocTagBar();
+  const list=getDocChildren();
+  document.getElementById('docGridWrap').style.display = docViewMode==='grid' ? '' : 'none';
+  document.getElementById('docListWrap').style.display = docViewMode==='list' ? '' : 'none';
+  if(docViewMode==='grid') renderDocGrid(list); else renderDocListView(list);
+  document.getElementById('docViewGridBtn').classList.toggle('active', docViewMode==='grid');
+  document.getElementById('docViewListBtn').classList.toggle('active', docViewMode==='list');
+}
+
+function renderDocBreadcrumb(){
+  const box=document.getElementById('docBreadcrumb');
+  const chain=docBreadcrumbChain();
+  let html = `<button class="doc-crumb${!docCurrentFolder?' current':''}" data-folderid="" onclick="docNavigateTo(null)" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="docCrumbDrop(event,null)">🏠 রুট</button>`;
+  chain.forEach((node,i)=>{
+    html += `<span class="doc-crumb-sep">›</span>`;
+    if(i===chain.length-1){
+      html += `<button class="doc-crumb current" disabled>${escHtml(node.name)}</button>`;
+    }else{
+      html += `<button class="doc-crumb" data-folderid="${node.id}" onclick="docNavigateTo('${node.id}')" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="docCrumbDrop(event,'${node.id}')">${escHtml(node.name)}</button>`;
+    }
+  });
+  box.innerHTML=html;
+}
+function renderDocTagBar(){
+  const box=document.getElementById('docTagBar');
+  const tags=[...new Set(getDocs().flatMap(d=>d.tags||[]))].sort((a,b)=>a.localeCompare(b,'bn'));
+  if(!tags.length){ box.innerHTML=''; return; }
+  let html=`<span class="doc-tag-chip${!docTagFilter?' active':''}" onclick="docTagFilter=null;renderDocs();">সব ক্যাটাগরি</span>`;
+  tags.forEach(t=>{ html+=`<span class="doc-tag-chip${docTagFilter===t?' active':''}" onclick="docTagFilter='${escHtml(t)}';renderDocs();">${escHtml(t)}</span>`; });
+  box.innerHTML=html;
+}
+
+function renderDocGrid(list){
+  const wrap=document.getElementById('docGridWrap');
+  if(!list.length){
+    wrap.innerHTML=`<div class="empty-st" style="grid-column:1/-1;"><div class="ei">📭</div><p>${docSearchQuery?'কিছু পাওয়া যায়নি':'এই ফোল্ডার খালি — নতুন ফোল্ডার বা ফাইল যোগ করুন'}</p></div>`;
+    return;
+  }
+  wrap.innerHTML = list.map(d=>{
+    const isFolder=d.item_type==='folder';
+    const thumb = isFolder ? '📁' : (d.mime_type&&d.mime_type.startsWith('image/') ? `<img src="${supaStoragePublicUrl(d.storage_path)}" loading="lazy" draggable="false"/>` : docIconFor(d.mime_type));
+    const meta = isFolder ? '' : humanSize(d.size_bytes);
+    const dragAttrs = isFolder ? `ondragover="docDragOver(event)" ondragleave="docDragLeave(event)" ondrop="docDrop(event,'${d.id}')"` : '';
+    return `<div class="doc-card" draggable="true" data-id="${d.id}" data-type="${d.item_type}"
+        onclick="docCardClick('${d.id}')" ondragstart="docDragStart(event,'${d.id}')" ondragend="docDragEnd(event)" ${dragAttrs}>
+        <button class="doc-card-menu-btn" onclick="event.stopPropagation();openDocCtxMenu(event,'${d.id}')">⋮</button>
+        <div class="doc-thumb">${thumb}</div>
+        <div class="doc-name">${escHtml(d.name)}</div>
+        ${meta?`<div class="doc-meta">${meta}</div>`:''}
+      </div>`;
+  }).join('');
+  attachDocTouchHandlers();
+}
+function renderDocListView(list){
+  const wrap=document.getElementById('docListWrap');
+  if(!list.length){
+    wrap.innerHTML=`<div class="empty-st"><div class="ei">📭</div><p>${docSearchQuery?'কিছু পাওয়া যায়নি':'এই ফোল্ডার খালি — নতুন ফোল্ডার বা ফাইল যোগ করুন'}</p></div>`;
+    return;
+  }
+  wrap.innerHTML = list.map(d=>{
+    const isFolder=d.item_type==='folder';
+    const icon = isFolder ? '📁' : (d.mime_type&&d.mime_type.startsWith('image/') ? `<img src="${supaStoragePublicUrl(d.storage_path)}" loading="lazy" draggable="false"/>` : docIconFor(d.mime_type));
+    const meta = isFolder ? `${getDocs().filter(x=>x.parent_id===d.id).length} আইটেম` : humanSize(d.size_bytes);
+    const dragAttrs = isFolder ? `ondragover="docDragOver(event)" ondragleave="docDragLeave(event)" ondrop="docDrop(event,'${d.id}')"` : '';
+    return `<div class="doc-list-row" draggable="true" data-id="${d.id}" data-type="${d.item_type}"
+        onclick="docCardClick('${d.id}')" ondragstart="docDragStart(event,'${d.id}')" ondragend="docDragEnd(event)" ${dragAttrs}>
+        <div class="doc-list-icon">${icon}</div>
+        <div class="doc-list-name">${escHtml(d.name)}</div>
+        <div class="doc-list-meta">${meta}</div>
+        <button class="doc-list-menu-btn" onclick="event.stopPropagation();openDocCtxMenu(event,'${d.id}')">⋮</button>
+      </div>`;
+  }).join('');
+  attachDocTouchHandlers();
+}
+
+function docCardClick(id){
+  const d=getDocs().find(x=>x.id===id); if(!d) return;
+  if(d.item_type==='folder') docNavigateTo(id);
+  else openDocPreview(id);
+}
+
+// ── কনটেক্সট মেনু (⋮) ──
+function openDocCtxMenu(evt, id){
+  const d=getDocs().find(x=>x.id===id); if(!d) return;
+  const menu=document.getElementById('docCtxMenu');
+  const isFolder=d.item_type==='folder';
+  let html='';
+  html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openRenameDoc('${id}')">✏️ রিনেম</button>`;
+  html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openMoveDoc('${id}','move')">📂 মুভ করুন</button>`;
+  if(!isFolder) html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openMoveDoc('${id}','copy')">📄 কপি করুন</button>`;
+  if(!isFolder) html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();window.open(supaStoragePublicUrl('${d.storage_path}'),'_blank')">⬇️ ডাউনলোড</button>`;
+  html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openDocDetails('${id}')">ℹ️ বিস্তারিত</button>`;
+  html+=`<button class="doc-ctx-item danger" onclick="closeDocCtxMenu();deleteDocItem('${id}')">🗑️ মুছুন</button>`;
+  menu.innerHTML=html;
+  const x = evt.touches ? evt.touches[0].clientX : evt.clientX;
+  const y = evt.touches ? evt.touches[0].clientY : evt.clientY;
+  menu.style.left = Math.min(x, window.innerWidth-190)+'px';
+  menu.style.top  = Math.min(y, window.innerHeight-230)+'px';
+  menu.style.display='block';
+  setTimeout(()=>document.addEventListener('click',closeDocCtxMenuOnce),0);
+}
+function closeDocCtxMenu(){ document.getElementById('docCtxMenu').style.display='none'; }
+function closeDocCtxMenuOnce(){ closeDocCtxMenu(); document.removeEventListener('click',closeDocCtxMenuOnce); }
+
+// ── নতুন ফোল্ডার ──
+function createFolder(){
+  const name=document.getElementById('folderName').value.trim();
+  if(!name){ toast('⚠️ ফোল্ডারের নাম দিন'); return; }
+  const tags=document.getElementById('folderTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const dept=currentUser?.reqDept||'field';
+  const now=new Date().toISOString();
+  const nf={id:crypto.randomUUID(),dept,parent_id:docCurrentFolder,item_type:'folder',name,tags,storage_path:null,mime_type:null,size_bytes:null,duration_seconds:null,created_at:now,updated_at:now};
+  const docs=getDocs(); docs.push(nf); saveDocs(docs);
+  closeModal('modalNewFolder');
+  renderDocs(); toast('✅ ফোল্ডার তৈরি হয়েছে');
+  if(supaOk) supa(CFG.TABLE_DOCS,'POST',nf).catch(notifyCloudSyncFail);
+}
+
+// ── আপলোড ──
+function getVideoDuration(file){
+  return new Promise((resolve,reject)=>{
+    const v=document.createElement('video'); v.preload='metadata';
+    v.onloadedmetadata=()=>{ URL.revokeObjectURL(v.src); resolve(v.duration); };
+    v.onerror=()=>{ URL.revokeObjectURL(v.src); reject(new Error('video read fail')); };
+    v.src=URL.createObjectURL(file);
+  });
+}
+async function stageUploadFiles(fileList){
+  _stagedFiles = Array.from(fileList);
+  const box=document.getElementById('uploadFileList');
+  box.innerHTML='⏳ ফাইল পরীক্ষা করা হচ্ছে...';
+  const rows=[];
+  for(const f of _stagedFiles){
+    let warn='';
+    if(f.type && f.type.startsWith('video/')){
+      try{
+        const dur=await getVideoDuration(f);
+        f._duration=dur;
+        if(dur > CFG.MAX_VIDEO_SECONDS){ warn=` ⚠️ ${Math.round(dur)}সে — ১ মিনিটের বেশি, বাদ যাবে`; f._skip=true; }
+      }catch(e){ /* দৈর্ঘ্য না পেলেও আপলোড চলবে */ }
+    }
+    rows.push(`<div class="doc-upload-row"><span class="dur">${docIconFor(f.type)} ${escHtml(f.name)}${warn}</span><span class="sz">${humanSize(f.size)}</span></div>`);
+  }
+  box.innerHTML = rows.join('') || '<p style="color:var(--muted);font-size:12px;">কোনো ফাইল নির্বাচিত হয়নি</p>';
+  document.getElementById('uploadTags').value='';
+  openModal('modalUploadStage');
+}
+async function startUpload(){
+  const validFiles=_stagedFiles.filter(f=>!f._skip);
+  if(!validFiles.length){ toast('⚠️ আপলোডযোগ্য কোনো ফাইল নেই'); return; }
+  const tags=document.getElementById('uploadTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const dept=currentUser?.reqDept||'field';
+  closeModal('modalUploadStage');
+  toast(`⏳ ${validFiles.length}টি ফাইল আপলোড হচ্ছে...`);
+  const docs=getDocs();
+  for(const f of validFiles){
+    try{
+      const ext=f.name.includes('.') ? f.name.slice(f.name.lastIndexOf('.')) : '';
+      const storagePath=`${dept}/${crypto.randomUUID()}${ext}`;
+      await supaStorageUpload(storagePath, f);
+      const now=new Date().toISOString();
+      const nd={id:crypto.randomUUID(),dept,parent_id:docCurrentFolder,item_type:'file',name:f.name,tags,
+        storage_path:storagePath, mime_type:f.type||'application/octet-stream', size_bytes:f.size,
+        duration_seconds: f._duration?Math.round(f._duration):null, created_at:now, updated_at:now};
+      docs.push(nd);
+      if(supaOk) await supa(CFG.TABLE_DOCS,'POST',nd).catch(notifyCloudSyncFail);
+    }catch(e){ toast(`❌ ${f.name} আপলোড ব্যর্থ: ${e.message}`); }
+  }
+  saveDocs(docs);
+  document.getElementById('docFileInput').value='';
+  renderDocs(); toast('✅ আপলোড সম্পন্ন');
+}
+
+// ── রিনেম ──
+function openRenameDoc(id){
+  const d=getDocs().find(x=>x.id===id); if(!d) return;
+  if(!canEdit(d.dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  document.getElementById('renameDocId').value=id;
+  document.getElementById('renameDocName').value=d.name;
+  document.getElementById('renameDocTags').value=(d.tags||[]).join(', ');
+  openModal('modalRenameDoc');
+}
+function confirmRenameDoc(){
+  const id=document.getElementById('renameDocId').value;
+  const docs=getDocs(); const idx=docs.findIndex(x=>x.id===id); if(idx<0) return;
+  const name=document.getElementById('renameDocName').value.trim();
+  if(!name){ toast('⚠️ নাম দিন'); return; }
+  const tags=document.getElementById('renameDocTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  docs[idx]={...docs[idx],name,tags,updated_at:new Date().toISOString()};
+  saveDocs(docs);
+  closeModal('modalRenameDoc');
+  renderDocs(); toast('✅ আপডেট হয়েছে');
+  if(supaOk) supa(CFG.TABLE_DOCS+'?id=eq.'+id,'PATCH',{name,tags,updated_at:docs[idx].updated_at}).catch(notifyCloudSyncFail);
+}
+
+// ── মুভ / কপি ──
+function openMoveDoc(id, mode){
+  const d=getDocs().find(x=>x.id===id); if(!d) return;
+  if(!canEdit(d.dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  document.getElementById('moveDocId').value=id;
+  document.getElementById('moveDocMode').value=mode;
+  document.getElementById('moveDocTitle').textContent = mode==='copy' ? '📄 কপি করুন — গন্তব্য বেছে নিন' : '📂 মুভ করুন — গন্তব্য বেছে নিন';
+  renderMoveDocTree(id, mode);
+  openModal('modalMoveDoc');
+}
+function renderMoveDocTree(excludeId, mode){
+  const box=document.getElementById('moveDocTree');
+  const folders=getDocs().filter(d=>d.item_type==='folder' && (mode==='copy' || (d.id!==excludeId && !isDocDescendant(excludeId,d.id))));
+  let html=`<div class="doc-tree-item"><span>🏠 রুট</span><button class="doc-tree-btn" onclick="confirmMoveDoc(null)">এখানে</button></div>`;
+  folders.forEach(f=>{
+    html+=`<div class="doc-tree-item"><span>📁 ${escHtml(docFolderPathLabel(f.id))}</span><button class="doc-tree-btn" onclick="confirmMoveDoc('${f.id}')">এখানে</button></div>`;
+  });
+  box.innerHTML=html;
+}
+async function confirmMoveDoc(targetFolderId){
+  const id=document.getElementById('moveDocId').value;
+  const mode=document.getElementById('moveDocMode').value;
+  closeModal('modalMoveDoc');
+  if(mode==='copy') await copyDocItem(id, targetFolderId);
+  else moveDocItem(id, targetFolderId);
+}
+function moveDocItem(id, targetFolderId){
+  if(id===targetFolderId) return;
+  if(targetFolderId && isDocDescendant(id, targetFolderId)){ toast('⚠️ কোনো ফোল্ডার নিজের সাব-ফোল্ডারে সরানো যায় না'); return; }
+  const docs=getDocs(); const idx=docs.findIndex(x=>x.id===id); if(idx<0) return;
+  if(!canEdit(docs[idx].dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  if((docs[idx].parent_id||null)===(targetFolderId||null)) return;
+  docs[idx]={...docs[idx],parent_id:targetFolderId,updated_at:new Date().toISOString()};
+  saveDocs(docs);
+  renderDocs(); toast('✅ সরানো হয়েছে');
+  if(supaOk) supa(CFG.TABLE_DOCS+'?id=eq.'+id,'PATCH',{parent_id:targetFolderId,updated_at:docs[idx].updated_at}).catch(notifyCloudSyncFail);
+}
+async function copyDocItem(id, targetFolderId){
+  const d=getDocs().find(x=>x.id===id); if(!d || d.item_type!=='file') return;
+  toast('⏳ কপি হচ্ছে...');
+  try{
+    const ext=d.storage_path.includes('.') ? d.storage_path.slice(d.storage_path.lastIndexOf('.')) : '';
+    const newPath=`${d.dept}/${crypto.randomUUID()}${ext}`;
+    await supaStorageCopy(d.storage_path, newPath);
+    const now=new Date().toISOString();
+    const nd={...d,id:crypto.randomUUID(),parent_id:targetFolderId,storage_path:newPath,created_at:now,updated_at:now};
+    const docs=getDocs(); docs.push(nd); saveDocs(docs);
+    renderDocs(); toast('✅ কপি হয়েছে');
+    if(supaOk) supa(CFG.TABLE_DOCS,'POST',nd).catch(notifyCloudSyncFail);
+  }catch(e){ toast('❌ কপি ব্যর্থ: '+e.message); }
+}
+
+// ── ডিলিট (ফোল্ডার হলে ভেতরের সব কিছুসহ) ──
+function collectDocDescendants(id){
+  const all=getDocs(); const result=[]; const queue=[id];
+  while(queue.length){
+    const cur=queue.shift();
+    const node=all.find(d=>d.id===cur);
+    if(node) result.push(node);
+    all.filter(d=>d.parent_id===cur).forEach(c=>queue.push(c.id));
+  }
+  return result;
+}
+function deleteDocItem(id){
+  const d=getDocs().find(x=>x.id===id); if(!d) return;
+  if(!canEdit(d.dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  const victims=collectDocDescendants(id);
+  const msg = d.item_type==='folder'
+    ? `এই ফোল্ডার ও এর ভেতরের সব কিছু (মোট ${victims.length}টি আইটেম) মুছে দেবেন?`
+    : 'এই ফাইলটি মুছে দেবেন?';
+  if(!confirm(msg)) return;
+  const victimIds=new Set(victims.map(v=>v.id));
+  const storagePaths=victims.filter(v=>v.storage_path).map(v=>v.storage_path);
+  saveDocs(getDocs().filter(x=>!victimIds.has(x.id)));
+  renderDocs(); toast('🗑️ মুছে গেছে');
+  if(storagePaths.length) supaStorageRemove(storagePaths).catch(()=>{});
+  if(supaOk){ victimIds.forEach(vid=>supa(CFG.TABLE_DOCS+'?id=eq.'+vid,'DELETE').catch(()=>{})); }
+}
+
+// ── ডিটেইলস ──
+function openDocDetails(id){
+  const d=getDocs().find(x=>x.id===id); if(!d) return;
+  const box=document.getElementById('docDetailsBody');
+  const rows=[
+    ['নাম', d.name],
+    ['ধরন', d.item_type==='folder'?'ফোল্ডার':(d.mime_type||'—')],
+    ['বিভাগ', DEPT[d.dept]?.name||d.dept],
+    ['ক্যাটাগরি ট্যাগ', (d.tags||[]).join(', ')||'—'],
+    ['অবস্থান', docFolderPathLabel(d.parent_id)||'রুট'],
+  ];
+  if(d.item_type==='file'){
+    rows.push(['সাইজ', humanSize(d.size_bytes)]);
+    if(d.duration_seconds) rows.push(['দৈর্ঘ্য', d.duration_seconds+' সেকেন্ড']);
+  }
+  rows.push(['তৈরি হয়েছে', d.created_at ? new Date(d.created_at).toLocaleString('bn-BD') : '—']);
+  box.innerHTML = rows.map(([k,v])=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:13px;"><span style="color:var(--muted);flex-shrink:0;">${k}</span><span style="font-weight:600;text-align:right;word-break:break-word;">${escHtml(String(v))}</span></div>`).join('')
+    + (d.item_type==='file' ? `<a href="${supaStoragePublicUrl(d.storage_path)}" target="_blank" class="btn-sub" style="display:block;text-align:center;text-decoration:none;margin-top:14px;">⬇️ ডাউনলোড / নতুন ট্যাবে খুলুন</a>` : '');
+  openModal('modalDocDetails');
+}
+
+// ── প্রিভিউ ──
+function openDocPreview(id){
+  const d=getDocs().find(x=>x.id===id); if(!d || d.item_type!=='file') return;
+  document.getElementById('docPreviewTitle').textContent=d.name;
+  const box=document.getElementById('docPreviewBody');
+  const url=supaStoragePublicUrl(d.storage_path);
+  if(d.mime_type?.startsWith('image/')) box.innerHTML=`<img src="${url}" style="max-width:100%;max-height:65vh;border-radius:8px;"/>`;
+  else if(d.mime_type?.startsWith('video/')) box.innerHTML=`<video src="${url}" controls style="max-width:100%;max-height:65vh;border-radius:8px;"></video>`;
+  else if(d.mime_type?.startsWith('audio/')) box.innerHTML=`<div style="font-size:48px;">🎵</div><audio src="${url}" controls style="width:100%;margin-top:10px;"></audio>`;
+  else if(d.mime_type==='application/pdf') box.innerHTML=`<div style="font-size:48px;">📕</div><a href="${url}" target="_blank" class="btn-sub" style="display:block;text-align:center;text-decoration:none;margin-top:10px;">PDF নতুন ট্যাবে খুলুন</a>`;
+  else box.innerHTML=`<div style="font-size:48px;">${docIconFor(d.mime_type)}</div><a href="${url}" target="_blank" class="btn-sub" style="display:block;text-align:center;text-decoration:none;margin-top:10px;">ফাইল খুলুন / ডাউনলোড</a>`;
+  openModal('modalDocPreview');
+}
+
+// ── ড্র্যাগ & ড্রপ (পিসি — HTML5 নেটিভ) ──
+function docDragStart(evt,id){ docDragId=id; evt.dataTransfer.effectAllowed='move'; evt.dataTransfer.setData('text/plain',id); evt.currentTarget.classList.add('dragging'); }
+function docDragEnd(evt){ evt.currentTarget.classList.remove('dragging'); docDragId=null; }
+function docDragOver(evt){ evt.preventDefault(); evt.currentTarget.classList.add('drag-over'); }
+function docDragLeave(evt){ evt.currentTarget.classList.remove('drag-over'); }
+function docDrop(evt,targetFolderId){
+  evt.preventDefault(); evt.currentTarget.classList.remove('drag-over');
+  const id=docDragId || evt.dataTransfer.getData('text/plain');
+  if(!id || id===targetFolderId) return;
+  moveDocItem(id, targetFolderId);
+}
+function docCrumbDrop(evt,folderId){
+  evt.preventDefault(); evt.currentTarget.classList.remove('drag-over');
+  const id=docDragId || evt.dataTransfer.getData('text/plain');
+  if(!id) return;
+  moveDocItem(id, folderId);
+}
+
+// ── ড্র্যাগ & ড্রপ (মোবাইল — লম্বা-চাপ দিয়ে টাচ-ড্র্যাগ) ──
+function attachDocTouchHandlers(){
+  document.querySelectorAll('.doc-card, .doc-list-row').forEach(el=>{
+    el.addEventListener('touchstart', docTouchStart, {passive:true});
+    el.addEventListener('touchmove',  docTouchMove,  {passive:false});
+    el.addEventListener('touchend',   docTouchEnd);
+  });
+}
+function docFindDropTarget(x,y){
+  const under=document.elementFromPoint(x,y);
+  return under?.closest('.doc-card[data-type="folder"], .doc-list-row[data-type="folder"], .doc-crumb[data-folderid]');
+}
+function docTouchStart(evt){
+  const el=evt.currentTarget, id=el.dataset.id, t=evt.touches[0];
+  _touchState={id, el, startX:t.clientX, startY:t.clientY, longPressFired:false, moved:false};
+  _touchState.timer=setTimeout(()=>{
+    if(!_touchState || _touchState.moved) return;
+    _touchState.longPressFired=true;
+    el.classList.add('dragging');
+    if(navigator.vibrate) navigator.vibrate(30);
+    const ghost=document.getElementById('docDragGhost');
+    const name=getDocs().find(d=>d.id===id)?.name||'';
+    ghost.textContent='📦 '+name;
+    ghost.style.left=(t.clientX-40)+'px'; ghost.style.top=(t.clientY-20)+'px';
+    ghost.style.display='block';
+  }, 350);
+}
+function docTouchMove(evt){
+  if(!_touchState) return;
+  const t=evt.touches[0];
+  if(Math.abs(t.clientX-_touchState.startX)>10 || Math.abs(t.clientY-_touchState.startY)>10) _touchState.moved=true;
+  if(_touchState.longPressFired){
+    evt.preventDefault();
+    const ghost=document.getElementById('docDragGhost');
+    ghost.style.left=(t.clientX-40)+'px'; ghost.style.top=(t.clientY-20)+'px';
+    document.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'));
+    ghost.style.display='none';
+    const dropEl=docFindDropTarget(t.clientX,t.clientY);
+    ghost.style.display='block';
+    if(dropEl && dropEl.dataset.id!==_touchState.id) dropEl.classList.add('drag-over');
+  }
+}
+function docTouchEnd(evt){
+  if(!_touchState) return;
+  clearTimeout(_touchState.timer);
+  document.getElementById('docDragGhost').style.display='none';
+  if(_touchState.longPressFired){
+    const t=evt.changedTouches[0];
+    const dropEl=docFindDropTarget(t.clientX,t.clientY);
+    document.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over'));
+    _touchState.el.classList.remove('dragging');
+    if(dropEl){
+      const targetId = dropEl.classList.contains('doc-crumb') ? (dropEl.dataset.folderid||null) : dropEl.dataset.id;
+      if(targetId !== _touchState.id) moveDocItem(_touchState.id, targetId);
+    }
+  }
+  _touchState=null;
 }
 
 // ═══════════════════════════════════════════════════════

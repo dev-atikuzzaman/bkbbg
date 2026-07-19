@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v1.4 — unified stock transaction (in/out ledger) system
-const CACHE_NAME = 'bgfcl-v12';
+// BGFCL Inventory Service Worker v1.5 — নতুন ফাইল/ডকুমেন্টস ট্যাব (ফোল্ডার + ফাইল, ড্র্যাগ-ড্রপ, Storage bucket)
+const CACHE_NAME = 'bgfcl-v13';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
