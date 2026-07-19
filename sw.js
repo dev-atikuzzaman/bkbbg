@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v1.5 — নতুন ফাইল/ডকুমেন্টস ট্যাব (ফোল্ডার + ফাইল, ড্র্যাগ-ড্রপ, Storage bucket)
-const CACHE_NAME = 'bgfcl-v13';
+// BGFCL Inventory Service Worker v1.6 — জনবলে "অফিসার" ক্যাটাগরি + ড্যাশবোর্ড নেম-লিস্ট
+const CACHE_NAME = 'bgfcl-v14';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

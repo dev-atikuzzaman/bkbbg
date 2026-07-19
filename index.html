@@ -181,6 +181,10 @@ main{max-width:1100px;margin:0 auto;padding:18px 14px 120px;}
 .sc-green{border-color:var(--green)}.sc-green .sv{color:var(--green);}
 .sc-red{border-color:var(--red)}.sc-red .sv{color:var(--red);}
 .sc-amber{border-color:var(--amber)}.sc-amber .sv{color:var(--amber);}
+.sc-purple{border-color:#7C3AED}.sc-purple .sv{color:#7C3AED;}
+.sum-names{margin-top:8px;padding-top:8px;border-top:1px dashed #E2E8F0;font-size:11px;color:#475569;max-height:88px;overflow-y:auto;line-height:1.6;}
+.sum-names .snm{display:inline-block;background:#F1F5F9;border-radius:10px;padding:2px 8px;margin:0 3px 3px 0;}
+.sum-names .snm-empty{color:#CBD5E1;}
 
 /* SECTION TITLE */
 .sec-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
@@ -564,9 +568,24 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     </div>
 
     <div class="sum-grid">
-      <div class="sum-card sc-blue"><div class="si">👷</div><div class="sv" id="sumDaily">0</div><div class="sl">দৈনিক শ্রমিক</div></div>
-      <div class="sum-card sc-green"><div class="si">🧑‍💼</div><div class="sv" id="sumStaff">0</div><div class="sl">সাধারণ স্টাফ</div></div>
+      <div class="sum-card sc-purple"><div class="si">🎖️</div><div class="sv" id="sumOfficer">0</div><div class="sl">অফিসার</div><div class="sum-names" id="namesOfficer"></div></div>
+      <div class="sum-card sc-blue"><div class="si">👷</div><div class="sv" id="sumDaily">0</div><div class="sl">দৈনিক শ্রমিক</div><div class="sum-names" id="namesDaily"></div></div>
+      <div class="sum-card sc-green"><div class="si">🧑‍💼</div><div class="sv" id="sumStaff">0</div><div class="sl">সাধারণ স্টাফ</div><div class="sum-names" id="namesStaff"></div></div>
       <div class="sum-card sc-amber"><div class="si">👥</div><div class="sv" id="sumManTotal">0</div><div class="sl">মোট জনবল</div></div>
+    </div>
+
+    <div class="sec-title">🎖️ অফিসার তালিকা</div>
+    <div class="chart-sec">
+      <div class="log-wrap">
+        <table class="log-table">
+          <thead><tr id="officerTheadRow">
+            <th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th>
+            <th>শেষ CL</th><th>CL বাকি</th><th>অন্য ছুটি (তারিখ)</th><th>অন্য ছুটি বাকি</th><th>AL নেয়া হয়েছে</th><th>AL নেয়ার তারিখ</th>
+            <th id="officerActCol"></th>
+          </tr></thead>
+          <tbody id="officerBody"></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="sec-title">👷 দৈনিক শ্রমিক তালিকা</div>
@@ -807,7 +826,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
           <select id="mpDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
         </div>
         <div class="fg"><label>জনবলের ধরন *</label>
-          <select id="mpType" onchange="toggleManpowerFields()"><option value="daily">দৈনিক শ্রমিক</option><option value="staff">সাধারণ স্টাফ</option></select>
+          <select id="mpType" onchange="toggleManpowerFields()"><option value="daily">দৈনিক শ্রমিক</option><option value="staff">সাধারণ স্টাফ</option><option value="officer">অফিসার</option></select>
         </div>
       </div>
       <div class="fg"><label>নাম *</label><input type="text" id="mpName" placeholder="পূর্ণ নাম"/></div>
@@ -1723,6 +1742,7 @@ function updateActionBar(){
   document.getElementById('actionBarDocs').style.display       = canWrite ? '' : 'none';
   document.getElementById('dailyActCol').textContent    = canWrite ? 'একশন' : '';
   document.getElementById('staffActCol').textContent    = canWrite ? 'একশন' : '';
+  document.getElementById('officerActCol').textContent  = canWrite ? 'একশন' : '';
   document.getElementById('activityActCol').textContent = canWrite ? 'একশন' : '';
 }
 
@@ -2302,13 +2322,26 @@ function getFM(){ return getManpower().filter(m=>filterDept==='all'||m.dept===fi
 
 function renderManpower(){
   const all = getFM();
+  const officer = all.filter(m=>m.type==='officer');
   const daily = all.filter(m=>m.type==='daily');
   const staff = all.filter(m=>m.type==='staff');
+  document.getElementById('sumOfficer').textContent  = officer.length;
   document.getElementById('sumDaily').textContent    = daily.length;
   document.getElementById('sumStaff').textContent    = staff.length;
   document.getElementById('sumManTotal').textContent = all.length;
+  renderNameChips('namesOfficer', officer);
+  renderNameChips('namesDaily', daily);
+  renderNameChips('namesStaff', staff);
+  renderOfficerTable(officer);
   renderDailyTable(daily);
   renderStaffTable(staff);
+}
+
+// সারাংশ কার্ডের নিচে কে কে আছেন তার নামের তালিকা (ড্যাশবোর্ড ভিউ)
+function renderNameChips(elId, list){
+  const box=document.getElementById(elId);
+  if(!list.length){ box.innerHTML='<span class="snm-empty">কেউ নেই</span>'; return; }
+  box.innerHTML = list.map(m=>`<span class="snm">${escHtml(m.name)}</span>`).join('');
 }
 
 function cfThHtml(defs){ return defs.map(d=>`<th>${escHtml(d.label)}</th>`).join(''); }
@@ -2344,6 +2377,41 @@ function renderDailyTable(list){
       <td><span class="tag-dept" style="background:${cfg.color}22;color:${cfg.color};">${cfg.name}</span></td>
       ${cfTdHtml(defs, m.customFields)}
       <td>${canE?`<button class="btn-ei" onclick="openAttendanceModal('${m.id}')" title="উপস্থিতি">📅</button><button class="btn-ei" onclick="openEditManpower('${m.id}')" title="সম্পাদনা">✏️</button><button class="btn-di" onclick="deleteManpower('${m.id}')" title="মুছুন">🗑️</button>`:''}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function renderOfficerTable(list){
+  const tb=document.getElementById('officerBody');
+  const defs = getCustomDefs().manpower || [];
+  document.getElementById('officerTheadRow').innerHTML =
+    `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th>
+     <th>শেষ CL</th><th>CL বাকি</th><th>অন্য ছুটি (তারিখ)</th><th>অন্য ছুটি বাকি</th><th>AL নেয়া হয়েছে</th><th>AL নেয়ার তারিখ</th>
+     ${cfThHtml(defs)}<th id="officerActCol"></th>`;
+  updateActionBar();
+  tb.innerHTML='';
+  if(!list.length){
+    tb.innerHTML=`<tr><td colspan="${11+defs.length}" style="text-align:center;padding:28px;color:#94A3B8;">কোনো অফিসারের তথ্য নেই</td></tr>`;
+    return;
+  }
+  list.forEach(m=>{
+    const cfg=DEPT[m.dept]||{color:'#64748B',name:m.dept};
+    const canE=canEdit(m.dept);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><strong>${escHtml(m.name)}</strong></td>
+      <td>${escHtml(m.designation)||'—'}</td>
+      <td>${escHtml(m.phone)||'—'}</td>
+      <td>${escHtml(m.address)||'—'}</td>
+      <td><span class="tag-dept" style="background:${cfg.color}22;color:${cfg.color};">${cfg.name}</span></td>
+      <td>${m.cl_last_date||'—'}</td>
+      <td>${m.cl_remaining ?? '—'}</td>
+      <td>${m.other_leave_last_date||'—'}</td>
+      <td>${m.other_leave_remaining ?? '—'}</td>
+      <td>${m.al_taken==='yes'?'✅ হ্যাঁ':'❌ না'}</td>
+      <td>${m.al_taken==='yes' ? (m.al_date||'—') : '—'}</td>
+      ${cfTdHtml(defs, m.customFields)}
+      <td>${canE?`<button class="btn-ei" onclick="openEditManpower('${m.id}')" title="সম্পাদনা">✏️</button><button class="btn-di" onclick="deleteManpower('${m.id}')" title="মুছুন">🗑️</button>`:''}</td>`;
     tb.appendChild(tr);
   });
 }
@@ -3030,7 +3098,7 @@ function docTouchEnd(evt){
 // ═══════════════════════════════════════════════════════
 function toggleManpowerFields(){
   const type=document.getElementById('mpType').value;
-  document.getElementById('mpStaffFields').style.display = type==='staff' ? '' : 'none';
+  document.getElementById('mpStaffFields').style.display = (type==='staff'||type==='officer') ? '' : 'none';
 }
 
 function toggleAlDateField(){
@@ -3102,7 +3170,7 @@ async function saveManpowerForm(){
     cl_last_date:null, cl_remaining:0, other_leave_last_date:null, other_leave_remaining:0, al_taken:'no', al_date:null,
     customFields,
   };
-  if(type==='staff'){
+  if(type==='staff'||type==='officer'){
     rec.cl_last_date = document.getElementById('mpClDate').value || null;
     rec.cl_remaining = +document.getElementById('mpClRemain').value || 0;
     rec.other_leave_last_date = document.getElementById('mpOtherDate').value || null;
