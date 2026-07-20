@@ -507,6 +507,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
         <label class="btn-p bp-purple" style="cursor:pointer;">📥 Import<input type="file" accept=".json" id="importFileMaterials" style="display:none" onchange="importJSON(event)"/></label>
       </div>
       <button class="btn-p" style="background:#334155;color:white;" onclick="printCurrentTab()">🖨️ Print</button>
+      <button class="btn-p" style="background:#B91C1C;color:white;" onclick="generatePDFReport('materials')">📄 PDF রিপোর্ট</button>
     </div>
 
     <!-- SUMMARY -->
@@ -565,6 +566,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
         <label class="btn-p bp-purple" style="cursor:pointer;">📥 Import<input type="file" accept=".json" id="importFileManpower" style="display:none" onchange="importJSON(event)"/></label>
       </div>
       <button class="btn-p" style="background:#334155;color:white;" onclick="printCurrentTab()">🖨️ Print</button>
+      <button class="btn-p" style="background:#B91C1C;color:white;" onclick="generatePDFReport('manpower')">📄 PDF রিপোর্ট</button>
     </div>
 
     <div class="sum-grid">
@@ -624,6 +626,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
         <label class="btn-p bp-purple" style="cursor:pointer;">📥 Import<input type="file" accept=".json" id="importFileActivities" style="display:none" onchange="importJSON(event)"/></label>
       </div>
       <button class="btn-p" style="background:#334155;color:white;" onclick="printCurrentTab()">🖨️ Print</button>
+      <button class="btn-p" style="background:#B91C1C;color:white;" onclick="generatePDFReport('activities')">📄 PDF রিপোর্ট</button>
     </div>
 
     <div class="chart-sec">
@@ -668,6 +671,26 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 <div id="docDragGhost" class="doc-drag-ghost" style="display:none;"></div>
 <!-- ফাইল/ফোল্ডার কার্ডের "⋮" মেনু -->
 <div id="docCtxMenu" class="doc-ctx-menu" style="display:none;"></div>
+
+<!-- 🆕 PDF রিপোর্ট টেমপ্লেট (স্ক্রিনে দেখা যায় না — html2canvas দিয়ে ছবি বানিয়ে PDF-এ বসানো হয়) -->
+<div id="pdfReportRoot" style="position:fixed;left:-99999px;top:0;width:794px;background:#fff;">
+  <div id="pdfReportTemplate" style="font-family:'Hind Siliguri',sans-serif;padding:36px;color:#0F172A;">
+    <div style="display:flex;align-items:center;gap:14px;border-bottom:3px solid #0B3B60;padding-bottom:16px;margin-bottom:20px;">
+      <img src="icon-512.png" style="width:56px;height:56px;border-radius:10px;"/>
+      <div>
+        <div style="font-size:20px;font-weight:700;color:#0B3B60;">বাখরাবাদ গ্যাস ফিল্ড</div>
+        <div style="font-size:12px;color:#64748B;">ডিজিটাল স্টক ইনভেন্টরি · BGFCL</div>
+      </div>
+    </div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:4px;" id="pdfRepTitle"></div>
+    <div style="font-size:11px;color:#64748B;margin-bottom:18px;" id="pdfRepMeta"></div>
+    <div id="pdfRepBody"></div>
+    <div style="margin-top:24px;padding-top:12px;border-top:1px solid #E2E8F0;font-size:10px;color:#94A3B8;display:flex;justify-content:space-between;">
+      <span>এই রিপোর্টটি BGFCL ডিজিটাল স্টক ইনভেন্টরি সিস্টেম থেকে স্বয়ংক্রিয়ভাবে তৈরি</span>
+      <span id="pdfRepGenAt"></span>
+    </div>
+  </div>
+</div>
 
 <!-- পূর্ণ টেমপ্লেট প্রিন্ট এরিয়া (স্ক্রিনে অদৃশ্য, printAttendanceReport() কল হলে JS দিয়ে পূরণ ও দৃশ্যমান হবে) -->
 <div id="reportPrintArea"></div>
@@ -981,6 +1004,17 @@ canvas#mainChart{width:100%!important;max-height:300px;}
   </div>
 </div>
 
+<!-- 🆕 কার্যকলাপ লগ (অডিট) -->
+<div class="mo" id="modalAuditLog">
+  <div class="modal" style="max-width:480px;">
+    <div class="mhdr"><h3>🕓 কার্যকলাপ লগ</h3><button class="btn-x" onclick="closeModal('modalAuditLog')">✕</button></div>
+    <div class="mbody">
+      <div class="doc-tagbar" id="auditModuleFilter" style="margin-bottom:10px;"></div>
+      <div id="auditLogList" style="max-height:60vh;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
 <!-- INSTALL BAR -->
 <div id="installBar">
   <div class="ii">📱</div>
@@ -994,6 +1028,9 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<!-- 🆕 PDF রিপোর্ট (কোম্পানি লেটারহেডসহ) — html2canvas দিয়ে বাংলা টেক্সট ইমেজ-রেন্ডার করে jsPDF-এ বসানো হয় -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════
 //  GLOBAL SAFETY NET — never allow a blank/white screen
@@ -1028,6 +1065,7 @@ const CFG = {
   TABLE_ACTIVITIES: 'activities',
   TABLE_ATTENDANCE: 'attendance',
   TABLE_DOCS: 'doc_items',              // 🆕 ফাইল/ডকুমেন্টস ট্যাব
+  TABLE_AUDIT: 'audit_log',             // 🆕 কার্যকলাপ ইতিহাস
   STORAGE_BUCKET: 'documents',          // 🆕 Supabase Storage বাকেট (ফাইলের বাইট এখানে)
   MAX_VIDEO_SECONDS: 60,                // 🆕 ভিডিওর সর্বোচ্চ দৈর্ঘ্য
   URL: 'https://tqixslcjpeqbsoumnblo.supabase.co',
@@ -1071,6 +1109,27 @@ function saveTxns(d){ localStorage.setItem('bgfcl_txns',JSON.stringify(d)); }
 // 🆕 ফাইল/ডকুমেন্টস (ফোল্ডার + ফাইল, একই টেবিলে গাছ-আকারে parent_id দিয়ে)
 function getDocs(){ return JSON.parse(localStorage.getItem('bgfcl_docs')||'null') || []; }
 function saveDocs(d){ localStorage.setItem('bgfcl_docs',JSON.stringify(d)); }
+
+// 🆕 কার্যকলাপ ইতিহাস (অডিট লগ) — কে কখন কী করলো
+function getAuditLog(){ return JSON.parse(localStorage.getItem('bgfcl_audit')||'null') || []; }
+function saveAuditLog(d){ localStorage.setItem('bgfcl_audit',JSON.stringify(d)); }
+function logAudit(module, action, recordLabel, details){
+  const entry = {
+    id: crypto.randomUUID(),
+    actor_email: currentUser?.email || null,
+    actor_name:  currentUser?.name  || currentUser?.email || 'অজানা',
+    actor_role:  currentUser?.role  || null,
+    dept:        currentUser?.reqDept || null,
+    module, action, record_label: recordLabel || null, details: details || null,
+    created_at: new Date().toISOString(),
+  };
+  const logs=getAuditLog();
+  logs.unshift(entry);
+  if(logs.length>500) logs.length=500; // লোকাল ক্যাশ সীমিত রাখা হচ্ছে
+  saveAuditLog(logs);
+  // অডিট-লগ ক্লাউডে ব্যর্থ হলেও মূল অ্যাকশন যেন কোনোভাবে আটকে না যায়, তাই silent-fail
+  if(supaOk) supa(CFG.TABLE_AUDIT,'POST',entry).catch(()=>{});
+}
 function getManpower(){    return JSON.parse(localStorage.getItem('bgfcl_manpower')||'null')   || []; }
 function getActivities(){  return JSON.parse(localStorage.getItem('bgfcl_activities')||'null') || []; }
 function saveManpower(d){  localStorage.setItem('bgfcl_manpower', JSON.stringify(d)); }
@@ -1762,6 +1821,9 @@ function showUserMenu(){
       ${r!=='viewer'&&r!=='pending'?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748B;">বিভাগ</span><strong>${r==='super'?'সকল বিভাগ':reqDeptName}</strong></div>`:''}
     </div>
   `;
+  if(r==='super'||r==='admin'){
+    html+=`<button onclick="closeModal('modalUser');openAuditLog();" style="width:100%;background:#F1F5F9;border:1px solid var(--bd);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🕓 কার্যকলাপ লগ (অডিট)</button>`;
+  }
   html+=`<button onclick="doLogout()" style="width:100%;background:var(--red-l);border:1px solid #FECACA;border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:#DC2626;font-weight:600;cursor:pointer;">🚪 লগআউট</button>`;
   document.getElementById('userMenuBody').innerHTML=html;
   openModal('modalUser');
@@ -1781,6 +1843,46 @@ function doLogout(){
   document.getElementById('authTabs').style.display='';
   switchAuthTab('login');
   toast('✅ লগআউট হয়েছে');
+}
+
+// ═══════════════════════════════════════════════════════
+//  🆕 কার্যকলাপ লগ (অডিট) — ভিউয়ার
+// ═══════════════════════════════════════════════════════
+let _auditFilter='all';
+async function openAuditLog(){
+  openModal('modalAuditLog');
+  document.getElementById('auditLogList').innerHTML='⏳ লোড হচ্ছে...';
+  if(supaOk){
+    try{
+      const logs=await supa(CFG.TABLE_AUDIT+'?order=created_at.desc&limit=300');
+      if(logs) saveAuditLog(logs);
+    }catch(e){ /* ক্লাউড থেকে আনা না গেলে লোকাল ক্যাশ দিয়েই দেখানো হবে */ }
+  }
+  renderAuditModuleFilter();
+  renderAuditLogList();
+}
+function renderAuditModuleFilter(){
+  const box=document.getElementById('auditModuleFilter');
+  const modules=[['all','সব'],['materials','📦 মালামাল'],['manpower','👷 জনবল'],['activities','📝 কার্যক্রম'],['docs','📁 ফাইল']];
+  box.innerHTML = modules.map(([k,l])=>`<span class="doc-tag-chip${_auditFilter===k?' active':''}" onclick="_auditFilter='${k}';renderAuditModuleFilter();renderAuditLogList();">${l}</span>`).join('');
+}
+function renderAuditLogList(){
+  const box=document.getElementById('auditLogList');
+  let logs=getAuditLog();
+  if(_auditFilter!=='all') logs=logs.filter(l=>l.module===_auditFilter);
+  if(!logs.length){ box.innerHTML=`<div class="empty-st"><div class="ei">🕓</div><p>কোনো কার্যকলাপ পাওয়া যায়নি</p></div>`; return; }
+  const actionLabel={create:'✅ তৈরি',update:'✏️ আপডেট',delete:'🗑️ মুছেছে',move:'📂 সরিয়েছে',copy:'📄 কপি করেছে',upload:'⬆️ আপলোড',rename:'✏️ রিনেম'};
+  const moduleLabel={materials:'📦 মালামাল',manpower:'👷 জনবল',activities:'📝 কার্যক্রম',docs:'📁 ফাইল'};
+  box.innerHTML = logs.map(l=>{
+    const when = l.created_at ? new Date(l.created_at).toLocaleString('bn-BD',{dateStyle:'medium',timeStyle:'short'}) : '';
+    return `<div style="padding:10px 4px;border-bottom:1px solid #F1F5F9;font-size:12px;">
+      <div style="display:flex;justify-content:space-between;gap:8px;">
+        <strong style="color:var(--navy);">${actionLabel[l.action]||l.action} — ${escHtml(l.record_label||'')}</strong>
+        <span style="color:var(--muted);white-space:nowrap;flex-shrink:0;">${when}</span>
+      </div>
+      <div style="color:var(--muted);margin-top:2px;">${moduleLabel[l.module]||l.module} · ${escHtml(l.actor_name||'অজানা')}${l.details?' · '+escHtml(l.details):''}</div>
+    </div>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2156,6 +2258,93 @@ function printCurrentTab(){
   window.print();
 }
 
+// ═══════════════════════════════════════════════════════
+//  🆕 PDF রিপোর্ট (কোম্পানি লেটারহেডসহ)
+//  html2canvas দিয়ে হিডেন টেমপ্লেটকে ছবিতে রূপান্তর করা হয় (এতে বাংলা
+//  টেক্সট ব্রাউজারের নিজস্ব ফন্ট রেন্ডারিং দিয়েই আসে, jsPDF-এর আলাদা
+//  ফন্ট এমবেড করার দরকার হয় না), তারপর সেই ছবিটা jsPDF দিয়ে A4
+//  পেজ-বাই-পেজ কেটে PDF বানানো হয়।
+// ═══════════════════════════════════════════════════════
+function pdfTableHTML(headers, rows){
+  const th = headers.map(h=>`<th style="background:#0B3B60;color:#fff;padding:6px 8px;font-size:10px;text-align:left;border:1px solid #0B3B60;">${escHtml(h)}</th>`).join('');
+  const trs = rows.length
+    ? rows.map(r=>`<tr>${r.map(c=>`<td style="padding:5px 8px;font-size:10px;border:1px solid #E2E8F0;">${c}</td>`).join('')}</tr>`).join('')
+    : `<tr><td colspan="${headers.length}" style="padding:10px;font-size:10px;color:#94A3B8;text-align:center;border:1px solid #E2E8F0;">কোনো তথ্য নেই</td></tr>`;
+  return `<table style="width:100%;border-collapse:collapse;margin-bottom:16px;"><thead><tr>${th}</tr></thead><tbody>${trs}</tbody></table>`;
+}
+
+function buildReportBodyHTML(type){
+  const deptLabel = filterDept==='all' ? 'সকল বিভাগ' : (DEPT[filterDept]?.name||filterDept);
+  let title='', meta='', body='';
+  if(type==='materials'){
+    title='📦 মালামাল লেনদেন রিপোর্ট';
+    meta=`বিভাগ: ${deptLabel} · মাস: ${MN[M]} ${Y}`;
+    const stock=getCurrentStock();
+    body += `<div style="font-weight:700;font-size:13px;margin-bottom:8px;">বর্তমান স্টক সারাংশ (${MN[M]} ${Y} পর্যন্ত)</div>`;
+    body += pdfTableHTML(['প্রোডাক্ট','বিভাগ','বর্তমান পরিমাণ','একক'],
+      stock.map(s=>[escHtml(s.product_name), escHtml(DEPT[s.dept]?.name||s.dept), String(s.qty), escHtml(s.unit||'')]));
+    const txns=getFT();
+    body += `<div style="font-weight:700;font-size:13px;margin:16px 0 8px;">${MN[M]} ${Y} মাসের লেনদেন</div>`;
+    body += pdfTableHTML(['তারিখ','প্রোডাক্ট','ধরন','পরিমাণ','বিস্তারিত'],
+      txns.map(t=>[t.txn_date, escHtml(t.product_name), t.txn_type==='in'?'ইন':'আউট',
+        (t.txn_type==='in'?'+':'−')+t.qty+' '+escHtml(t.unit||''),
+        escHtml(t.txn_type==='in' ? (t.source||'—') : (t.purpose||'—'))]));
+  } else if(type==='manpower'){
+    title='👷 জনবল রিপোর্ট';
+    meta=`বিভাগ: ${deptLabel}`;
+    const all=getFM();
+    const officer=all.filter(m=>m.type==='officer'), staff=all.filter(m=>m.type==='staff'), daily=all.filter(m=>m.type==='daily');
+    body += `<div style="font-weight:700;font-size:13px;margin-bottom:10px;">সারাংশ — অফিসার: ${officer.length} · স্টাফ: ${staff.length} · দৈনিক শ্রমিক: ${daily.length} · মোট: ${all.length}</div>`;
+    const mkRows = list => list.map(m=>[escHtml(m.name), escHtml(m.designation||'—'), escHtml(m.phone||'—'), escHtml(DEPT[m.dept]?.name||m.dept)]);
+    body += `<div style="font-weight:700;font-size:13px;margin:14px 0 8px;">🎖️ অফিসার তালিকা</div>` + pdfTableHTML(['নাম','পদবী','ফোন','বিভাগ'], mkRows(officer));
+    body += `<div style="font-weight:700;font-size:13px;margin:14px 0 8px;">🧑‍💼 স্টাফ তালিকা</div>` + pdfTableHTML(['নাম','পদবী','ফোন','বিভাগ'], mkRows(staff));
+    body += `<div style="font-weight:700;font-size:13px;margin:14px 0 8px;">👷 দৈনিক শ্রমিক তালিকা</div>` + pdfTableHTML(['নাম','পদবী','ফোন','বিভাগ'], mkRows(daily));
+  } else if(type==='activities'){
+    title='📝 কার্যক্রম রিপোর্ট';
+    meta=`বিভাগ: ${deptLabel} · মাস: ${MN[M]} ${Y}`;
+    const acts=getFA();
+    body += pdfTableHTML(['তারিখ','বিভাগ','বিবরণ'], acts.map(a=>[a.date, escHtml(DEPT[a.dept]?.name||a.dept), escHtml(a.description)]));
+  }
+  document.getElementById('pdfRepTitle').textContent = title;
+  document.getElementById('pdfRepMeta').textContent  = meta;
+  document.getElementById('pdfRepBody').innerHTML    = body || '<p style="color:#94A3B8;">কোনো ডেটা নেই</p>';
+  document.getElementById('pdfRepGenAt').textContent = 'তৈরি: ' + new Date().toLocaleString('bn-BD') + (currentUser?.name ? ' · '+currentUser.name : '');
+}
+
+async function generatePDFReport(type){
+  if(typeof html2canvas==='undefined' || typeof window.jspdf==='undefined'){
+    toast('❌ PDF লাইব্রেরি লোড হয়নি — ইন্টারনেট সংযোগ চেক করুন'); return;
+  }
+  toast('⏳ PDF তৈরি হচ্ছে...');
+  try{
+    buildReportBodyHTML(type);
+    const el = document.getElementById('pdfReportTemplate');
+    await new Promise(r=>setTimeout(r,60)); // DOM রেন্ডার সম্পন্ন হওয়ার জন্য সামান্য বিরতি
+    const canvas = await html2canvas(el, {scale:2, backgroundColor:'#ffffff', useCORS:true});
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p','pt','a4');
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgW = pageW;
+    const imgH = canvas.height * imgW / canvas.width;
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    let heightLeft = imgH, position = 0;
+    pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+    heightLeft -= pageH;
+    while(heightLeft > 0){
+      position = heightLeft - imgH;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, imgW, imgH);
+      heightLeft -= pageH;
+    }
+    pdf.save(`BGFCL_${type}_report_${new Date().toISOString().slice(0,10)}.pdf`);
+    toast('✅ PDF ডাউনলোড হয়েছে');
+  }catch(e){
+    console.error(e);
+    toast('❌ PDF তৈরি ব্যর্থ: '+e.message);
+  }
+}
+
 function renderCurrentTab(){
   if(currentTab==='materials')       renderAll();
   else if(currentTab==='manpower')   renderManpower();
@@ -2521,6 +2710,7 @@ async function saveTxn(){
     customFields,
   };
   const txns=getTxns(); txns.push(nt); saveTxns(txns);
+  logAudit('materials', 'create', nt.product_name, `${txn_type==='in'?'ইন':'আউট'} ${nt.qty}${nt.unit?' '+nt.unit:''}`);
   closeModal('modalTxn');
   ['txProduct','txQty','txUnit','txSource','txPurpose','txWorkOrder','txNote'].forEach(id=>document.getElementById(id).value='');
   fileInput.value=''; document.getElementById('txImagePreview').style.display='none';
@@ -2588,6 +2778,7 @@ async function updateTxn(){
     customFields,
   };
   saveTxns(txns);
+  logAudit('materials', 'update', txns[idx].product_name, `${txn_type==='in'?'ইন':'আউট'} ${txns[idx].qty}${txns[idx].unit?' '+txns[idx].unit:''}`);
   closeModal('modalEditTxn');
   renderAll(); toast('✅ আপডেট হয়েছে');
   if(supaOk) supa(CFG.TABLE_TXN+'?id=eq.'+id,'PATCH',txns[idx]).catch(notifyCloudSyncFail);
@@ -2598,6 +2789,7 @@ function deleteTxn(id){
   if(!canEdit(t.dept)){ toast('⚠️ অনুমতি নেই'); return; }
   if(!confirm('এই লেনদেন মুছে দেবেন? (এতে প্রোডাক্টের বর্তমান স্টক হিসাবও বদলে যাবে)')) return;
   saveTxns(getTxns().filter(x=>x.id!==id));
+  logAudit('materials', 'delete', t.product_name, `${t.txn_type==='in'?'ইন':'আউট'} ${t.qty}${t.unit?' '+t.unit:''}`);
   renderAll(); toast('🗑️ মুছে গেছে');
   if(supaOk) supa(CFG.TABLE_TXN+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
 }
@@ -2820,6 +3012,7 @@ function createFolder(){
   const now=new Date().toISOString();
   const nf={id:crypto.randomUUID(),dept,parent_id:docCurrentFolder,item_type:'folder',name,tags,storage_path:null,mime_type:null,size_bytes:null,duration_seconds:null,created_at:now,updated_at:now};
   const docs=getDocs(); docs.push(nf); saveDocs(docs);
+  logAudit('docs', 'create', name, 'ফোল্ডার তৈরি');
   closeModal('modalNewFolder');
   renderDocs(); toast('✅ ফোল্ডার তৈরি হয়েছে');
   if(supaOk) supa(CFG.TABLE_DOCS,'POST',nf).catch(notifyCloudSyncFail);
@@ -2872,6 +3065,7 @@ async function startUpload(){
         storage_path:storagePath, mime_type:f.type||'application/octet-stream', size_bytes:f.size,
         duration_seconds: f._duration?Math.round(f._duration):null, created_at:now, updated_at:now};
       docs.push(nd);
+      logAudit('docs', 'upload', f.name, humanSize(f.size));
       if(supaOk) await supa(CFG.TABLE_DOCS,'POST',nd).catch(notifyCloudSyncFail);
     }catch(e){ toast(`❌ ${f.name} আপলোড ব্যর্থ: ${e.message}`); }
   }
@@ -2895,8 +3089,10 @@ function confirmRenameDoc(){
   const name=document.getElementById('renameDocName').value.trim();
   if(!name){ toast('⚠️ নাম দিন'); return; }
   const tags=document.getElementById('renameDocTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const oldName = docs[idx].name;
   docs[idx]={...docs[idx],name,tags,updated_at:new Date().toISOString()};
   saveDocs(docs);
+  logAudit('docs', 'rename', name, oldName!==name ? `আগের নাম: ${oldName}` : null);
   closeModal('modalRenameDoc');
   renderDocs(); toast('✅ আপডেট হয়েছে');
   if(supaOk) supa(CFG.TABLE_DOCS+'?id=eq.'+id,'PATCH',{name,tags,updated_at:docs[idx].updated_at}).catch(notifyCloudSyncFail);
@@ -2936,6 +3132,7 @@ function moveDocItem(id, targetFolderId){
   if((docs[idx].parent_id||null)===(targetFolderId||null)) return;
   docs[idx]={...docs[idx],parent_id:targetFolderId,updated_at:new Date().toISOString()};
   saveDocs(docs);
+  logAudit('docs', 'move', docs[idx].name, `নতুন অবস্থান: ${docFolderPathLabel(targetFolderId)||'রুট'}`);
   renderDocs(); toast('✅ সরানো হয়েছে');
   if(supaOk) supa(CFG.TABLE_DOCS+'?id=eq.'+id,'PATCH',{parent_id:targetFolderId,updated_at:docs[idx].updated_at}).catch(notifyCloudSyncFail);
 }
@@ -2949,6 +3146,7 @@ async function copyDocItem(id, targetFolderId){
     const now=new Date().toISOString();
     const nd={...d,id:crypto.randomUUID(),parent_id:targetFolderId,storage_path:newPath,created_at:now,updated_at:now};
     const docs=getDocs(); docs.push(nd); saveDocs(docs);
+    logAudit('docs', 'copy', nd.name, `গন্তব্য: ${docFolderPathLabel(targetFolderId)||'রুট'}`);
     renderDocs(); toast('✅ কপি হয়েছে');
     if(supaOk) supa(CFG.TABLE_DOCS,'POST',nd).catch(notifyCloudSyncFail);
   }catch(e){ toast('❌ কপি ব্যর্থ: '+e.message); }
@@ -2976,6 +3174,7 @@ function deleteDocItem(id){
   const victimIds=new Set(victims.map(v=>v.id));
   const storagePaths=victims.filter(v=>v.storage_path).map(v=>v.storage_path);
   saveDocs(getDocs().filter(x=>!victimIds.has(x.id)));
+  logAudit('docs', 'delete', d.name, d.item_type==='folder' ? `ফোল্ডার (ভেতরে ${victims.length-1}টি আইটেমসহ)` : 'ফাইল');
   renderDocs(); toast('🗑️ মুছে গেছে');
   if(storagePaths.length) supaStorageRemove(storagePaths).catch(()=>{});
   if(supaOk){ victimIds.forEach(vid=>supa(CFG.TABLE_DOCS+'?id=eq.'+vid,'DELETE').catch(()=>{})); }
@@ -3179,6 +3378,7 @@ async function saveManpowerForm(){
     rec.al_taken = document.getElementById('mpAlTaken').value;
     rec.al_date = rec.al_taken==='yes' ? (document.getElementById('mpAlDate').value || null) : null;
   }
+  const wasEdit = idx>=0;
   if(idx>=0){
     if(!canEdit(list[idx].dept)){ toast('⚠️ অনুমতি নেই'); return; }
     list[idx]=rec;
@@ -3186,6 +3386,8 @@ async function saveManpowerForm(){
     list.push(rec);
   }
   saveManpower(list);
+  const typeLabel = type==='officer'?'অফিসার':type==='staff'?'স্টাফ':'দৈনিক শ্রমিক';
+  logAudit('manpower', wasEdit?'update':'create', name, typeLabel);
   closeModal('modalManpower');
   resetManpowerForm();
   renderManpower();
@@ -3206,6 +3408,7 @@ function deleteManpower(id){
   if(!canEdit(m.dept)){ toast('⚠️ অনুমতি নেই'); return; }
   if(!confirm('এই জনবলের তথ্য মুছে দেবেন?')) return;
   saveManpower(getManpower().filter(x=>x.id!==id));
+  logAudit('manpower', 'delete', m.name, m.type==='officer'?'অফিসার':m.type==='staff'?'স্টাফ':'দৈনিক শ্রমিক');
   renderManpower(); toast('🗑️ মুছে গেছে');
   if(supaOk) supa(CFG.TABLE_MANPOWER+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
 }
@@ -3478,6 +3681,7 @@ async function saveActivityForm(){
   const existingCF = idx>=0 ? (list[idx].customFields||{}) : {};
   const customFields = await collectCustomFieldValues('actCustomFields', existingCF);
   const rec={id:id||crypto.randomUUID(), dept, date, description, customFields};
+  const wasEdit = idx>=0;
   if(idx>=0){
     if(!canEdit(list[idx].dept)){ toast('⚠️ অনুমতি নেই'); return; }
     list[idx]=rec;
@@ -3485,6 +3689,7 @@ async function saveActivityForm(){
     list.push(rec);
   }
   saveActivities(list);
+  logAudit('activities', wasEdit?'update':'create', description.slice(0,60), date);
   closeModal('modalActivity');
   renderActivities();
   toast(idx>=0 ? '✅ আপডেট হয়েছে' : '✅ কার্যক্রম যোগ হয়েছে');
@@ -3499,6 +3704,7 @@ function deleteActivity(id){
   if(!canEdit(a.dept)){ toast('⚠️ অনুমতি নেই'); return; }
   if(!confirm('এই কার্যক্রম মুছে দেবেন?')) return;
   saveActivities(getActivities().filter(x=>x.id!==id));
+  logAudit('activities', 'delete', (a.description||'').slice(0,60), a.date);
   renderActivities(); toast('🗑️ মুছে গেছে');
   if(supaOk) supa(CFG.TABLE_ACTIVITIES+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
 }

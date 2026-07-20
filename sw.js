@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v1.7 — অফিসার ফিল্ড ফিক্স, তালিকার ক্রম ও "স্টাফ" নামকরণ
-const CACHE_NAME = 'bgfcl-v15';
+// BGFCL Inventory Service Worker v1.8 — অডিট লগ (কার্যকলাপ ইতিহাস) + কোম্পানি লেটারহেডসহ PDF রিপোর্ট
+const CACHE_NAME = 'bgfcl-v16';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
