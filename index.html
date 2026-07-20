@@ -569,8 +569,8 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 
     <div class="sum-grid">
       <div class="sum-card sc-purple"><div class="si">🎖️</div><div class="sv" id="sumOfficer">0</div><div class="sl">অফিসার</div><div class="sum-names" id="namesOfficer"></div></div>
+      <div class="sum-card sc-green"><div class="si">🧑‍💼</div><div class="sv" id="sumStaff">0</div><div class="sl">স্টাফ</div><div class="sum-names" id="namesStaff"></div></div>
       <div class="sum-card sc-blue"><div class="si">👷</div><div class="sv" id="sumDaily">0</div><div class="sl">দৈনিক শ্রমিক</div><div class="sum-names" id="namesDaily"></div></div>
-      <div class="sum-card sc-green"><div class="si">🧑‍💼</div><div class="sv" id="sumStaff">0</div><div class="sl">সাধারণ স্টাফ</div><div class="sum-names" id="namesStaff"></div></div>
       <div class="sum-card sc-amber"><div class="si">👥</div><div class="sv" id="sumManTotal">0</div><div class="sl">মোট জনবল</div></div>
     </div>
 
@@ -588,19 +588,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       </div>
     </div>
 
-    <div class="sec-title">👷 দৈনিক শ্রমিক তালিকা</div>
-    <div class="chart-sec">
-      <div class="log-wrap">
-        <table class="log-table">
-          <thead><tr id="dailyTheadRow">
-            <th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th><th id="dailyActCol"></th>
-          </tr></thead>
-          <tbody id="dailyBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="sec-title">🧑‍💼 সাধারণ স্টাফ তালিকা</div>
+    <div class="sec-title">🧑‍💼 স্টাফ তালিকা</div>
     <div class="chart-sec">
       <div class="log-wrap">
         <table class="log-table">
@@ -610,6 +598,18 @@ canvas#mainChart{width:100%!important;max-height:300px;}
             <th id="staffActCol"></th>
           </tr></thead>
           <tbody id="staffBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sec-title">👷 দৈনিক শ্রমিক তালিকা</div>
+    <div class="chart-sec">
+      <div class="log-wrap">
+        <table class="log-table">
+          <thead><tr id="dailyTheadRow">
+            <th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th><th id="dailyActCol"></th>
+          </tr></thead>
+          <tbody id="dailyBody"></tbody>
         </table>
       </div>
     </div>
@@ -826,7 +826,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
           <select id="mpDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
         </div>
         <div class="fg"><label>জনবলের ধরন *</label>
-          <select id="mpType" onchange="toggleManpowerFields()"><option value="daily">দৈনিক শ্রমিক</option><option value="staff">সাধারণ স্টাফ</option><option value="officer">অফিসার</option></select>
+          <select id="mpType" onchange="toggleManpowerFields()"><option value="daily">দৈনিক শ্রমিক</option><option value="staff">স্টাফ</option><option value="officer">অফিসার</option></select>
         </div>
       </div>
       <div class="fg"><label>নাম *</label><input type="text" id="mpName" placeholder="পূর্ণ নাম"/></div>
@@ -837,7 +837,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <div class="fg"><label>ঠিকানা</label><textarea id="mpAddress" rows="2" style="resize:vertical;"></textarea></div>
 
       <div id="mpStaffFields" style="display:none;">
-        <div class="subsec-title">🗂️ স্টাফ সংক্রান্ত অতিরিক্ত তথ্য</div>
+        <div class="subsec-title" id="mpStaffFieldsTitle">🗂️ স্টাফ সংক্রান্ত অতিরিক্ত তথ্য</div>
         <div class="fg-row">
           <div class="fg"><label>শেষ CL ছুটি নেবার তারিখ</label><input type="date" id="mpClDate"/></div>
           <div class="fg"><label>CL বাকি আছে</label><input type="number" id="mpClRemain" min="0" placeholder="0"/></div>
@@ -2333,8 +2333,8 @@ function renderManpower(){
   renderNameChips('namesDaily', daily);
   renderNameChips('namesStaff', staff);
   renderOfficerTable(officer);
-  renderDailyTable(daily);
   renderStaffTable(staff);
+  renderDailyTable(daily);
 }
 
 // সারাংশ কার্ডের নিচে কে কে আছেন তার নামের তালিকা (ড্যাশবোর্ড ভিউ)
@@ -3099,6 +3099,7 @@ function docTouchEnd(evt){
 function toggleManpowerFields(){
   const type=document.getElementById('mpType').value;
   document.getElementById('mpStaffFields').style.display = (type==='staff'||type==='officer') ? '' : 'none';
+  document.getElementById('mpStaffFieldsTitle').textContent = type==='officer' ? '🗂️ অফিসার সংক্রান্ত অতিরিক্ত তথ্য' : '🗂️ স্টাফ সংক্রান্ত অতিরিক্ত তথ্য';
 }
 
 function toggleAlDateField(){

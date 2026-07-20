@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v1.6 — জনবলে "অফিসার" ক্যাটাগরি + ড্যাশবোর্ড নেম-লিস্ট
-const CACHE_NAME = 'bgfcl-v14';
+// BGFCL Inventory Service Worker v1.7 — অফিসার ফিল্ড ফিক্স, তালিকার ক্রম ও "স্টাফ" নামকরণ
+const CACHE_NAME = 'bgfcl-v15';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
