@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v1.9 — অটোমেটিক ডেইলি ব্যাকআপ (pg_cron) + এরর ট্র্যাকিং সিস্টেম
-const CACHE_NAME = 'bgfcl-v17';
+// BGFCL Inventory Service Worker v2.0 — ওভারভিউ ড্যাশবোর্ড (হোমপেজ) + Excel এক্সপোর্ট
+const CACHE_NAME = 'bgfcl-v18';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
