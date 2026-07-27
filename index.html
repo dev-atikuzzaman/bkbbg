@@ -1015,6 +1015,28 @@ canvas#mainChart{width:100%!important;max-height:300px;}
   </div>
 </div>
 
+<!-- 🆕 এরর লগ -->
+<div class="mo" id="modalErrorLog">
+  <div class="modal" style="max-width:480px;">
+    <div class="mhdr"><h3>🐞 এরর লগ</h3><button class="btn-x" onclick="closeModal('modalErrorLog')">✕</button></div>
+    <div class="mbody">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">অ্যাপে কোনো জাভাস্ক্রিপ্ট এরর/ক্র্যাশ হলে এখানে স্বয়ংক্রিয়ভাবে জমা হয়।</p>
+      <div id="errorLogList" style="max-height:60vh;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 🆕 ব্যাকআপ তালিকা -->
+<div class="mo" id="modalBackupList">
+  <div class="modal" style="max-width:480px;">
+    <div class="mhdr"><h3>🗄️ ব্যাকআপ তালিকা</h3><button class="btn-x" onclick="closeModal('modalBackupList')">✕</button></div>
+    <div class="mbody">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">প্রতিদিন রাত ১২টায় স্বয়ংক্রিয়ভাবে ব্যাকআপ নেয়া হয় (গত ৩০ দিনের রাখা হয়)। যেকোনো দিনের ব্যাকআপ ডাউনলোড করে রাখতে পারবেন।</p>
+      <div id="backupListBody" style="max-height:60vh;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
 <!-- INSTALL BAR -->
 <div id="installBar">
   <div class="ii">📱</div>
@@ -1066,11 +1088,73 @@ const CFG = {
   TABLE_ATTENDANCE: 'attendance',
   TABLE_DOCS: 'doc_items',              // 🆕 ফাইল/ডকুমেন্টস ট্যাব
   TABLE_AUDIT: 'audit_log',             // 🆕 কার্যকলাপ ইতিহাস
+  TABLE_ERRORLOG: 'error_log',          // 🆕 এরর ট্র্যাকিং
+  TABLE_BACKUPS: 'backup_snapshots',    // 🆕 অটোমেটিক ডেইলি ব্যাকআপ (ভিউ-অনলি, শুধু pg_cron লেখে)
+  SENTRY_DSN: '', // ঐচ্ছিক — sentry.io থেকে ফ্রি অ্যাকাউন্ট বানিয়ে DSN বসালে উন্নত এরর-ট্র্যাকিং চালু হবে
   STORAGE_BUCKET: 'documents',          // 🆕 Supabase Storage বাকেট (ফাইলের বাইট এখানে)
   MAX_VIDEO_SECONDS: 60,                // 🆕 ভিডিওর সর্বোচ্চ দৈর্ঘ্য
   URL: 'https://tqixslcjpeqbsoumnblo.supabase.co',
   KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRxaXhzbGNqcGVxYnNvdW1uYmxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MTgzMjQsImV4cCI6MjA5OTA5NDMyNH0.0Sv4-WMsxK4kFDXUL5b1LF6LGNYR0ti5niAEmzHWb8M',
 };
+
+// ═══════════════════════════════════════════════════════
+//  🆕 এরর ট্র্যাকিং — কোনো জাভাস্ক্রিপ্ট এরর/ক্র্যাশ হলে স্বয়ংক্রিয়ভাবে
+//  ডাটাবেজে জমা হয়ে যায় (ব্যবহারকারীকে স্ক্রিনশট পাঠাতে হয় না)।
+//  raw fetch() ব্যবহার করা হয়েছে ইচ্ছাকৃতভাবে — supa()/অন্য হেল্পার
+//  ফাংশন নিজেই যদি ভেঙে পড়ে (যেই বাগটা ধরার কথা), তাহলেও যেন এই
+//  লগিং পাথ কাজ করে, তাই সম্পূর্ণ স্বাধীন ও সরলভাবে লেখা।
+// ═══════════════════════════════════════════════════════
+let _lastLoggedError = ''; // একই এরর বারবার (লুপে) লগ হয়ে স্প্যাম হওয়া ঠেকানোর জন্য
+function logClientError(message, stack, sourceInfo){
+  try{
+    const msg = String(message||'').slice(0,500);
+    const key = msg+'|'+String(sourceInfo||'');
+    if(key === _lastLoggedError) return; // পরপর একই এরর হলে দ্বিতীয়বার আর পাঠানো হচ্ছে না
+    _lastLoggedError = key;
+    const entry = {
+      id: (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+      actor_email: (typeof currentUser!=='undefined' && currentUser?.email) || null,
+      actor_name:  (typeof currentUser!=='undefined' && (currentUser?.name||currentUser?.email)) || null,
+      message: msg,
+      stack: String(stack||'').slice(0,2000),
+      url: String(sourceInfo||location.href),
+      user_agent: navigator.userAgent,
+      created_at: new Date().toISOString(),
+    };
+    // অফলাইনেও ইতিহাস হারাবে না — লোকাল ক্যাশে রাখা হচ্ছে
+    try{
+      const logs = JSON.parse(localStorage.getItem('bgfcl_errors')||'[]');
+      logs.unshift(entry); if(logs.length>200) logs.length=200;
+      localStorage.setItem('bgfcl_errors', JSON.stringify(logs));
+    }catch(_e){}
+    fetch(CFG.URL+'/rest/v1/'+CFG.TABLE_ERRORLOG, {
+      method:'POST',
+      headers:{'apikey':CFG.KEY,'Authorization':'Bearer '+CFG.KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body: JSON.stringify(entry),
+    }).catch(()=>{});
+    // ঐচ্ছিক Sentry — DSN বসানো থাকলে সেখানেও পাঠানো হবে
+    if(window.Sentry) window.Sentry.captureException(new Error(msg));
+  }catch(_e){ /* এরর লগ করতে গিয়ে নিজেই এরর হলে চুপচাপ থেমে যাওয়া হচ্ছে — ইনফাইনাইট লুপ এড়াতে */ }
+}
+window.addEventListener('error', function(e){
+  logClientError(e.message, e.error?.stack, (e.filename||'')+':'+(e.lineno||''));
+});
+window.addEventListener('unhandledrejection', function(e){
+  const r=e.reason;
+  logClientError('Unhandled Promise Rejection: '+(r?.message||r), r?.stack, '');
+});
+// ঐচ্ছিক Sentry ইন্টিগ্রেশন — CFG.SENTRY_DSN খালি থাকলে কিছুই লোড হবে না,
+// অ্যাপ স্বাভাবিকভাবে চলবে (উপরের internal error_log-ই একাই যথেষ্ট)
+if(CFG.SENTRY_DSN){
+  const _sc=document.createElement('script');
+  _sc.src='https://browser.sentry-cdn.com/7.120.3/bundle.tracing.min.js';
+  _sc.crossOrigin='anonymous';
+  _sc.onload=function(){
+    window.Sentry.init({ dsn: CFG.SENTRY_DSN, tracesSampleRate: 0.2 });
+    if(typeof currentUser!=='undefined' && currentUser?.email) window.Sentry.setUser({email:currentUser.email});
+  };
+  document.head.appendChild(_sc);
+}
 
 const DEPT = {
   field:      {name:'ফিল্ড মেইনটেন্যান্স',  icon:'🔧', color:'#3B82F6', bg:'#DBEAFE'},
@@ -1710,6 +1794,7 @@ function enterAsViewer(){
 function setCurrentUser(u){
   currentUser = u;
   localStorage.setItem('bgfcl_user', JSON.stringify(u));
+  if(window.Sentry && u?.email) window.Sentry.setUser({email:u.email});
 }
 
 function enterApp(){
@@ -1823,6 +1908,10 @@ function showUserMenu(){
   `;
   if(r==='super'||r==='admin'){
     html+=`<button onclick="closeModal('modalUser');openAuditLog();" style="width:100%;background:#F1F5F9;border:1px solid var(--bd);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🕓 কার্যকলাপ লগ (অডিট)</button>`;
+    html+=`<button onclick="closeModal('modalUser');openErrorLog();" style="width:100%;background:#F1F5F9;border:1px solid var(--bd);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🐞 এরর লগ</button>`;
+  }
+  if(r==='super'){
+    html+=`<button onclick="closeModal('modalUser');openBackupList();" style="width:100%;background:#F1F5F9;border:1px solid var(--bd);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🗄️ ব্যাকআপ তালিকা</button>`;
   }
   html+=`<button onclick="doLogout()" style="width:100%;background:var(--red-l);border:1px solid #FECACA;border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:#DC2626;font-weight:600;cursor:pointer;">🚪 লগআউট</button>`;
   document.getElementById('userMenuBody').innerHTML=html;
@@ -1883,6 +1972,66 @@ function renderAuditLogList(){
       <div style="color:var(--muted);margin-top:2px;">${moduleLabel[l.module]||l.module} · ${escHtml(l.actor_name||'অজানা')}${l.details?' · '+escHtml(l.details):''}</div>
     </div>`;
   }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  🆕 এরর লগ — ভিউয়ার
+// ═══════════════════════════════════════════════════════
+async function openErrorLog(){
+  openModal('modalErrorLog');
+  const box=document.getElementById('errorLogList');
+  box.innerHTML='⏳ লোড হচ্ছে...';
+  let logs = JSON.parse(localStorage.getItem('bgfcl_errors')||'[]');
+  try{
+    const cloud = await supa(CFG.TABLE_ERRORLOG+'?order=created_at.desc&limit=100');
+    if(cloud) logs = cloud;
+  }catch(e){ /* ক্লাউড থেকে আনা না গেলে লোকাল ক্যাশ দিয়েই দেখানো হবে */ }
+  if(!logs.length){ box.innerHTML=`<div class="empty-st"><div class="ei">✅</div><p>কোনো এরর পাওয়া যায়নি — সব ঠিকঠাক চলছে</p></div>`; return; }
+  box.innerHTML = logs.map(l=>{
+    const when = l.created_at ? new Date(l.created_at).toLocaleString('bn-BD',{dateStyle:'medium',timeStyle:'short'}) : '';
+    return `<div style="padding:10px 4px;border-bottom:1px solid #F1F5F9;font-size:12px;">
+      <div style="display:flex;justify-content:space-between;gap:8px;">
+        <strong style="color:#DC2626;word-break:break-word;">${escHtml(l.message||'')}</strong>
+        <span style="color:var(--muted);white-space:nowrap;flex-shrink:0;">${when}</span>
+      </div>
+      <div style="color:var(--muted);margin-top:2px;">${escHtml(l.actor_name||'অজানা')} · ${escHtml(l.url||'')}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  🆕 ব্যাকআপ তালিকা — ভিউয়ার (ডাউনলোড-অনলি, সরাসরি রিস্টোর বাটন
+//  ইচ্ছাকৃতভাবে রাখা হয়নি — ভুলবশত লাইভ ডেটা ওভাররাইট হওয়ার ঝুঁকি
+//  এড়াতে; দরকার হলে ডাউনলোড করা JSON ফাইল ম্যানুয়ালি রিভিউ করে নেয়া
+//  উচিত)
+// ═══════════════════════════════════════════════════════
+let _backupCache=[];
+async function openBackupList(){
+  openModal('modalBackupList');
+  const box=document.getElementById('backupListBody');
+  box.innerHTML='⏳ লোড হচ্ছে...';
+  try{
+    const rows = await supa(CFG.TABLE_BACKUPS+'?order=snapshot_date.desc&select=id,snapshot_date,created_at');
+    _backupCache = rows||[];
+  }catch(e){ box.innerHTML=`<div class="empty-st"><div class="ei">⚠️</div><p>ব্যাকআপ তালিকা আনা যায়নি — ইন্টারনেট চেক করুন</p></div>`; return; }
+  if(!_backupCache.length){ box.innerHTML=`<div class="empty-st"><div class="ei">🗄️</div><p>এখনো কোনো ব্যাকআপ নেয়া হয়নি (SQL সেটআপ ঠিকভাবে রান হয়েছে কিনা যাচাই করুন)</p></div>`; return; }
+  box.innerHTML = _backupCache.map(b=>{
+    const dateLabel = new Date(b.snapshot_date).toLocaleDateString('bn-BD',{year:'numeric',month:'long',day:'numeric'});
+    return `<div class="doc-tree-item"><span>📅 ${dateLabel}</span><button class="doc-tree-btn" onclick="downloadBackupSnapshot('${b.snapshot_date}')">⬇️ ডাউনলোড</button></div>`;
+  }).join('');
+}
+async function downloadBackupSnapshot(snapshotDate){
+  toast('⏳ ব্যাকআপ প্রস্তুত হচ্ছে...');
+  try{
+    const rows = await supa(CFG.TABLE_BACKUPS+'?snapshot_date=eq.'+snapshotDate);
+    const snap = rows?.[0]; if(!snap){ toast('❌ পাওয়া যায়নি'); return; }
+    const blob = new Blob([JSON.stringify(snap,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`BGFCL_backup_${snapshotDate}.json`;
+    a.click();
+    toast('✅ ডাউনলোড হয়েছে');
+  }catch(e){ toast('❌ ডাউনলোড ব্যর্থ: '+e.message); }
 }
 
 // ═══════════════════════════════════════════════════════

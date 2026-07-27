@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v1.8 — অডিট লগ (কার্যকলাপ ইতিহাস) + কোম্পানি লেটারহেডসহ PDF রিপোর্ট
-const CACHE_NAME = 'bgfcl-v16';
+// BGFCL Inventory Service Worker v1.9 — অটোমেটিক ডেইলি ব্যাকআপ (pg_cron) + এরর ট্র্যাকিং সিস্টেম
+const CACHE_NAME = 'bgfcl-v17';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
