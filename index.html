@@ -12,17 +12,6 @@
   <link rel="apple-touch-icon" href="icon-192.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet"/>
   <title>BGFCL স্টক ইনভেন্টরি</title>
-  <script>
-    // 🆕 থিম যত দ্রুত সম্ভব সেট করা হচ্ছে (CSS লোড হওয়ার আগেই), যাতে
-    // ডার্ক মোডে থাকা অবস্থায় রিফ্রেশ করলে সাদা স্ক্রিন এক পলকের জন্যও
-    // ঝলকে না ওঠে (flash of wrong theme এড়ানো)
-    (function(){
-      try{
-        const saved = localStorage.getItem('bgfcl_theme');
-        if(saved==='dark') document.documentElement.setAttribute('data-theme','dark');
-      }catch(e){}
-    })();
-  </script>
 <style>
 :root{
   --navy:#0D1B2A;--navy-mid:#1A2E42;--navy-light:#243B55;
@@ -117,9 +106,6 @@ header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,#1E3
   header, .main-tabs, #installBar, .mo, #toast, #loaderOv,
   .action-bar, #pendingBanner, .controls-row, .chart-tabs, #mainChart{display:none !important;}
   body{background:white !important;color:#0F172A !important;}
-  /* ডার্ক মোড চালু থাকলেও প্রিন্ট/PDF আউটপুট সবসময় সাদা/হালকা থিমেই হবে */
-  [data-theme="dark"] .chart-sec, [data-theme="dark"] .dept-grid, [data-theme="dark"] .sum-grid,
-  [data-theme="dark"] .log-table td, [data-theme="dark"] .log-table th{background:white !important;color:#0F172A !important;border-color:#E2E8F0 !important;}
   main{padding:0;max-width:100% !important;}
   .chart-sec, .dept-grid, .sum-grid{box-shadow:none;}
   /* horizontal-scroll কন্টেইনার প্রিন্টে ক্লিপ হয়ে যেত — এখন পুরো টেবিল দেখাবে */
@@ -385,78 +371,12 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 }
 
 /* ═══════════════════════════════════════════════════════
-   🆕 ডার্ক মোড
-   [data-theme="dark"] হলে এই ব্লক সক্রিয় হয় — মূল কাঠামো
-   (হেডার/ট্যাব) এমনিতেই গাঢ় নীল, তাই ওগুলো অপরিবর্তিত থাকে;
-   এখানে মূলত সাদা/হালকা সারফেসগুলো (কার্ড, মোডাল, টেবিল, ইনপুট)
-   গাঢ় করা হয়েছে। !important ব্যবহার করা হয়েছে যাতে এলিমেন্টের
-   ভেতরের inline style (যেমন style="background:#fff") থাকলেও
-   ডার্ক মোডে ওভাররাইড হয়।
-   ═══════════════════════════════════════════════════════ */
-[data-theme="dark"]{
-  --dk-bg:#0B1622; --dk-surface:#152233; --dk-surface2:#1B2B3F;
-  --dk-border:#2A3F56; --dk-text:#E2E8F0; --dk-muted:#8291A3;
-}
-[data-theme="dark"] body{background:var(--dk-bg);color:var(--dk-text);}
-[data-theme="dark"] main{background:transparent;}
-
-[data-theme="dark"] .sum-card,
-[data-theme="dark"] .dept-card,
-[data-theme="dark"] .chart-sec,
-[data-theme="dark"] .modal,
-[data-theme="dark"] .doc-card,
-[data-theme="dark"] .doc-ctx-menu,
-[data-theme="dark"] .ov-card,
-[data-theme="dark"] .ov-feed,
-[data-theme="dark"] .doc-tree-item,
-[data-theme="dark"] .auth-card,
-[data-theme="dark"] #installBar{
-  background:var(--dk-surface) !important; color:var(--dk-text) !important;
-  border-color:var(--dk-border) !important;
-}
-[data-theme="dark"] .auth-tab{background:var(--dk-surface) !important;color:var(--dk-muted) !important;}
-[data-theme="dark"] .auth-tab.active{background:var(--dk-surface2) !important;color:var(--dk-text) !important;}
-[data-theme="dark"] .doc-list-row:hover,
-[data-theme="dark"] .filter-btn,
-[data-theme="dark"] .doc-thumb,
-[data-theme="dark"] .doc-list-icon{
-  background:var(--dk-surface2) !important; color:var(--dk-text) !important;
-}
-[data-theme="dark"] .log-table thead tr, [data-theme="dark"] .log-table th{
-  background:var(--dk-bg) !important; color:var(--dk-text) !important;
-}
-[data-theme="dark"] .log-table td{background:var(--dk-surface) !important;color:var(--dk-text) !important;border-color:var(--dk-border) !important;}
-[data-theme="dark"] .log-table tr:hover td{background:var(--dk-surface2) !important;}
-[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea{
-  background:var(--dk-surface2) !important; color:var(--dk-text) !important; border-color:var(--dk-border) !important;
-}
-[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder{color:var(--dk-muted) !important;}
-[data-theme="dark"] .sl, [data-theme="dark"] .dept-sub, [data-theme="dark"] .ei,
-[data-theme="dark"] .empty-st, [data-theme="dark"] .doc-meta, [data-theme="dark"] .doc-list-meta,
-[data-theme="dark"] .sec-title, [data-theme="dark"] label{color:var(--dk-muted) !important;}
-[data-theme="dark"] .item-name, [data-theme="dark"] .doc-name, [data-theme="dark"] .doc-list-name,
-[data-theme="dark"] .sv, [data-theme="dark"] .dept-name, [data-theme="dark"] td strong{color:var(--dk-text) !important;}
-[data-theme="dark"] .sum-names{border-color:var(--dk-border) !important;}
-[data-theme="dark"] .sum-names .snm{background:var(--dk-surface2) !important;color:var(--dk-text) !important;}
-[data-theme="dark"] .doc-tagbar .doc-tag-chip, [data-theme="dark"] .doc-search,
-[data-theme="dark"] .doc-view-btn{background:var(--dk-surface2) !important;color:var(--dk-text) !important;border-color:var(--dk-border) !important;}
-[data-theme="dark"] .doc-view-btn.active{background:var(--amber) !important;color:#000 !important;}
-[data-theme="dark"] .doc-crumb{color:var(--dk-text) !important;}
-[data-theme="dark"] .modal .fg label, [data-theme="dark"] .subsec-title{color:var(--dk-muted) !important;}
-[data-theme="dark"] .pending-item, [data-theme="dark"] .empty-st .ei{background:var(--dk-surface2) !important;}
-[data-theme="dark"] hr, [data-theme="dark"] .doc-upload-row{border-color:var(--dk-border) !important;}
-
-/* স্কেলিটন লোডিং-এর ব্লকগুলো ডার্ক মোডেও দৃশ্যমান রাখা */
-[data-theme="dark"] .skel-block{background:linear-gradient(90deg,#1B2B3F 25%,#243A52 37%,#1B2B3F 63%);background-size:400% 100%;}
-
-/* ═══════════════════════════════════════════════════════
    🆕 স্কেলিটন লোডিং — প্রথমবার ক্লাউড থেকে ডেটা আসার আগ পর্যন্ত
    ফাঁকা/নমুনা ডেটা দেখানোর বদলে পালস-অ্যানিমেটেড ধূসর ব্লক দেখানো হয়
    ═══════════════════════════════════════════════════════ */
 @keyframes skel-shimmer{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
 .skel-block{background:linear-gradient(90deg,#E2E8F0 25%,#F1F5F9 37%,#E2E8F0 63%);background-size:400% 100%;animation:skel-shimmer 1.4s ease infinite;border-radius:8px;}
 #skeletonOverlay{position:fixed;inset:0;z-index:150;background:#EEF2F7;padding:16px;overflow:auto;}
-[data-theme="dark"] #skeletonOverlay{background:var(--dk-bg);}
 .skel-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px;}
 .skel-card{height:78px;}
 .skel-row{height:44px;margin-bottom:6px;}
@@ -468,7 +388,6 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 .doc-select-box{position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:6px;border:2px solid #CBD5E1;background:#fff;z-index:5;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;}
 .doc-list-row .doc-select-box{position:static;margin-right:2px;flex-shrink:0;}
 .doc-select-box.checked{background:var(--amber);border-color:var(--amber);}
-[data-theme="dark"] .doc-select-box{background:var(--dk-surface2);border-color:var(--dk-border);}
 .doc-bulk-bar{position:sticky;top:0;z-index:60;background:var(--navy);color:#fff;border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
 .doc-bulk-bar .dbb-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .doc-bulk-bar button{border:none;border-radius:8px;padding:7px 12px;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;}
@@ -485,8 +404,6 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 .ob-icon{font-size:44px;text-align:center;margin-bottom:14px;}
 .ob-title{font-size:16px;font-weight:700;text-align:center;color:var(--navy);margin-bottom:8px;}
 .ob-body{font-size:13px;color:#475569;text-align:center;line-height:1.7;padding:0 4px;}
-[data-theme="dark"] .ob-title{color:var(--dk-text) !important;}
-[data-theme="dark"] .ob-body{color:var(--dk-muted) !important;}
 </style>
 </head>
 <body>
@@ -2067,15 +1984,6 @@ function enterApp(){
 function showSkeleton(){ const el=document.getElementById('skeletonOverlay'); if(el) el.style.display='block'; }
 function hideSkeleton(){ const el=document.getElementById('skeletonOverlay'); if(el) el.style.display='none'; }
 
-// 🆕 ডার্ক মোড টগল
-function toggleDarkMode(){
-  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
-  if(isDark){ document.documentElement.removeAttribute('data-theme'); localStorage.setItem('bgfcl_theme','light'); }
-  else{ document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('bgfcl_theme','dark'); }
-  if(chartInst) renderChart(); // Chart.js নিজে থিম বদল বোঝে না, তাই চার্ট থাকলে আবার আঁকা হচ্ছে
-  showUserMenu(); // মেনু খোলা থাকলে বাটনের আইকন/লেখা (🌙/☀️) সাথে সাথে বদলে যাবে
-}
-
 // ═══════════════════════════════════════════════════════
 //  🆕 অনবোর্ডিং / টিউটোরিয়াল — নতুন ব্যবহারকারীর জন্য সংক্ষিপ্ত পরিচিতি
 // ═══════════════════════════════════════════════════════
@@ -2085,7 +1993,7 @@ const ONBOARDING_SLIDES = [
   {icon:'📦', title:'মালামাল', body:'প্রতিটা লেনদেন "ইন" (যুক্ত হলো) বা "আউট" (ব্যবহার হলো) হিসেবে যোগ করুন — বর্তমান স্টক নিজে থেকেই হিসাব হয়ে যাবে। ছবি, উৎস, ওয়ার্ক অর্ডার নং — সব যোগ করা যায়।'},
   {icon:'👷', title:'জনবল', body:'অফিসার, স্টাফ ও দৈনিক শ্রমিক — তিন ক্যাটাগরিতে জনবলের তথ্য রাখুন, ছুটির হিসাব ট্র্যাক করুন, আর দৈনিক শ্রমিকদের উপস্থিতিও নিতে পারবেন।'},
   {icon:'📁', title:'ফাইল/ডকুমেন্টস', body:'যেকোনো ফাইল আপলোড করুন, ফোল্ডারে গুছিয়ে রাখুন। ফোনে আঙুল দিয়ে চেপে ধরে টেনে অন্য ফোল্ডারে নেয়া যায়, পিসিতে ড্র্যাগ-ড্রপ করা যায়।'},
-  {icon:'📊', title:'রিপোর্ট ও নিরাপত্তা', body:'যেকোনো ট্যাব থেকে PDF বা Excel রিপোর্ট বানাতে পারবেন। প্রতিটা পরিবর্তনের ইতিহাস "কার্যকলাপ লগ"-এ থাকে, আর প্রতিদিন রাতে স্বয়ংক্রিয় ব্যাকআপও হয়। প্রোফাইল আইকনে ট্যাপ করে ডার্ক মোডও চালু করতে পারবেন। শুরু করুন! ✅'},
+  {icon:'📊', title:'রিপোর্ট ও নিরাপত্তা', body:'যেকোনো ট্যাব থেকে PDF বা Excel রিপোর্ট বানাতে পারবেন। প্রতিটা পরিবর্তনের ইতিহাস "কার্যকলাপ লগ"-এ থাকে, আর প্রতিদিন রাতে স্বয়ংক্রিয় ব্যাকআপও হয়। শুরু করুন! ✅'},
 ];
 let obIndex = 0;
 function startOnboarding(){
@@ -2199,8 +2107,6 @@ function showUserMenu(){
       ${r!=='viewer'&&r!=='pending'?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748B;">বিভাগ</span><strong>${r==='super'?'সকল বিভাগ':reqDeptName}</strong></div>`:''}
     </div>
   `;
-  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
-  html+=`<button onclick="toggleDarkMode()" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">${isDark?'☀️ লাইট মোড':'🌙 ডার্ক মোড'}</button>`;
   html+=`<button onclick="closeModal('modalUser');startOnboarding();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">❓ টিউটোরিয়াল আবার দেখুন</button>`;
   if(r==='super'||r==='admin'){
     html+=`<button onclick="closeModal('modalUser');openAuditLog();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🕓 কার্যকলাপ লগ (অডিট)</button>`;

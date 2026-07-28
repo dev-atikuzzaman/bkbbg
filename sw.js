@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v2.1 — ডার্ক মোড, স্কেলিটন লোডিং, মাল্টি-সিলেক্ট বাল্ক অ্যাকশন, অনবোর্ডিং টিউটোরিয়াল
-const CACHE_NAME = 'bgfcl-v19';
+// BGFCL Inventory Service Worker v2.2 — ডার্ক মোড ফিচার সরানো হয়েছে (ইউজারের অনুরোধে), বাকি সব আগের মতোই
+const CACHE_NAME = 'bgfcl-v20';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
