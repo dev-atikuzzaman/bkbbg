@@ -12,6 +12,17 @@
   <link rel="apple-touch-icon" href="icon-192.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet"/>
   <title>BGFCL স্টক ইনভেন্টরি</title>
+  <script>
+    // 🆕 থিম যত দ্রুত সম্ভব সেট করা হচ্ছে (CSS লোড হওয়ার আগেই), যাতে
+    // ডার্ক মোডে থাকা অবস্থায় রিফ্রেশ করলে সাদা স্ক্রিন এক পলকের জন্যও
+    // ঝলকে না ওঠে (flash of wrong theme এড়ানো)
+    (function(){
+      try{
+        const saved = localStorage.getItem('bgfcl_theme');
+        if(saved==='dark') document.documentElement.setAttribute('data-theme','dark');
+      }catch(e){}
+    })();
+  </script>
 <style>
 :root{
   --navy:#0D1B2A;--navy-mid:#1A2E42;--navy-light:#243B55;
@@ -105,7 +116,10 @@ header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 60%,#1E3
   @page{ size: landscape; margin: 10mm; }
   header, .main-tabs, #installBar, .mo, #toast, #loaderOv,
   .action-bar, #pendingBanner, .controls-row, .chart-tabs, #mainChart{display:none !important;}
-  body{background:white;}
+  body{background:white !important;color:#0F172A !important;}
+  /* ডার্ক মোড চালু থাকলেও প্রিন্ট/PDF আউটপুট সবসময় সাদা/হালকা থিমেই হবে */
+  [data-theme="dark"] .chart-sec, [data-theme="dark"] .dept-grid, [data-theme="dark"] .sum-grid,
+  [data-theme="dark"] .log-table td, [data-theme="dark"] .log-table th{background:white !important;color:#0F172A !important;border-color:#E2E8F0 !important;}
   main{padding:0;max-width:100% !important;}
   .chart-sec, .dept-grid, .sum-grid{box-shadow:none;}
   /* horizontal-scroll কন্টেইনার প্রিন্টে ক্লিপ হয়ে যেত — এখন পুরো টেবিল দেখাবে */
@@ -288,8 +302,8 @@ canvas#mainChart{width:100%!important;max-height:300px;}
    🆕 ফাইল/ডকুমেন্টস ম্যানেজার
    ═══════════════════════════════════════════════════════ */
 .doc-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;}
-.doc-search{flex:1 1 160px;padding:9px 12px;border:1px solid var(--bd);border-radius:10px;font-family:var(--f);font-size:13px;}
-.doc-view-toggle{display:flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden;}
+.doc-search{flex:1 1 160px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;font-family:var(--f);font-size:13px;}
+.doc-view-toggle{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .doc-view-btn{background:#fff;border:none;padding:8px 12px;cursor:pointer;font-size:15px;color:var(--muted);}
 .doc-view-btn.active{background:var(--amber);color:#fff;}
 .doc-breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:10px;font-size:13px;}
@@ -300,11 +314,11 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 .doc-crumb-sep{color:#CBD5E1;}
 .doc-crumb.drag-over{background:#FFFBEB;outline:2px dashed var(--amber);outline-offset:-2px;}
 .doc-tagbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
-.doc-tag-chip{background:#F1F5F9;border:1px solid var(--bd);color:#475569;font-family:var(--f);font-size:12px;padding:5px 11px;border-radius:20px;cursor:pointer;}
+.doc-tag-chip{background:#F1F5F9;border:1px solid var(--border);color:#475569;font-family:var(--f);font-size:12px;padding:5px 11px;border-radius:20px;cursor:pointer;}
 .doc-tag-chip.active{background:#EDE9FE;border-color:#7C3AED;color:#7C3AED;font-weight:700;}
 
 .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
-.doc-card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;user-select:none;transition:box-shadow .15s,transform .1s;position:relative;}
+.doc-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;user-select:none;transition:box-shadow .15s,transform .1s;position:relative;}
 .doc-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.08);}
 .doc-card.drag-over{outline:2px dashed var(--amber);outline-offset:-2px;background:#FFFBEB;}
 .doc-card.dragging{opacity:.4;}
@@ -312,7 +326,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 .doc-thumb img{width:100%;height:100%;object-fit:cover;}
 .doc-name{font-size:12px;font-weight:600;color:var(--navy);word-break:break-word;line-height:1.3;max-height:2.6em;overflow:hidden;}
 .doc-meta{font-size:10px;color:var(--muted);margin-top:2px;}
-.doc-card-menu-btn{position:absolute;top:2px;right:2px;background:rgba(255,255,255,.9);border:1px solid var(--bd);border-radius:50%;width:24px;height:24px;font-size:14px;line-height:1;cursor:pointer;color:var(--muted);}
+.doc-card-menu-btn{position:absolute;top:2px;right:2px;background:rgba(255,255,255,.9);border:1px solid var(--border);border-radius:50%;width:24px;height:24px;font-size:14px;line-height:1;cursor:pointer;color:var(--muted);}
 
 .doc-list{display:flex;flex-direction:column;gap:2px;}
 .doc-list-row{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:8px;cursor:pointer;user-select:none;}
@@ -325,12 +339,12 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 .doc-list-meta{font-size:11px;color:var(--muted);flex-shrink:0;}
 .doc-list-menu-btn{background:none;border:none;font-size:17px;color:var(--muted);cursor:pointer;padding:4px 8px;flex-shrink:0;}
 
-.doc-ctx-menu{position:fixed;z-index:400;background:#fff;border:1px solid var(--bd);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:170px;overflow:hidden;}
+.doc-ctx-menu{position:fixed;z-index:400;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);min-width:170px;overflow:hidden;}
 .doc-ctx-item{display:block;width:100%;text-align:right;background:none;border:none;padding:10px 14px;font-family:var(--f);font-size:13px;text-align:left;cursor:pointer;color:var(--navy);}
 .doc-ctx-item:hover{background:#F1F5F9;}
 .doc-ctx-item.danger{color:#DC2626;}
 
-.doc-tree-item{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:8px;border:1px solid var(--bd);margin-bottom:6px;}
+.doc-tree-item{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:8px;border:1px solid var(--border);margin-bottom:6px;}
 .doc-tree-btn{background:var(--amber);color:#fff;border:none;font-family:var(--f);font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer;}
 
 .doc-drag-ghost{position:fixed;z-index:999;pointer-events:none;background:#fff;border:2px solid var(--amber);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:.95;}
@@ -369,6 +383,110 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 @media(max-width:600px){
   .ov-grid{grid-template-columns:repeat(2,1fr);}
 }
+
+/* ═══════════════════════════════════════════════════════
+   🆕 ডার্ক মোড
+   [data-theme="dark"] হলে এই ব্লক সক্রিয় হয় — মূল কাঠামো
+   (হেডার/ট্যাব) এমনিতেই গাঢ় নীল, তাই ওগুলো অপরিবর্তিত থাকে;
+   এখানে মূলত সাদা/হালকা সারফেসগুলো (কার্ড, মোডাল, টেবিল, ইনপুট)
+   গাঢ় করা হয়েছে। !important ব্যবহার করা হয়েছে যাতে এলিমেন্টের
+   ভেতরের inline style (যেমন style="background:#fff") থাকলেও
+   ডার্ক মোডে ওভাররাইড হয়।
+   ═══════════════════════════════════════════════════════ */
+[data-theme="dark"]{
+  --dk-bg:#0B1622; --dk-surface:#152233; --dk-surface2:#1B2B3F;
+  --dk-border:#2A3F56; --dk-text:#E2E8F0; --dk-muted:#8291A3;
+}
+[data-theme="dark"] body{background:var(--dk-bg);color:var(--dk-text);}
+[data-theme="dark"] main{background:transparent;}
+
+[data-theme="dark"] .sum-card,
+[data-theme="dark"] .dept-card,
+[data-theme="dark"] .chart-sec,
+[data-theme="dark"] .modal,
+[data-theme="dark"] .doc-card,
+[data-theme="dark"] .doc-ctx-menu,
+[data-theme="dark"] .ov-card,
+[data-theme="dark"] .ov-feed,
+[data-theme="dark"] .doc-tree-item,
+[data-theme="dark"] .auth-card,
+[data-theme="dark"] #installBar{
+  background:var(--dk-surface) !important; color:var(--dk-text) !important;
+  border-color:var(--dk-border) !important;
+}
+[data-theme="dark"] .auth-tab{background:var(--dk-surface) !important;color:var(--dk-muted) !important;}
+[data-theme="dark"] .auth-tab.active{background:var(--dk-surface2) !important;color:var(--dk-text) !important;}
+[data-theme="dark"] .doc-list-row:hover,
+[data-theme="dark"] .filter-btn,
+[data-theme="dark"] .doc-thumb,
+[data-theme="dark"] .doc-list-icon{
+  background:var(--dk-surface2) !important; color:var(--dk-text) !important;
+}
+[data-theme="dark"] .log-table thead tr, [data-theme="dark"] .log-table th{
+  background:var(--dk-bg) !important; color:var(--dk-text) !important;
+}
+[data-theme="dark"] .log-table td{background:var(--dk-surface) !important;color:var(--dk-text) !important;border-color:var(--dk-border) !important;}
+[data-theme="dark"] .log-table tr:hover td{background:var(--dk-surface2) !important;}
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea{
+  background:var(--dk-surface2) !important; color:var(--dk-text) !important; border-color:var(--dk-border) !important;
+}
+[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder{color:var(--dk-muted) !important;}
+[data-theme="dark"] .sl, [data-theme="dark"] .dept-sub, [data-theme="dark"] .ei,
+[data-theme="dark"] .empty-st, [data-theme="dark"] .doc-meta, [data-theme="dark"] .doc-list-meta,
+[data-theme="dark"] .sec-title, [data-theme="dark"] label{color:var(--dk-muted) !important;}
+[data-theme="dark"] .item-name, [data-theme="dark"] .doc-name, [data-theme="dark"] .doc-list-name,
+[data-theme="dark"] .sv, [data-theme="dark"] .dept-name, [data-theme="dark"] td strong{color:var(--dk-text) !important;}
+[data-theme="dark"] .sum-names{border-color:var(--dk-border) !important;}
+[data-theme="dark"] .sum-names .snm{background:var(--dk-surface2) !important;color:var(--dk-text) !important;}
+[data-theme="dark"] .doc-tagbar .doc-tag-chip, [data-theme="dark"] .doc-search,
+[data-theme="dark"] .doc-view-btn{background:var(--dk-surface2) !important;color:var(--dk-text) !important;border-color:var(--dk-border) !important;}
+[data-theme="dark"] .doc-view-btn.active{background:var(--amber) !important;color:#000 !important;}
+[data-theme="dark"] .doc-crumb{color:var(--dk-text) !important;}
+[data-theme="dark"] .modal .fg label, [data-theme="dark"] .subsec-title{color:var(--dk-muted) !important;}
+[data-theme="dark"] .pending-item, [data-theme="dark"] .empty-st .ei{background:var(--dk-surface2) !important;}
+[data-theme="dark"] hr, [data-theme="dark"] .doc-upload-row{border-color:var(--dk-border) !important;}
+
+/* স্কেলিটন লোডিং-এর ব্লকগুলো ডার্ক মোডেও দৃশ্যমান রাখা */
+[data-theme="dark"] .skel-block{background:linear-gradient(90deg,#1B2B3F 25%,#243A52 37%,#1B2B3F 63%);background-size:400% 100%;}
+
+/* ═══════════════════════════════════════════════════════
+   🆕 স্কেলিটন লোডিং — প্রথমবার ক্লাউড থেকে ডেটা আসার আগ পর্যন্ত
+   ফাঁকা/নমুনা ডেটা দেখানোর বদলে পালস-অ্যানিমেটেড ধূসর ব্লক দেখানো হয়
+   ═══════════════════════════════════════════════════════ */
+@keyframes skel-shimmer{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
+.skel-block{background:linear-gradient(90deg,#E2E8F0 25%,#F1F5F9 37%,#E2E8F0 63%);background-size:400% 100%;animation:skel-shimmer 1.4s ease infinite;border-radius:8px;}
+#skeletonOverlay{position:fixed;inset:0;z-index:150;background:#EEF2F7;padding:16px;overflow:auto;}
+[data-theme="dark"] #skeletonOverlay{background:var(--dk-bg);}
+.skel-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px;}
+.skel-card{height:78px;}
+.skel-row{height:44px;margin-bottom:6px;}
+
+/* ═══════════════════════════════════════════════════════
+   🆕 মাল্টি-সিলেক্ট + বাল্ক অ্যাকশন (ফাইল/ডকুমেন্টস)
+   ═══════════════════════════════════════════════════════ */
+.doc-card.selectable, .doc-list-row.selectable{position:relative;}
+.doc-select-box{position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:6px;border:2px solid #CBD5E1;background:#fff;z-index:5;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;}
+.doc-list-row .doc-select-box{position:static;margin-right:2px;flex-shrink:0;}
+.doc-select-box.checked{background:var(--amber);border-color:var(--amber);}
+[data-theme="dark"] .doc-select-box{background:var(--dk-surface2);border-color:var(--dk-border);}
+.doc-bulk-bar{position:sticky;top:0;z-index:60;background:var(--navy);color:#fff;border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.doc-bulk-bar .dbb-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.doc-bulk-bar button{border:none;border-radius:8px;padding:7px 12px;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;}
+.dbb-move{background:var(--blue);color:#fff;}
+.dbb-delete{background:var(--red);color:#fff;}
+.dbb-cancel{background:rgba(255,255,255,.15);color:#fff;}
+
+/* ═══════════════════════════════════════════════════════
+   🆕 অনবোর্ডিং / টিউটোরিয়াল
+   ═══════════════════════════════════════════════════════ */
+.ob-dots{display:flex;justify-content:center;gap:6px;margin:14px 0;}
+.ob-dot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:all .2s;}
+.ob-dot.active{background:var(--amber);width:20px;border-radius:5px;}
+.ob-icon{font-size:44px;text-align:center;margin-bottom:14px;}
+.ob-title{font-size:16px;font-weight:700;text-align:center;color:var(--navy);margin-bottom:8px;}
+.ob-body{font-size:13px;color:#475569;text-align:center;line-height:1.7;padding:0 4px;}
+[data-theme="dark"] .ob-title{color:var(--dk-text) !important;}
+[data-theme="dark"] .ob-body{color:var(--dk-muted) !important;}
 </style>
 </head>
 <body>
@@ -462,6 +580,21 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 
 <!-- ══════════ APP SHELL ══════════ -->
 <div id="appShell">
+<!-- 🆕 স্কেলিটন লোডিং ওভারলে (প্রথমবার ক্লাউড থেকে ডেটা আসার আগ পর্যন্ত দেখা যায়) -->
+<div id="skeletonOverlay" style="display:none;">
+  <div class="skel-block" style="height:60px;margin-bottom:14px;"></div>
+  <div class="skel-cards">
+    <div class="skel-block skel-card"></div>
+    <div class="skel-block skel-card"></div>
+    <div class="skel-block skel-card"></div>
+    <div class="skel-block skel-card"></div>
+  </div>
+  <div class="skel-block skel-row"></div>
+  <div class="skel-block skel-row"></div>
+  <div class="skel-block skel-row"></div>
+  <div class="skel-block skel-row"></div>
+  <div class="skel-block skel-row"></div>
+</div>
 <header>
   <div class="header-top">
     <div class="logo-badge">⛽</div>
@@ -732,8 +865,10 @@ canvas#mainChart{width:100%!important;max-height:300px;}
         <button class="doc-view-btn" id="docViewGridBtn" onclick="setDocViewMode('grid')" title="গ্রিড ভিউ">▦</button>
         <button class="doc-view-btn" id="docViewListBtn" onclick="setDocViewMode('list')" title="লিস্ট ভিউ">☰</button>
       </div>
+      <button class="doc-view-btn" id="docSelectModeBtn" onclick="toggleDocSelectMode()" title="একাধিক নির্বাচন" style="border:1px solid var(--border);border-radius:10px;">☑️</button>
     </div>
 
+    <div id="docBulkBar"></div>
     <div class="doc-breadcrumb" id="docBreadcrumb"></div>
     <div class="doc-tagbar" id="docTagBar"></div>
 
@@ -1076,6 +1211,24 @@ canvas#mainChart{width:100%!important;max-height:300px;}
   <div class="modal" style="max-width:340px;">
     <div class="mhdr"><h3>👤 আমার প্রোফাইল</h3><button class="btn-x" onclick="closeModal('modalUser')">✕</button></div>
     <div class="mbody" id="userMenuBody"></div>
+  </div>
+</div>
+
+<!-- 🆕 অনবোর্ডিং / টিউটোরিয়াল -->
+<div class="mo" id="modalOnboarding">
+  <div class="modal" style="max-width:360px;">
+    <div class="mhdr"><h3 id="obStepLabel">পরিচিতি</h3><button class="btn-x" onclick="closeModal('modalOnboarding')">✕</button></div>
+    <div class="mbody">
+      <div class="ob-icon" id="obIcon"></div>
+      <div class="ob-title" id="obTitle"></div>
+      <div class="ob-body" id="obBody"></div>
+      <div class="ob-dots" id="obDots"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn-p" id="obPrevBtn" style="flex:1;justify-content:center;background:#F1F5F9;color:var(--navy);" onclick="onboardingPrev()">← আগে</button>
+        <button class="btn-p bp-amber" id="obNextBtn" style="flex:2;justify-content:center;" onclick="onboardingNext()">পরবর্তী →</button>
+      </div>
+      <button onclick="finishOnboarding()" style="width:100%;background:none;border:none;color:var(--muted);font-family:var(--f);font-size:12px;padding:10px;cursor:pointer;">স্কিপ করুন</button>
+    </div>
   </div>
 </div>
 
@@ -1885,20 +2038,81 @@ function enterApp(){
   try{ updateActionBar(); }catch(e){ console.error('updateActionBar failed:',e); }
   try{ switchMainTab('overview'); }catch(e){ console.error('switchMainTab failed:',e); toast('⚠️ ডেটা লোডে সমস্যা হয়েছে'); }
 
+  // 🆕 একদম প্রথমবার (এই ডিভাইসে আগে কোনো ডেটা ক্যাশ হয়নি) হলে, ক্লাউড
+  // থেকে আসল ডেটা না আসা পর্যন্ত নমুনা/ফাঁকা ডেটার বদলে স্কেলিটন
+  // দেখানো হচ্ছে — flash of fake/empty content এড়াতে
+  const isFreshDevice = !localStorage.getItem('bgfcl_txns');
+  if(isFreshDevice){ showSkeleton(); setTimeout(hideSkeleton, 6000); } // ৬ সেকেন্ড নিরাপত্তা-জাল
+
   try{
     checkSupaConn().then(ok=>{
       supaOk=ok;
       if(ok){
-        fetchFromCloud().catch(e=>console.error('fetchFromCloud failed:',e));
+        fetchFromCloud().then(hideSkeleton).catch(e=>{ console.error('fetchFromCloud failed:',e); hideSkeleton(); });
         initRealtime();
       }
-      else toast('⚠️ ক্লাউড সিঙ্ক ব্যর্থ: '+(lastSupaError||'কারণ জানা যায়নি')+' (badge-এ ট্যাপ করুন)');
-    }).catch(()=>{ supaOk=false; });
-  }catch(e){ console.error('checkSupaConn call failed:',e); }
+      else { hideSkeleton(); toast('⚠️ ক্লাউড সিঙ্ক ব্যর্থ: '+(lastSupaError||'কারণ জানা যায়নি')+' (badge-এ ট্যাপ করুন)'); }
+    }).catch(()=>{ supaOk=false; hideSkeleton(); });
+  }catch(e){ console.error('checkSupaConn call failed:',e); hideSkeleton(); }
 
   try{
     if(currentUser?.role==='super') loadPendingApprovals();
   }catch(e){ console.error('loadPendingApprovals failed:',e); }
+
+  // 🆕 নতুন ব্যবহারকারীর জন্য একবার অনবোর্ডিং টিউটোরিয়াল দেখানো
+  try{
+    if(!localStorage.getItem('bgfcl_onboarded')) setTimeout(startOnboarding, 700);
+  }catch(e){}
+}
+function showSkeleton(){ const el=document.getElementById('skeletonOverlay'); if(el) el.style.display='block'; }
+function hideSkeleton(){ const el=document.getElementById('skeletonOverlay'); if(el) el.style.display='none'; }
+
+// 🆕 ডার্ক মোড টগল
+function toggleDarkMode(){
+  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
+  if(isDark){ document.documentElement.removeAttribute('data-theme'); localStorage.setItem('bgfcl_theme','light'); }
+  else{ document.documentElement.setAttribute('data-theme','dark'); localStorage.setItem('bgfcl_theme','dark'); }
+  if(chartInst) renderChart(); // Chart.js নিজে থিম বদল বোঝে না, তাই চার্ট থাকলে আবার আঁকা হচ্ছে
+  showUserMenu(); // মেনু খোলা থাকলে বাটনের আইকন/লেখা (🌙/☀️) সাথে সাথে বদলে যাবে
+}
+
+// ═══════════════════════════════════════════════════════
+//  🆕 অনবোর্ডিং / টিউটোরিয়াল — নতুন ব্যবহারকারীর জন্য সংক্ষিপ্ত পরিচিতি
+// ═══════════════════════════════════════════════════════
+const ONBOARDING_SLIDES = [
+  {icon:'👋', title:'স্বাগতম BGFCL ডিজিটাল স্টক ইনভেন্টরিতে', body:'বাখরাবাদ গ্যাস ফিল্ডের মালামাল, জনবল, কার্যক্রম ও ফাইল — সব একসাথে ম্যানেজ করার জন্য এই অ্যাপ। ছোট্ট একটা পরিচিতি দেখে নিন — মাত্র কয়েক সেকেন্ড লাগবে।'},
+  {icon:'🏠', title:'ওভারভিউ ড্যাশবোর্ড', body:'অ্যাপ খুললেই প্রথমে এই হোমপেজ দেখবেন — সব ট্যাবের গুরুত্বপূর্ণ সংখ্যা ও সাম্প্রতিক কার্যকলাপ একনজরে। যেকোনো কার্ডে ট্যাপ করলে সরাসরি সেই ট্যাবে চলে যাবেন।'},
+  {icon:'📦', title:'মালামাল', body:'প্রতিটা লেনদেন "ইন" (যুক্ত হলো) বা "আউট" (ব্যবহার হলো) হিসেবে যোগ করুন — বর্তমান স্টক নিজে থেকেই হিসাব হয়ে যাবে। ছবি, উৎস, ওয়ার্ক অর্ডার নং — সব যোগ করা যায়।'},
+  {icon:'👷', title:'জনবল', body:'অফিসার, স্টাফ ও দৈনিক শ্রমিক — তিন ক্যাটাগরিতে জনবলের তথ্য রাখুন, ছুটির হিসাব ট্র্যাক করুন, আর দৈনিক শ্রমিকদের উপস্থিতিও নিতে পারবেন।'},
+  {icon:'📁', title:'ফাইল/ডকুমেন্টস', body:'যেকোনো ফাইল আপলোড করুন, ফোল্ডারে গুছিয়ে রাখুন। ফোনে আঙুল দিয়ে চেপে ধরে টেনে অন্য ফোল্ডারে নেয়া যায়, পিসিতে ড্র্যাগ-ড্রপ করা যায়।'},
+  {icon:'📊', title:'রিপোর্ট ও নিরাপত্তা', body:'যেকোনো ট্যাব থেকে PDF বা Excel রিপোর্ট বানাতে পারবেন। প্রতিটা পরিবর্তনের ইতিহাস "কার্যকলাপ লগ"-এ থাকে, আর প্রতিদিন রাতে স্বয়ংক্রিয় ব্যাকআপও হয়। প্রোফাইল আইকনে ট্যাপ করে ডার্ক মোডও চালু করতে পারবেন। শুরু করুন! ✅'},
+];
+let obIndex = 0;
+function startOnboarding(){
+  obIndex = 0;
+  renderOnboardingSlide();
+  openModal('modalOnboarding');
+}
+function renderOnboardingSlide(){
+  const s = ONBOARDING_SLIDES[obIndex];
+  document.getElementById('obStepLabel').textContent = `পরিচিতি (${obIndex+1}/${ONBOARDING_SLIDES.length})`;
+  document.getElementById('obIcon').textContent = s.icon;
+  document.getElementById('obTitle').textContent = s.title;
+  document.getElementById('obBody').textContent = s.body;
+  document.getElementById('obDots').innerHTML = ONBOARDING_SLIDES.map((_,i)=>`<div class="ob-dot${i===obIndex?' active':''}"></div>`).join('');
+  document.getElementById('obPrevBtn').style.visibility = obIndex===0 ? 'hidden' : 'visible';
+  document.getElementById('obNextBtn').textContent = obIndex===ONBOARDING_SLIDES.length-1 ? '✅ শুরু করুন' : 'পরবর্তী →';
+}
+function onboardingNext(){
+  if(obIndex < ONBOARDING_SLIDES.length-1){ obIndex++; renderOnboardingSlide(); }
+  else finishOnboarding();
+}
+function onboardingPrev(){
+  if(obIndex>0){ obIndex--; renderOnboardingSlide(); }
+}
+function finishOnboarding(){
+  localStorage.setItem('bgfcl_onboarded','1');
+  closeModal('modalOnboarding');
 }
 
 function backToLogin(){
@@ -1985,12 +2199,15 @@ function showUserMenu(){
       ${r!=='viewer'&&r!=='pending'?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748B;">বিভাগ</span><strong>${r==='super'?'সকল বিভাগ':reqDeptName}</strong></div>`:''}
     </div>
   `;
+  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
+  html+=`<button onclick="toggleDarkMode()" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">${isDark?'☀️ লাইট মোড':'🌙 ডার্ক মোড'}</button>`;
+  html+=`<button onclick="closeModal('modalUser');startOnboarding();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">❓ টিউটোরিয়াল আবার দেখুন</button>`;
   if(r==='super'||r==='admin'){
-    html+=`<button onclick="closeModal('modalUser');openAuditLog();" style="width:100%;background:#F1F5F9;border:1px solid var(--bd);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🕓 কার্যকলাপ লগ (অডিট)</button>`;
-    html+=`<button onclick="closeModal('modalUser');openErrorLog();" style="width:100%;background:#F1F5F9;border:1px solid var(--bd);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🐞 এরর লগ</button>`;
+    html+=`<button onclick="closeModal('modalUser');openAuditLog();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🕓 কার্যকলাপ লগ (অডিট)</button>`;
+    html+=`<button onclick="closeModal('modalUser');openErrorLog();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🐞 এরর লগ</button>`;
   }
   if(r==='super'){
-    html+=`<button onclick="closeModal('modalUser');openBackupList();" style="width:100%;background:#F1F5F9;border:1px solid var(--bd);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🗄️ ব্যাকআপ তালিকা</button>`;
+    html+=`<button onclick="closeModal('modalUser');openBackupList();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🗄️ ব্যাকআপ তালিকা</button>`;
   }
   html+=`<button onclick="doLogout()" style="width:100%;background:var(--red-l);border:1px solid #FECACA;border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:#DC2626;font-weight:600;cursor:pointer;">🚪 লগআউট</button>`;
   document.getElementById('userMenuBody').innerHTML=html;
@@ -3143,6 +3360,8 @@ let docCurrentFolder = null;
 let docViewMode = localStorage.getItem('bgfcl_doc_view') || 'grid';
 let docTagFilter = null;
 let docSearchQuery = '';
+let docSelectMode = false;  // 🆕 একাধিক নির্বাচন মোড চালু আছে কিনা
+let docSelected = new Set(); // 🆕 বর্তমানে নির্বাচিত আইটেমের id-গুলো
 let docDragId = null;      // PC (HTML5 DnD) — বর্তমানে ধরে থাকা আইটেমের id
 let _stagedFiles = [];     // আপলোড-স্টেজিং এ থাকা ফাইলগুলো
 let _touchState = null;    // মোবাইল টাচ-ড্র্যাগের অবস্থা
@@ -3217,12 +3436,14 @@ function setDocViewMode(mode){
 function renderDocs(){
   renderDocBreadcrumb();
   renderDocTagBar();
+  renderDocBulkBar();
   const list=getDocChildren();
   document.getElementById('docGridWrap').style.display = docViewMode==='grid' ? '' : 'none';
   document.getElementById('docListWrap').style.display = docViewMode==='list' ? '' : 'none';
   if(docViewMode==='grid') renderDocGrid(list); else renderDocListView(list);
   document.getElementById('docViewGridBtn').classList.toggle('active', docViewMode==='grid');
   document.getElementById('docViewListBtn').classList.toggle('active', docViewMode==='list');
+  document.getElementById('docSelectModeBtn').classList.toggle('active', docSelectMode);
 }
 
 function renderDocBreadcrumb(){
@@ -3258,16 +3479,17 @@ function renderDocGrid(list){
     const isFolder=d.item_type==='folder';
     const thumb = isFolder ? '📁' : (d.mime_type&&d.mime_type.startsWith('image/') ? `<img src="${supaStoragePublicUrl(d.storage_path)}" loading="lazy" draggable="false"/>` : docIconFor(d.mime_type));
     const meta = isFolder ? '' : humanSize(d.size_bytes);
-    const dragAttrs = isFolder ? `ondragover="docDragOver(event)" ondragleave="docDragLeave(event)" ondrop="docDrop(event,'${d.id}')"` : '';
-    return `<div class="doc-card" draggable="true" data-id="${d.id}" data-type="${d.item_type}"
+    const dragAttrs = (!docSelectMode && isFolder) ? `ondragover="docDragOver(event)" ondragleave="docDragLeave(event)" ondrop="docDrop(event,'${d.id}')"` : '';
+    const checkbox = docSelectMode ? `<div class="doc-select-box${docSelected.has(d.id)?' checked':''}">${docSelected.has(d.id)?'✓':''}</div>` : `<button class="doc-card-menu-btn" onclick="event.stopPropagation();openDocCtxMenu(event,'${d.id}')">⋮</button>`;
+    return `<div class="doc-card${docSelectMode?' selectable':''}" draggable="${!docSelectMode}" data-id="${d.id}" data-type="${d.item_type}"
         onclick="docCardClick('${d.id}')" ondragstart="docDragStart(event,'${d.id}')" ondragend="docDragEnd(event)" ${dragAttrs}>
-        <button class="doc-card-menu-btn" onclick="event.stopPropagation();openDocCtxMenu(event,'${d.id}')">⋮</button>
+        ${checkbox}
         <div class="doc-thumb">${thumb}</div>
         <div class="doc-name">${escHtml(d.name)}</div>
         ${meta?`<div class="doc-meta">${meta}</div>`:''}
       </div>`;
   }).join('');
-  attachDocTouchHandlers();
+  if(!docSelectMode) attachDocTouchHandlers();
 }
 function renderDocListView(list){
   const wrap=document.getElementById('docListWrap');
@@ -3279,22 +3501,100 @@ function renderDocListView(list){
     const isFolder=d.item_type==='folder';
     const icon = isFolder ? '📁' : (d.mime_type&&d.mime_type.startsWith('image/') ? `<img src="${supaStoragePublicUrl(d.storage_path)}" loading="lazy" draggable="false"/>` : docIconFor(d.mime_type));
     const meta = isFolder ? `${getDocs().filter(x=>x.parent_id===d.id).length} আইটেম` : humanSize(d.size_bytes);
-    const dragAttrs = isFolder ? `ondragover="docDragOver(event)" ondragleave="docDragLeave(event)" ondrop="docDrop(event,'${d.id}')"` : '';
-    return `<div class="doc-list-row" draggable="true" data-id="${d.id}" data-type="${d.item_type}"
+    const dragAttrs = (!docSelectMode && isFolder) ? `ondragover="docDragOver(event)" ondragleave="docDragLeave(event)" ondrop="docDrop(event,'${d.id}')"` : '';
+    const checkbox = docSelectMode ? `<div class="doc-select-box${docSelected.has(d.id)?' checked':''}">${docSelected.has(d.id)?'✓':''}</div>` : '';
+    const menuBtn = docSelectMode ? '' : `<button class="doc-list-menu-btn" onclick="event.stopPropagation();openDocCtxMenu(event,'${d.id}')">⋮</button>`;
+    return `<div class="doc-list-row${docSelectMode?' selectable':''}" draggable="${!docSelectMode}" data-id="${d.id}" data-type="${d.item_type}"
         onclick="docCardClick('${d.id}')" ondragstart="docDragStart(event,'${d.id}')" ondragend="docDragEnd(event)" ${dragAttrs}>
+        ${checkbox}
         <div class="doc-list-icon">${icon}</div>
         <div class="doc-list-name">${escHtml(d.name)}</div>
         <div class="doc-list-meta">${meta}</div>
-        <button class="doc-list-menu-btn" onclick="event.stopPropagation();openDocCtxMenu(event,'${d.id}')">⋮</button>
+        ${menuBtn}
       </div>`;
   }).join('');
-  attachDocTouchHandlers();
+  if(!docSelectMode) attachDocTouchHandlers();
 }
 
 function docCardClick(id){
+  if(docSelectMode){ toggleDocSelection(id); return; }
   const d=getDocs().find(x=>x.id===id); if(!d) return;
   if(d.item_type==='folder') docNavigateTo(id);
   else openDocPreview(id);
+}
+
+// ═══════════════════════════════════════════════════════
+//  🆕 মাল্টি-সিলেক্ট + বাল্ক অ্যাকশন
+// ═══════════════════════════════════════════════════════
+function toggleDocSelectMode(){
+  docSelectMode = !docSelectMode;
+  docSelected.clear();
+  renderDocs();
+}
+function toggleDocSelection(id){
+  if(docSelected.has(id)) docSelected.delete(id); else docSelected.add(id);
+  renderDocs();
+}
+function renderDocBulkBar(){
+  const box=document.getElementById('docBulkBar');
+  if(!docSelectMode || docSelected.size===0){ box.innerHTML=''; return; }
+  box.innerHTML = `<div class="doc-bulk-bar">
+    <span>✅ ${docSelected.size}টি নির্বাচিত</span>
+    <div class="dbb-actions">
+      <button class="dbb-move" onclick="bulkMoveDocsStart()">📂 মুভ করুন</button>
+      <button class="dbb-delete" onclick="bulkDeleteDocs()">🗑️ মুছুন</button>
+      <button class="dbb-cancel" onclick="docSelected.clear();renderDocs();">✕ বাতিল</button>
+    </div>
+  </div>`;
+}
+function bulkDeleteDocs(){
+  const ids=[...docSelected];
+  if(!ids.length) return;
+  // অনুমতি যাচাই — যেকোনো একটাতেও অনুমতি না থাকলে পুরো বাল্ক-ডিলিট আটকে দেয়া হচ্ছে
+  const items = ids.map(id=>getDocs().find(x=>x.id===id)).filter(Boolean);
+  const noPerm = items.find(d=>!canEdit(d.dept));
+  if(noPerm){ toast(`⚠️ "${noPerm.name}"-এর জন্য অনুমতি নেই`); return; }
+  // প্রতিটার (ফোল্ডার হলে ভেতরের সবকিছুসহ) সম্পূর্ণ তালিকা বের করে একত্র করা হচ্ছে
+  const allVictims = new Map();
+  items.forEach(d=>{ collectDocDescendants(d.id).forEach(v=>allVictims.set(v.id,v)); });
+  if(!confirm(`মোট ${allVictims.size}টি আইটেম (উপ-ফোল্ডার/ফাইলসহ) মুছে দেবেন?`)) return;
+  const victimIds=[...allVictims.keys()];
+  const storagePaths=[...allVictims.values()].filter(v=>v.storage_path).map(v=>v.storage_path);
+  saveDocs(getDocs().filter(x=>!allVictims.has(x.id)));
+  logAudit('docs', 'delete', `বাল্ক ডিলিট (${victimIds.length}টি আইটেম)`, items.map(i=>i.name).slice(0,5).join(', '));
+  docSelected.clear(); docSelectMode=false;
+  renderDocs(); toast(`🗑️ ${victimIds.length}টি আইটেম মুছে গেছে`);
+  if(storagePaths.length) supaStorageRemove(storagePaths).catch(()=>{});
+  if(supaOk){ victimIds.forEach(vid=>supa(CFG.TABLE_DOCS+'?id=eq.'+vid,'DELETE').catch(()=>{})); }
+}
+function bulkMoveDocsStart(){
+  const ids=[...docSelected];
+  if(!ids.length) return;
+  const items = ids.map(id=>getDocs().find(x=>x.id===id)).filter(Boolean);
+  const noPerm = items.find(d=>!canEdit(d.dept));
+  if(noPerm){ toast(`⚠️ "${noPerm.name}"-এর জন্য অনুমতি নেই`); return; }
+  document.getElementById('moveDocId').value='__bulk__';
+  document.getElementById('moveDocMode').value='bulk-move';
+  document.getElementById('moveDocTitle').textContent = `📂 ${ids.length}টি আইটেম মুভ করুন — গন্তব্য বেছে নিন`;
+  // যেকোনো নির্বাচিত ফোল্ডারের ভেতরে/নিজের মধ্যে মুভ ঠেকাতে সবগুলো id-ই exclude করা হচ্ছে
+  renderMoveDocTreeMulti(ids);
+  openModal('modalMoveDoc');
+}
+function renderMoveDocTreeMulti(excludeIds){
+  const box=document.getElementById('moveDocTree');
+  const folders=getDocs().filter(d=>d.item_type==='folder' && !excludeIds.includes(d.id) && !excludeIds.some(eid=>isDocDescendant(eid,d.id)));
+  let html=`<div class="doc-tree-item"><span>🏠 রুট</span><button class="doc-tree-btn" onclick="confirmBulkMove(null)">এখানে</button></div>`;
+  folders.forEach(f=>{
+    html+=`<div class="doc-tree-item"><span>📁 ${escHtml(docFolderPathLabel(f.id))}</span><button class="doc-tree-btn" onclick="confirmBulkMove('${f.id}')">এখানে</button></div>`;
+  });
+  box.innerHTML=html;
+}
+function confirmBulkMove(targetFolderId){
+  const ids=[...docSelected];
+  closeModal('modalMoveDoc');
+  ids.forEach(id=>moveDocItem(id, targetFolderId));
+  docSelected.clear(); docSelectMode=false;
+  renderDocs(); toast(`✅ ${ids.length}টি আইটেম সরানো হয়েছে`);
 }
 
 // ── কনটেক্সট মেনু (⋮) ──

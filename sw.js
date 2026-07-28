@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v2.0 — ওভারভিউ ড্যাশবোর্ড (হোমপেজ) + Excel এক্সপোর্ট
-const CACHE_NAME = 'bgfcl-v18';
+// BGFCL Inventory Service Worker v2.1 — ডার্ক মোড, স্কেলিটন লোডিং, মাল্টি-সিলেক্ট বাল্ক অ্যাকশন, অনবোর্ডিং টিউটোরিয়াল
+const CACHE_NAME = 'bgfcl-v19';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
