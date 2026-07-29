@@ -1,10 +1,25 @@
-// BGFCL Inventory Service Worker v2.3 — ফন্ট আপলোড/সিলেক্ট + ফন্ট সাইজ/পেজ জুম, "বিভাগ"→"শাখা" নামকরণ, ৮টা নতুন শাখা যোগ
-const CACHE_NAME = 'bgfcl-v21';
+// BGFCL Inventory Service Worker v2.4 — কোড ১২টা মডিউল ফাইলে ভাগ করা হয়েছে (রক্ষণাবেক্ষণ সহজ করতে) + অডিট/এরর লগে সার্ভার-সাইড পেজিনেশন
+const CACHE_NAME = 'bgfcl-v22';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   'https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;600&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
+  // 🆕 কোড এখন ১২টা আলাদা মডিউল ফাইলে ভাগ করা (আগে একটাই বিশাল ইনলাইন
+  // <script> ছিল) — অফলাইনে যেন সবগুলো ফাইলই সাথে সাথে পাওয়া যায়,
+  // তাই এখানে সবকটাকে precache তালিকায় যোগ করা হলো।
+  '/js/00-bootstrap-config.js',
+  '/js/01-state-data.js',
+  '/js/02-api-supabase.js',
+  '/js/03-auth-onboarding.js',
+  '/js/04-audit-backup.js',
+  '/js/05-sync-init.js',
+  '/js/06-overview-materials.js',
+  '/js/07-manpower-view.js',
+  '/js/08-activities-view.js',
+  '/js/09-docs-manager.js',
+  '/js/10-manpower-crud.js',
+  '/js/11-activities-crud-ui-boot.js',
 ];
 
 // এই ডোমেইনে যাওয়া কোনো রিকোয়েস্ট Service Worker কখনো ক্যাশ/ইন্টারসেপ্ট করবে না।
