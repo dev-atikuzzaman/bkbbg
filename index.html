@@ -439,9 +439,9 @@ canvas#mainChart{width:100%!important;max-height:300px;}
         <div class="fg"><label>পদবী *</label><input type="text" id="suDesig" placeholder="সহকারী ব্যবস্থাপক"/></div>
       </div>
       <div class="fg-row">
-        <div class="fg"><label>বিভাগ (চাকরি) *</label>
+        <div class="fg"><label>শাখা (চাকরি) *</label>
           <select id="suDept">
-            <option value="">বিভাগ বেছে নিন</option>
+            <option value="">শাখা বেছে নিন</option>
             <option value="field">ফিল্ড মেইনটেন্যান্স</option>
             <option value="plant">প্লান্ট মেইনটেন্যান্স</option>
             <option value="production">প্রোডাকশন</option>
@@ -449,9 +449,17 @@ canvas#mainChart{width:100%!important;max-height:300px;}
             <option value="security">সিকিউরিটি</option>
             <option value="admin">প্রশাসন</option>
             <option value="electric">বিদ্যুৎ</option>
+            <option value="generator">জেনারেটর</option>
+            <option value="housing">হাউজিং</option>
+            <option value="condensate">কনডেনসেট প্রসেসিং</option>
+            <option value="firesafety">ফায়ার সেফটি</option>
+            <option value="mi_room">এম. আই রুম</option>
+            <option value="heavy_vehicle">ভারি যান</option>
+            <option value="mechanical">মেকানিক্যাল</option>
+            <option value="accounts">একাউন্টস</option>
           </select>
         </div>
-        <div class="fg"><label>যে বিভাগের অ্যাডমিন হতে চান *</label>
+        <div class="fg"><label>যে শাখার অ্যাডমিন হতে চান *</label>
           <select id="suReqDept">
             <option value="">বেছে নিন</option>
             <option value="field">ফিল্ড মেইনটেন্যান্স</option>
@@ -461,6 +469,14 @@ canvas#mainChart{width:100%!important;max-height:300px;}
             <option value="security">সিকিউরিটি</option>
             <option value="admin">প্রশাসন</option>
             <option value="electric">বিদ্যুৎ</option>
+            <option value="generator">জেনারেটর</option>
+            <option value="housing">হাউজিং</option>
+            <option value="condensate">কনডেনসেট প্রসেসিং</option>
+            <option value="firesafety">ফায়ার সেফটি</option>
+            <option value="mi_room">এম. আই রুম</option>
+            <option value="heavy_vehicle">ভারি যান</option>
+            <option value="mechanical">মেকানিক্যাল</option>
+            <option value="accounts">একাউন্টস</option>
           </select>
         </div>
       </div>
@@ -537,14 +553,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     <button class="main-tab" data-tab="docs">📁 ফাইল</button>
   </div>
   <div class="filter-bar" id="deptFilter">
-    <button class="filter-btn active" data-dept="all">🔍 সব বিভাগ</button>
-    <button class="filter-btn" data-dept="field">🔧 ফিল্ড মেইনটেন্যান্স</button>
-    <button class="filter-btn" data-dept="plant">🏭 প্লান্ট মেইনটেন্যান্স</button>
-    <button class="filter-btn" data-dept="production">⚗️ প্রোডাকশন</button>
-    <button class="filter-btn" data-dept="compressor">💨 কম্প্রেসর</button>
-    <button class="filter-btn" data-dept="security">🛡️ সিকিউরিটি</button>
-    <button class="filter-btn" data-dept="admin">📋 প্রশাসন</button>
-    <button class="filter-btn" data-dept="electric">⚡ বিদ্যুৎ</button>
+    <button class="filter-btn active" data-dept="all">🔍 সব শাখা</button>
   </div>
 </header>
 
@@ -637,18 +646,18 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <div class="sum-card sc-blue"><div class="si">📦</div><div class="sv" id="sumTotal">0</div><div class="sl">মোট প্রোডাক্ট ধরন</div></div>
       <div class="sum-card sc-green"><div class="si">➕</div><div class="sv" id="sumIncoming">0</div><div class="sl">এই মাসে যুক্ত (ইন)</div></div>
       <div class="sum-card sc-red"><div class="si">➖</div><div class="sv" id="sumLow">0</div><div class="sl">এই মাসে ব্যবহার (আউট)</div></div>
-      <div class="sum-card sc-amber"><div class="si">🏢</div><div class="sv" id="sumDepts">7</div><div class="sl">মোট বিভাগ</div></div>
+      <div class="sum-card sc-amber"><div class="si">🏢</div><div class="sv" id="sumDepts">15</div><div class="sl">মোট শাখা</div></div>
     </div>
 
     <!-- DEPT CARDS -->
-    <div class="sec-title">📊 বিভাগভিত্তিক স্টক অবস্থা</div>
+    <div class="sec-title">📊 শাখাভিত্তিক স্টক অবস্থা</div>
     <div class="dept-grid" id="deptGrid"></div>
 
     <!-- CHART -->
     <div class="chart-sec">
       <div class="sec-title">📈 গ্রাফিক্যাল বিশ্লেষণ</div>
       <div class="chart-tabs">
-        <button class="chart-tab active" data-chart="bar">বিভাগ তুলনা</button>
+        <button class="chart-tab active" data-chart="bar">শাখা তুলনা</button>
         <button class="chart-tab" data-chart="line">মাসভিত্তিক ট্রেন্ড</button>
         <button class="chart-tab" data-chart="pie">স্টক বিতরণ</button>
         <button class="chart-tab" data-chart="status">স্টক অবস্থা</button>
@@ -668,7 +677,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <div class="log-wrap">
         <table class="log-table">
           <thead><tr>
-            <th>তারিখ</th><th>প্রোডাক্ট</th><th>বিভাগ</th><th>ধরন</th>
+            <th>তারিখ</th><th>প্রোডাক্ট</th><th>শাখা</th><th>ধরন</th>
             <th>পরিমাণ</th><th>উৎস / কাজ</th><th>ছবি</th>
             <th id="logActCol"></th>
           </tr></thead>
@@ -704,7 +713,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <div class="log-wrap">
         <table class="log-table">
           <thead><tr id="officerTheadRow">
-            <th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th>
+            <th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>শাখা</th>
             <th>শেষ CL</th><th>CL বাকি</th><th>অন্য ছুটি (তারিখ)</th><th>অন্য ছুটি বাকি</th><th>AL নেয়া হয়েছে</th><th>AL নেয়ার তারিখ</th>
             <th id="officerActCol"></th>
           </tr></thead>
@@ -718,7 +727,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <div class="log-wrap">
         <table class="log-table">
           <thead><tr id="staffTheadRow">
-            <th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th>
+            <th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>শাখা</th>
             <th>শেষ CL</th><th>CL বাকি</th><th>অন্য ছুটি (তারিখ)</th><th>অন্য ছুটি বাকি</th><th>AL নেয়া হয়েছে</th><th>AL নেয়ার তারিখ</th>
             <th id="staffActCol"></th>
           </tr></thead>
@@ -732,7 +741,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <div class="log-wrap">
         <table class="log-table">
           <thead><tr id="dailyTheadRow">
-            <th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th><th id="dailyActCol"></th>
+            <th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>শাখা</th><th id="dailyActCol"></th>
           </tr></thead>
           <tbody id="dailyBody"></tbody>
         </table>
@@ -758,7 +767,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <div class="log-wrap">
         <table class="log-table">
           <thead><tr id="activityTheadRow">
-            <th>তারিখ</th><th>বিভাগ</th><th>বিবরণ</th><th id="activityActCol"></th>
+            <th>তারিখ</th><th>শাখা</th><th>বিবরণ</th><th id="activityActCol"></th>
           </tr></thead>
           <tbody id="activityBody"></tbody>
         </table>
@@ -830,8 +839,8 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     <div class="mhdr"><h3>🧾 নতুন লেনদেন</h3><button class="btn-x" onclick="closeModal('modalTxn')">✕</button></div>
     <div class="mbody">
       <div class="fg-row">
-        <div class="fg"><label>বিভাগ *</label>
-          <select id="txDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
+        <div class="fg"><label>শাখা *</label>
+          <select id="txDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option><option value="generator">জেনারেটর</option><option value="housing">হাউজিং</option><option value="condensate">কনডেনসেট প্রসেসিং</option><option value="firesafety">ফায়ার সেফটি</option><option value="mi_room">এম. আই রুম</option><option value="heavy_vehicle">ভারি যান</option><option value="mechanical">মেকানিক্যাল</option><option value="accounts">একাউন্টস</option></select>
         </div>
         <div class="fg"><label>ধরন *</label>
           <select id="txType" onchange="toggleTxnType('tx')"><option value="in">➕ যুক্ত হলো (ইন)</option><option value="out">➖ ব্যবহার হলো (আউট)</option></select>
@@ -870,8 +879,8 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <input type="hidden" id="etxId"/>
       <input type="hidden" id="etxImageCurrent"/>
       <div class="fg-row">
-        <div class="fg"><label>বিভাগ *</label>
-          <select id="etxDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
+        <div class="fg"><label>শাখা *</label>
+          <select id="etxDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option><option value="generator">জেনারেটর</option><option value="housing">হাউজিং</option><option value="condensate">কনডেনসেট প্রসেসিং</option><option value="firesafety">ফায়ার সেফটি</option><option value="mi_room">এম. আই রুম</option><option value="heavy_vehicle">ভারি যান</option><option value="mechanical">মেকানিক্যাল</option><option value="accounts">একাউন্টস</option></select>
         </div>
         <div class="fg"><label>ধরন *</label>
           <select id="etxType" onchange="toggleTxnType('etx')"><option value="in">➕ যুক্ত হলো (ইন)</option><option value="out">➖ ব্যবহার হলো (আউট)</option></select>
@@ -972,8 +981,8 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     <div class="mbody">
       <input type="hidden" id="mpId"/>
       <div class="fg-row">
-        <div class="fg"><label>বিভাগ *</label>
-          <select id="mpDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
+        <div class="fg"><label>শাখা *</label>
+          <select id="mpDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option><option value="generator">জেনারেটর</option><option value="housing">হাউজিং</option><option value="condensate">কনডেনসেট প্রসেসিং</option><option value="firesafety">ফায়ার সেফটি</option><option value="mi_room">এম. আই রুম</option><option value="heavy_vehicle">ভারি যান</option><option value="mechanical">মেকানিক্যাল</option><option value="accounts">একাউন্টস</option></select>
         </div>
         <div class="fg"><label>জনবলের ধরন *</label>
           <select id="mpType" onchange="toggleManpowerFields()"><option value="daily">দৈনিক শ্রমিক</option><option value="staff">স্টাফ</option><option value="officer">অফিসার</option></select>
@@ -1035,8 +1044,8 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <input type="hidden" id="actId"/>
       <div class="fg-row">
         <div class="fg"><label>তারিখ *</label><input type="date" id="actDate"/></div>
-        <div class="fg"><label>বিভাগ *</label>
-          <select id="actDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option></select>
+        <div class="fg"><label>শাখা *</label>
+          <select id="actDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option><option value="generator">জেনারেটর</option><option value="housing">হাউজিং</option><option value="condensate">কনডেনসেট প্রসেসিং</option><option value="firesafety">ফায়ার সেফটি</option><option value="mi_room">এম. আই রুম</option><option value="heavy_vehicle">ভারি যান</option><option value="mechanical">মেকানিক্যাল</option><option value="accounts">একাউন্টস</option></select>
         </div>
       </div>
       <div class="fg"><label>কাজের বিবরণ *</label><textarea id="actDesc" rows="4" style="resize:vertical;" placeholder="আজকের সম্পাদিত কাজের বিবরণ লিখুন..."></textarea></div>
@@ -1058,17 +1067,21 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <div class="fg"><label>অধীনস্থ কোম্পানির ঠিকানা</label><input type="text" id="repSubAddress" onchange="saveReportHeaderFromForm()"/></div>
       <div class="fg"><label>প্রতিবেদনের শিরোনাম</label><input type="text" id="repTitle" onchange="saveReportHeaderFromForm()"/></div>
 
-      <div class="subsec-title">📅 সময়কাল ও বিভাগ</div>
+      <div class="subsec-title">📅 সময়কাল ও শাখা</div>
       <div class="fg-row">
         <div class="fg"><label>শুরুর তারিখ</label><input type="date" id="repStart" onchange="onReportContextChange()"/></div>
         <div class="fg"><label>শেষ তারিখ</label><input type="date" id="repEnd" onchange="onReportContextChange()"/></div>
       </div>
-      <div class="fg"><label>বিভাগ</label>
+      <div class="fg"><label>শাখা</label>
         <select id="repDept" onchange="onReportContextChange()">
-          <option value="all">সকল বিভাগ</option>
+          <option value="all">সকল শাখা</option>
           <option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option>
           <option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option>
           <option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">বিদ্যুৎ</option>
+          <option value="generator">জেনারেটর</option><option value="housing">হাউজিং</option>
+          <option value="condensate">কনডেনসেট প্রসেসিং</option><option value="firesafety">ফায়ার সেফটি</option>
+          <option value="mi_room">এম. আই রুম</option><option value="heavy_vehicle">ভারি যান</option>
+          <option value="mechanical">মেকানিক্যাল</option><option value="accounts">একাউন্টস</option>
         </select>
       </div>
 
@@ -1145,6 +1158,39 @@ canvas#mainChart{width:100%!important;max-height:300px;}
         <button class="btn-p bp-amber" id="obNextBtn" style="flex:2;justify-content:center;" onclick="onboardingNext()">পরবর্তী →</button>
       </div>
       <button onclick="finishOnboarding()" style="width:100%;background:none;border:none;color:var(--muted);font-family:var(--f);font-size:12px;padding:10px;cursor:pointer;">স্কিপ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🆕 ফন্ট ও ডিসপ্লে সেটিংস -->
+<div class="mo" id="modalDisplaySettings">
+  <div class="modal" style="max-width:380px;">
+    <div class="mhdr"><h3>🔤 ফন্ট ও ডিসপ্লে</h3><button class="btn-x" onclick="closeModal('modalDisplaySettings')">✕</button></div>
+    <div class="mbody">
+      <div class="fg"><label>ফন্ট বেছে নিন</label>
+        <select id="fontPresetSelect" onchange="applyFontPreset(this.value)">
+          <option value="default">ডিফল্ট (Hind Siliguri)</option>
+          <option value="siyamrupali">Siyam Rupali</option>
+          <option value="nikoshban">NikoshBan</option>
+          <option value="timesnewroman">Times New Roman</option>
+          <option value="custom" id="customFontOption" style="display:none;">📤 আপলোডকৃত কাস্টম ফন্ট</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>নিজের ফন্ট আপলোড করুন (.ttf/.otf/.woff/.woff2)</label>
+        <input type="file" accept=".ttf,.otf,.woff,.woff2" id="fontUploadInput" onchange="handleFontUpload(event)"/>
+        <p id="customFontStatus" style="font-size:11px;color:var(--muted);margin-top:6px;"></p>
+        <p style="font-size:11px;color:var(--muted);margin-top:4px;">Siyam Rupali/NikoshBan আপনার ডিভাইসে আগে থেকে ইনস্টল না থাকলে দেখাবে না — সেক্ষেত্রে ফন্ট ফাইলটা এখানে আপলোড করে দিন।</p>
+      </div>
+      <div class="fg">
+        <label>ফন্ট সাইজ (মূল কনটেন্ট) — <span id="fontSizeLabel">100%</span></label>
+        <input type="range" id="fontSizeSlider" min="80" max="140" step="5" value="100" oninput="applyFontSize(this.value)" style="width:100%;"/>
+      </div>
+      <div class="fg">
+        <label>পেজ ভিউ জুম (পুরো পেজ) — <span id="pageZoomLabel">100%</span></label>
+        <input type="range" id="pageZoomSlider" min="70" max="150" step="5" value="100" oninput="applyPageZoom(this.value)" style="width:100%;"/>
+      </div>
+      <button class="btn-p" style="width:100%;justify-content:center;background:#F1F5F9;color:var(--navy);" onclick="resetDisplaySettings()">↺ ডিফল্টে ফিরিয়ে নিন</button>
     </div>
   </div>
 </div>
@@ -1311,6 +1357,14 @@ const DEPT = {
   security:   {name:'সিকিউরিটি',              icon:'🛡️', color:'#EF4444', bg:'#FEE2E2'},
   admin:      {name:'প্রশাসন',                icon:'📋', color:'#F4A300', bg:'#FEF3C7'},
   electric:   {name:'বিদ্যুৎ',                icon:'⚡', color:'#14B8A6', bg:'#CCFBF1'},
+  generator:  {name:'জেনারেটর',               icon:'🔋', color:'#0EA5E9', bg:'#E0F2FE'},
+  housing:    {name:'হাউজিং',                 icon:'🏠', color:'#84CC16', bg:'#ECFCCB'},
+  condensate: {name:'কনডেনসেট প্রসেসিং',      icon:'💧', color:'#06B6D4', bg:'#CFFAFE'},
+  firesafety: {name:'ফায়ার সেফটি',            icon:'🧯', color:'#DC2626', bg:'#FEE2E2'},
+  mi_room:    {name:'এম. আই রুম',              icon:'🎛️', color:'#7C3AED', bg:'#EDE9FE'},
+  heavy_vehicle: {name:'ভারি যান',            icon:'🚛', color:'#78716C', bg:'#F5F5F4'},
+  mechanical: {name:'মেকানিক্যাল',            icon:'⚙️', color:'#475569', bg:'#F1F5F9'},
+  accounts:   {name:'একাউন্টস',               icon:'🧾', color:'#059669', bg:'#D1FAE5'},
 };
 const MN = ['','জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
 const AUDIT_ACTION_LABEL={create:'✅ তৈরি',update:'✏️ আপডেট',delete:'🗑️ মুছেছে',move:'📂 সরিয়েছে',copy:'📄 কপি করেছে',upload:'⬆️ আপলোড',rename:'✏️ রিনেম'};
@@ -1909,7 +1963,7 @@ function notifySuperAdmin(name, desig, deptName, email){
   // Open mailto as fallback notification
   const sub = encodeURIComponent(`[BGFCL Inventory] নতুন অ্যাডমিন অনুরোধ - ${name}`);
   const body = encodeURIComponent(
-    `নাম: ${name}\nপদবী: ${desig}\nইমেইল: ${email}\nঅনুরোধকৃত বিভাগ: ${deptName}\n\n` +
+    `নাম: ${name}\nপদবী: ${desig}\nইমেইল: ${email}\nঅনুরোধকৃত শাখা: ${deptName}\n\n` +
     `অনুগ্রহ করে অ্যাপে লগইন করে Pending Approvals থেকে অনুমোদন করুন।`
   );
   window.open(`mailto:${CFG.SUPER_ADMIN_EMAIL}?subject=${sub}&body=${body}`,'_blank');
@@ -1921,7 +1975,7 @@ function showPendingScreen(p){
   const pf = document.getElementById('pendingForm');
   pf.style.display='';
   document.getElementById('pendingMsg').textContent=
-    `${p.name} — ${DEPT[p.req_dept]?.name||p.req_dept} বিভাগের অ্যাডমিন অনুরোধ পাঠানো হয়েছে। সুপার অ্যাডমিন (${CFG.SUPER_ADMIN_EMAIL}) অনুমোদন করলে আপনি ইমেইলে জানবেন।`;
+    `${p.name} — ${DEPT[p.req_dept]?.name||p.req_dept} শাখার অ্যাডমিন অনুরোধ পাঠানো হয়েছে। সুপার অ্যাডমিন (${CFG.SUPER_ADMIN_EMAIL}) অনুমোদন করলে আপনি ইমেইলে জানবেন।`;
 }
 
 function doResetPass(){
@@ -2023,6 +2077,117 @@ function finishOnboarding(){
   closeModal('modalOnboarding');
 }
 
+// ═══════════════════════════════════════════════════════
+//  🆕 ফন্ট ও ডিসপ্লে সেটিংস (ফন্ট বাছাই/আপলোড, ফন্ট সাইজ, পেজ জুম)
+// ═══════════════════════════════════════════════════════
+const FONT_PRESETS = {
+  default:       "'Hind Siliguri', sans-serif",
+  siyamrupali:   "'Siyam Rupali', 'Hind Siliguri', sans-serif",
+  nikoshban:     "'NikoshBan', 'Hind Siliguri', sans-serif",
+  timesnewroman: "'Times New Roman', Times, serif",
+  custom:        "'UserCustomFont', 'Hind Siliguri', sans-serif",
+};
+
+function applyFontPreset(choice){
+  document.documentElement.style.setProperty('--f', FONT_PRESETS[choice] || FONT_PRESETS.default);
+  localStorage.setItem('bgfcl_font_choice', choice);
+  const sel=document.getElementById('fontPresetSelect'); if(sel) sel.value=choice;
+}
+
+async function handleFontUpload(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  if(!/\.(ttf|otf|woff2?)$/i.test(file.name)){ toast('⚠️ শুধু .ttf/.otf/.woff/.woff2 ফাইল আপলোড করা যাবে'); event.target.value=''; return; }
+  if(file.size > 3*1024*1024){ toast('⚠️ ফন্ট ফাইল ৩ MB-এর বেশি না রাখাই ভালো — লোড ধীর হয়ে যাবে'); event.target.value=''; return; }
+  try{
+    const buf = await file.arrayBuffer();
+    const fontFace = new FontFace('UserCustomFont', buf);
+    await fontFace.load();
+    document.fonts.add(fontFace);
+    const base64 = await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); });
+    localStorage.setItem('bgfcl_custom_font', base64);
+    localStorage.setItem('bgfcl_custom_font_name', file.name);
+    document.getElementById('customFontOption').style.display='';
+    document.getElementById('customFontStatus').textContent = `✅ ইনস্টল করা আছে: ${file.name}`;
+    applyFontPreset('custom');
+    toast('✅ ফন্ট আপলোড ও চালু হয়েছে');
+  }catch(e){
+    console.error('font upload failed:', e);
+    toast('❌ ফন্ট লোড করা যায়নি — ফাইলটা ঠিক আছে কিনা দেখুন');
+  }
+}
+
+async function loadSavedCustomFont(){
+  const saved = localStorage.getItem('bgfcl_custom_font');
+  if(!saved) return false;
+  try{
+    const fontFace = new FontFace('UserCustomFont', saved);
+    await fontFace.load();
+    document.fonts.add(fontFace);
+    return true;
+  }catch(e){ console.warn('সংরক্ষিত কাস্টম ফন্ট লোড করা যায়নি:', e); return false; }
+}
+
+// main, #appShell-এর ভেতরেই নেস্টেড — তাই zoom সরাসরি বসালে দুইটা
+// মান গুণ হয়ে যেত (compounding)। এখানে main-এর zoom সবসময় দুইটা
+// সংরক্ষিত মান থেকে হিসাব করে বসানো হয়, যাতে "ফন্ট সাইজ" স্লাইডার
+// সবসময় ঠিক তার নিজের মান অনুযায়ীই কাজ করে, "পেজ জুম" যা-ই থাকুক না কেন।
+function recalcMainZoom(){
+  const fontSizePct = +(localStorage.getItem('bgfcl_font_size')||100);
+  const pageZoomPct = +(localStorage.getItem('bgfcl_page_zoom')||100);
+  const m=document.querySelector('main');
+  if(m) m.style.zoom = (fontSizePct/pageZoomPct*100)+'%';
+}
+function applyFontSize(val){
+  localStorage.setItem('bgfcl_font_size', val);
+  const lbl=document.getElementById('fontSizeLabel'); if(lbl) lbl.textContent = val+'%';
+  recalcMainZoom();
+}
+function applyPageZoom(val){
+  // body-তে জুম বসানো হচ্ছে (শুধু #appShell-এ নয়) — কারণ মোডালগুলো
+  // (.mo) DOM-এ #appShell-এর sibling, appShell-এর ভেতরের এলিমেন্ট না;
+  // body-লেভেলে বসালে মোডাল-ডায়ালগও পেজ জুমের সাথে মিলিয়ে স্কেল হবে
+  document.body.style.zoom = val+'%';
+  const lbl=document.getElementById('pageZoomLabel'); if(lbl) lbl.textContent = val+'%';
+  localStorage.setItem('bgfcl_page_zoom', val);
+  recalcMainZoom(); // পেজ জুম বদলালেও মূল কনটেন্টের effective ফন্ট-সাইজ যেন অপরিবর্তিত থাকে
+}
+function resetDisplaySettings(){
+  applyFontPreset('default');
+  document.getElementById('fontSizeSlider').value=100; applyFontSize(100);
+  document.getElementById('pageZoomSlider').value=100; applyPageZoom(100);
+  toast('↺ ডিফল্ট সেটিংসে ফিরে গেছে');
+}
+function openDisplaySettings(){
+  document.getElementById('fontPresetSelect').value = localStorage.getItem('bgfcl_font_choice')||'default';
+  const fsz = localStorage.getItem('bgfcl_font_size')||'100';
+  document.getElementById('fontSizeSlider').value = fsz;
+  document.getElementById('fontSizeLabel').textContent = fsz+'%';
+  const pz = localStorage.getItem('bgfcl_page_zoom')||'100';
+  document.getElementById('pageZoomSlider').value = pz;
+  document.getElementById('pageZoomLabel').textContent = pz+'%';
+  const customName = localStorage.getItem('bgfcl_custom_font_name');
+  if(customName){
+    document.getElementById('customFontOption').style.display='';
+    document.getElementById('customFontStatus').textContent = `✅ ইনস্টল করা আছে: ${customName}`;
+  }
+  openModal('modalDisplaySettings');
+}
+// অ্যাপ চালু হওয়ার সময় সংরক্ষিত পছন্দ প্রয়োগ করা হয় (initApp থেকে ডাকা হয়)
+async function initDisplayPrefs(){
+  const savedFont = localStorage.getItem('bgfcl_font_choice');
+  if(savedFont==='custom'){
+    const ok = await loadSavedCustomFont();
+    applyFontPreset(ok ? 'custom' : 'default');
+  } else if(savedFont){
+    applyFontPreset(savedFont);
+  }
+  const fsz = localStorage.getItem('bgfcl_font_size');
+  if(fsz) applyFontSize(fsz);
+  const pz = localStorage.getItem('bgfcl_page_zoom');
+  if(pz) applyPageZoom(pz);
+}
+
 function backToLogin(){
   if(!confirm('লগইন স্ক্রিনে ফিরে যাবেন?')) return;
   doLogout();
@@ -2062,7 +2227,7 @@ const ROLE_LABEL = {
   viewer:{full:'ভিউয়ার',     short:'ভিউয়ার'},
   pending:{full:'অনুমোদনের অপেক্ষায়', short:'পেন্ডিং'},
 };
-const DEPT_SHORT = {field:'ফিল্ড', plant:'পিএম', production:'প্রোডাকশন', compressor:'কম্প্রেসর', security:'সিকিউরিটি', admin:'প্রশাসন', electric:'বিদ্যুৎ'};
+const DEPT_SHORT = {field:'ফিল্ড', plant:'পিএম', production:'প্রোডাকশন', compressor:'কম্প্রেসর', security:'সিকিউরিটি', admin:'প্রশাসন', electric:'বিদ্যুৎ', generator:'জেনারেটর', housing:'হাউজিং', condensate:'কনডেনসেট', firesafety:'ফায়ার সেফটি', mi_room:'এম.আই রুম', heavy_vehicle:'ভারি যান', mechanical:'মেকানিক্যাল', accounts:'একাউন্টস'};
 
 function updateUserChip(){
   if(!currentUser) return;
@@ -2073,8 +2238,8 @@ function updateUserChip(){
   const deptShort = DEPT_SHORT[deptKey] || deptFull;
   document.getElementById('officerName').textContent = n.length>18 ? n.slice(0,18)+'…' : n;
   document.getElementById('officerRole').textContent = rm.full;
-  document.getElementById('officerDept').textContent = currentUser.role==='super' ? 'সকল বিভাগ' : deptFull;
-  document.getElementById('officerCompact').textContent = currentUser.role==='super' ? rm.short+', সকল বিভাগ' : `${rm.short}, ${deptShort}`;
+  document.getElementById('officerDept').textContent = currentUser.role==='super' ? 'সকল শাখা' : deptFull;
+  document.getElementById('officerCompact').textContent = currentUser.role==='super' ? rm.short+', সকল শাখা' : `${rm.short}, ${deptShort}`;
 }
 
 function updateActionBar(){
@@ -2104,9 +2269,10 @@ function showUserMenu(){
     </div>
     <div style="background:#F8FAFC;border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px;">
       <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:#64748B;">ভূমিকা</span><strong>${r==='super'?'👑 সুপার অ্যাডমিন':r==='admin'?'🔑 শাখা অ্যাডমিন':r==='pending'?'⏳ পেন্ডিং':'👁️ ভিউয়ার'}</strong></div>
-      ${r!=='viewer'&&r!=='pending'?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748B;">বিভাগ</span><strong>${r==='super'?'সকল বিভাগ':reqDeptName}</strong></div>`:''}
+      ${r!=='viewer'&&r!=='pending'?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748B;">শাখা</span><strong>${r==='super'?'সকল শাখা':reqDeptName}</strong></div>`:''}
     </div>
   `;
+  html+=`<button onclick="closeModal('modalUser');openDisplaySettings();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🔤 ফন্ট ও ডিসপ্লে</button>`;
   html+=`<button onclick="closeModal('modalUser');startOnboarding();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">❓ টিউটোরিয়াল আবার দেখুন</button>`;
   if(r==='super'||r==='admin'){
     html+=`<button onclick="closeModal('modalUser');openAuditLog();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🕓 কার্যকলাপ লগ (অডিট)</button>`;
@@ -2253,7 +2419,7 @@ async function loadPendingApprovals(){
       <div class="pending-card">
         <div class="pending-info">
           <strong>${escHtml(p.name)} — ${escHtml(p.designation)}</strong>
-          <span>${escHtml(DEPT[p.req_dept]?.name||p.req_dept)} বিভাগের অ্যাডমিন · ${escHtml(p.email)}</span>
+          <span>${escHtml(DEPT[p.req_dept]?.name||p.req_dept)} শাখার অ্যাডমিন · ${escHtml(p.email)}</span>
         </div>
         <button class="btn-approve" onclick="approveUser('${p.id}')">✅ অনুমোদন</button>
         <button class="btn-reject"  onclick="rejectUser('${p.id}')">❌ বাতিল</button>
@@ -2268,7 +2434,7 @@ async function approveUser(id){
     await supa(CFG.TABLE_PROF+'?id=eq.'+id,'PATCH',{role:'admin',status:'approved',req_dept:p.req_dept});
     // Notify via mailto
     const sub = encodeURIComponent(`[BGFCL Inventory] আপনার অ্যাডমিন অনুরোধ অনুমোদিত হয়েছে`);
-    const body= encodeURIComponent(`${p.name},\n\nআপনার ${DEPT[p.req_dept]?.name||p.req_dept} বিভাগের অ্যাডমিন অনুরোধ অনুমোদিত হয়েছে।\nএখন অ্যাপে লগইন করুন।`);
+    const body= encodeURIComponent(`${p.name},\n\nআপনার ${DEPT[p.req_dept]?.name||p.req_dept} শাখার অ্যাডমিন অনুরোধ অনুমোদিত হয়েছে।\nএখন অ্যাপে লগইন করুন।`);
     window.open(`mailto:${p.email}?subject=${sub}&body=${body}`,'_blank');
     hideLoader();
     toast('✅ অনুমোদন সম্পন্ন');
@@ -2484,6 +2650,18 @@ function importJSON(e){
 //  INIT
 // ═══════════════════════════════════════════════════════
 function initApp(){
+  // 🆕 DEPT অবজেক্ট থেকে শাখা-ফিল্টার বাটন স্বয়ংক্রিয়ভাবে বসানো হচ্ছে
+  // (নতুন শাখা যোগ হলে শুধু DEPT অবজেক্ট বদলালেই এখানে আপনাআপনি চলে আসবে)
+  const df=document.getElementById('deptFilter');
+  Object.keys(DEPT).forEach(k=>{
+    const b=document.createElement('button');
+    b.className='filter-btn'; b.dataset.dept=k;
+    b.textContent = `${DEPT[k].icon} ${DEPT[k].name}`;
+    df.appendChild(b);
+  });
+  // 🆕 সংরক্ষিত ফন্ট/সাইজ/জুম পছন্দ প্রয়োগ করা হচ্ছে
+  try{ initDisplayPrefs(); }catch(e){ console.error('initDisplayPrefs failed:',e); }
+
   const sel=document.getElementById('yearSel');
   for(let y=2023;y<=2030;y++){
     const o=document.createElement('option');
@@ -2625,14 +2803,14 @@ function pdfTableHTML(headers, rows){
 }
 
 function buildReportBodyHTML(type){
-  const deptLabel = filterDept==='all' ? 'সকল বিভাগ' : (DEPT[filterDept]?.name||filterDept);
+  const deptLabel = filterDept==='all' ? 'সকল শাখা' : (DEPT[filterDept]?.name||filterDept);
   let title='', meta='', body='';
   if(type==='materials'){
     title='📦 মালামাল লেনদেন রিপোর্ট';
-    meta=`বিভাগ: ${deptLabel} · মাস: ${MN[M]} ${Y}`;
+    meta=`শাখা: ${deptLabel} · মাস: ${MN[M]} ${Y}`;
     const stock=getCurrentStock();
     body += `<div style="font-weight:700;font-size:13px;margin-bottom:8px;">বর্তমান স্টক সারাংশ (${MN[M]} ${Y} পর্যন্ত)</div>`;
-    body += pdfTableHTML(['প্রোডাক্ট','বিভাগ','বর্তমান পরিমাণ','একক'],
+    body += pdfTableHTML(['প্রোডাক্ট','শাখা','বর্তমান পরিমাণ','একক'],
       stock.map(s=>[escHtml(s.product_name), escHtml(DEPT[s.dept]?.name||s.dept), String(s.qty), escHtml(s.unit||'')]));
     const txns=getFT();
     body += `<div style="font-weight:700;font-size:13px;margin:16px 0 8px;">${MN[M]} ${Y} মাসের লেনদেন</div>`;
@@ -2642,19 +2820,19 @@ function buildReportBodyHTML(type){
         escHtml(t.txn_type==='in' ? (t.source||'—') : (t.purpose||'—'))]));
   } else if(type==='manpower'){
     title='👷 জনবল রিপোর্ট';
-    meta=`বিভাগ: ${deptLabel}`;
+    meta=`শাখা: ${deptLabel}`;
     const all=getFM();
     const officer=all.filter(m=>m.type==='officer'), staff=all.filter(m=>m.type==='staff'), daily=all.filter(m=>m.type==='daily');
     body += `<div style="font-weight:700;font-size:13px;margin-bottom:10px;">সারাংশ — অফিসার: ${officer.length} · স্টাফ: ${staff.length} · দৈনিক শ্রমিক: ${daily.length} · মোট: ${all.length}</div>`;
     const mkRows = list => list.map(m=>[escHtml(m.name), escHtml(m.designation||'—'), escHtml(m.phone||'—'), escHtml(DEPT[m.dept]?.name||m.dept)]);
-    body += `<div style="font-weight:700;font-size:13px;margin:14px 0 8px;">🎖️ অফিসার তালিকা</div>` + pdfTableHTML(['নাম','পদবী','ফোন','বিভাগ'], mkRows(officer));
-    body += `<div style="font-weight:700;font-size:13px;margin:14px 0 8px;">🧑‍💼 স্টাফ তালিকা</div>` + pdfTableHTML(['নাম','পদবী','ফোন','বিভাগ'], mkRows(staff));
-    body += `<div style="font-weight:700;font-size:13px;margin:14px 0 8px;">👷 দৈনিক শ্রমিক তালিকা</div>` + pdfTableHTML(['নাম','পদবী','ফোন','বিভাগ'], mkRows(daily));
+    body += `<div style="font-weight:700;font-size:13px;margin:14px 0 8px;">🎖️ অফিসার তালিকা</div>` + pdfTableHTML(['নাম','পদবী','ফোন','শাখা'], mkRows(officer));
+    body += `<div style="font-weight:700;font-size:13px;margin:14px 0 8px;">🧑‍💼 স্টাফ তালিকা</div>` + pdfTableHTML(['নাম','পদবী','ফোন','শাখা'], mkRows(staff));
+    body += `<div style="font-weight:700;font-size:13px;margin:14px 0 8px;">👷 দৈনিক শ্রমিক তালিকা</div>` + pdfTableHTML(['নাম','পদবী','ফোন','শাখা'], mkRows(daily));
   } else if(type==='activities'){
     title='📝 কার্যক্রম রিপোর্ট';
-    meta=`বিভাগ: ${deptLabel} · মাস: ${MN[M]} ${Y}`;
+    meta=`শাখা: ${deptLabel} · মাস: ${MN[M]} ${Y}`;
     const acts=getFA();
-    body += pdfTableHTML(['তারিখ','বিভাগ','বিবরণ'], acts.map(a=>[a.date, escHtml(DEPT[a.dept]?.name||a.dept), escHtml(a.description)]));
+    body += pdfTableHTML(['তারিখ','শাখা','বিবরণ'], acts.map(a=>[a.date, escHtml(DEPT[a.dept]?.name||a.dept), escHtml(a.description)]));
   }
   document.getElementById('pdfRepTitle').textContent = title;
   document.getElementById('pdfRepMeta').textContent  = meta;
@@ -2706,28 +2884,28 @@ function exportExcel(type){
     const wb = XLSX.utils.book_new();
     if(type==='materials'){
       const stock = getCurrentStock();
-      const stockRows = stock.map(s=>({'প্রোডাক্ট':s.product_name,'বিভাগ':DEPT[s.dept]?.name||s.dept,'বর্তমান পরিমাণ':s.qty,'একক':s.unit||''}));
+      const stockRows = stock.map(s=>({'প্রোডাক্ট':s.product_name,'শাখা':DEPT[s.dept]?.name||s.dept,'বর্তমান পরিমাণ':s.qty,'একক':s.unit||''}));
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(stockRows), 'বর্তমান স্টক');
       const txns = getFT();
-      const txnRows = txns.map(t=>({'তারিখ':t.txn_date,'প্রোডাক্ট':t.product_name,'ধরন':t.txn_type==='in'?'ইন':'আউট','পরিমাণ':t.qty,'একক':t.unit||'','উৎস/কাজ':t.txn_type==='in'?(t.source||''):(t.purpose||''),'ওয়ার্ক অর্ডার':t.work_order||'','বিভাগ':DEPT[t.dept]?.name||t.dept}));
+      const txnRows = txns.map(t=>({'তারিখ':t.txn_date,'প্রোডাক্ট':t.product_name,'ধরন':t.txn_type==='in'?'ইন':'আউট','পরিমাণ':t.qty,'একক':t.unit||'','উৎস/কাজ':t.txn_type==='in'?(t.source||''):(t.purpose||''),'ওয়ার্ক অর্ডার':t.work_order||'','শাখা':DEPT[t.dept]?.name||t.dept}));
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(txnRows), `লেনদেন ${MN[M]} ${Y}`.slice(0,31));
     } else if(type==='manpower'){
       const all=getFM();
       const typeLabel = m => m.type==='officer'?'অফিসার':m.type==='staff'?'স্টাফ':'দৈনিক শ্রমিক';
       const rows = all.map(m=>({
         'নাম':m.name,'ধরন':typeLabel(m),'পদবী':m.designation||'','ফোন':m.phone||'','ঠিকানা':m.address||'',
-        'বিভাগ':DEPT[m.dept]?.name||m.dept,'শেষ CL':m.cl_last_date||'','CL বাকি':m.cl_remaining??'',
+        'শাখা':DEPT[m.dept]?.name||m.dept,'শেষ CL':m.cl_last_date||'','CL বাকি':m.cl_remaining??'',
         'অন্য ছুটি তারিখ':m.other_leave_last_date||'','অন্য ছুটি বাকি':m.other_leave_remaining??'',
         'AL নেয়া হয়েছে':m.al_taken==='yes'?'হ্যাঁ':'না','AL তারিখ':m.al_taken==='yes'?(m.al_date||''):'',
       }));
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'জনবল');
     } else if(type==='activities'){
       const acts=getFA();
-      const rows=acts.map(a=>({'তারিখ':a.date,'বিভাগ':DEPT[a.dept]?.name||a.dept,'বিবরণ':a.description}));
+      const rows=acts.map(a=>({'তারিখ':a.date,'শাখা':DEPT[a.dept]?.name||a.dept,'বিবরণ':a.description}));
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `কার্যক্রম ${MN[M]} ${Y}`.slice(0,31));
     } else if(type==='docs'){
       const docs=getDocs();
-      const rows=docs.map(d=>({'নাম':d.name,'ধরন':d.item_type==='folder'?'ফোল্ডার':'ফাইল','ক্যাটাগরি ট্যাগ':(d.tags||[]).join(', '),'সাইজ (বাইট)':d.size_bytes||'','বিভাগ':DEPT[d.dept]?.name||d.dept,'তৈরি হয়েছে':d.created_at?new Date(d.created_at).toLocaleString('bn-BD'):''}));
+      const rows=docs.map(d=>({'নাম':d.name,'ধরন':d.item_type==='folder'?'ফোল্ডার':'ফাইল','ক্যাটাগরি ট্যাগ':(d.tags||[]).join(', '),'সাইজ (বাইট)':d.size_bytes||'','শাখা':DEPT[d.dept]?.name||d.dept,'তৈরি হয়েছে':d.created_at?new Date(d.created_at).toLocaleString('bn-BD'):''}));
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'ফাইল তালিকা');
     }
     XLSX.writeFile(wb, `BGFCL_${type}_${new Date().toISOString().slice(0,10)}.xlsx`);
@@ -2751,9 +2929,10 @@ function renderCurrentTab(){
 // ═══════════════════════════════════════════════════════
 function renderOverview(){
   const name = currentUser?.name || currentUser?.email || 'ব্যবহারকারী';
-  const deptLabel = filterDept==='all' ? 'সকল বিভাগ' : (DEPT[filterDept]?.name||filterDept);
+  const deptLabel = filterDept==='all' ? 'সকল শাখা' : (DEPT[filterDept]?.name||filterDept);
   document.getElementById('ovWelcomeTitle').textContent = `স্বাগতম, ${name} 👋`;
   document.getElementById('ovWelcomeSub').textContent = `${deptLabel} · ${MN[M]} ${Y} · ${new Date().toLocaleDateString('bn-BD',{weekday:'long',day:'numeric',month:'long'})}`;
+  document.getElementById('sumDepts').textContent = Object.keys(DEPT).length; // ভবিষ্যতে শাখা যোগ/বাদ দিলেও সংখ্যা নিজে থেকেই সঠিক থাকবে
 
   // মালামাল
   const stock = getCurrentStock();
@@ -2793,7 +2972,7 @@ function renderOverview(){
 }
 
 function renderAll(){
-  const stock = getCurrentStock();      // এই মাস পর্যন্ত cumulative বর্তমান স্টক (নির্বাচিত বিভাগ অনুযায়ী)
+  const stock = getCurrentStock();      // এই মাস পর্যন্ত cumulative বর্তমান স্টক (নির্বাচিত শাখা অনুযায়ী)
   const monthTxns = getFT();            // শুধু এই মাসের লেনদেন
   document.getElementById('sumTotal').textContent    = stock.length;
   document.getElementById('sumIncoming').textContent = monthTxns.filter(t=>t.txn_type==='in').length;
@@ -2855,7 +3034,7 @@ function renderChart(){
   const fnt={family:'Hind Siliguri',size:11};
 
   if(filterChart==='bar'){
-    // বিভাগভিত্তিক তুলনা: বর্তমান প্রোডাক্ট-ধরন সংখ্যা + এই মাসে ইন/আউট লেনদেন সংখ্যা (সব গণনা-ভিত্তিক, একক ভিন্ন হলেও তুলনাযোগ্য)
+    // শাখাভিত্তিক তুলনা: বর্তমান প্রোডাক্ট-ধরন সংখ্যা + এই মাসে ইন/আউট লেনদেন সংখ্যা (সব গণনা-ভিত্তিক, একক ভিন্ন হলেও তুলনাযোগ্য)
     const depts=Object.keys(DEPT);
     const stockAll=getCurrentStock('all');
     chartInst=new Chart(cv,{type:'bar',
@@ -2868,7 +3047,7 @@ function renderChart(){
       options:{responsive:true,plugins:{legend:{position:'top',labels:{font:fnt}}},scales:{y:{beginAtZero:true,ticks:{font:fnt}},x:{ticks:{font:fnt}}}}
     });
   }else if(filterChart==='line'){
-    // মাসভিত্তিক ট্রেন্ড: সারা বছরের প্রতি মাসে মোট ইন-পরিমাণ বনাম আউট-পরিমাণ (নির্বাচিত বিভাগ অনুযায়ী)
+    // মাসভিত্তিক ট্রেন্ড: সারা বছরের প্রতি মাসে মোট ইন-পরিমাণ বনাম আউট-পরিমাণ (নির্বাচিত শাখা অনুযায়ী)
     const ms=Array.from({length:12},(_,i)=>i+1);
     const inData  = ms.map(m=>txns.filter(t=>t.month===m&&t.year===Y&&t.txn_type==='in' &&(filterDept==='all'||t.dept===filterDept)).reduce((s,t)=>s+ (+t.qty||0),0));
     const outData = ms.map(m=>txns.filter(t=>t.month===m&&t.year===Y&&t.txn_type==='out'&&(filterDept==='all'||t.dept===filterDept)).reduce((s,t)=>s+ (+t.qty||0),0));
@@ -2880,7 +3059,7 @@ function renderChart(){
       options:{responsive:true,plugins:{legend:{position:'top',labels:{font:fnt}}},scales:{y:{beginAtZero:true,ticks:{font:fnt}},x:{ticks:{font:fnt}}}}
     });
   }else if(filterChart==='pie'){
-    // স্টক বিতরণ: বিভাগ অনুযায়ী প্রোডাক্ট-ধরন সংখ্যার ভাগ
+    // স্টক বিতরণ: শাখা অনুযায়ী প্রোডাক্ট-ধরন সংখ্যার ভাগ
     const depts=Object.keys(DEPT);
     const stockAll=getCurrentStock('all');
     chartInst=new Chart(cv,{type:'doughnut',
@@ -2888,7 +3067,7 @@ function renderChart(){
       options:{responsive:true,cutout:'60%',plugins:{legend:{position:'right',labels:{font:fnt,padding:10}}}}
     });
   }else{
-    // ইন বনাম আউট (এই মাস, নির্বাচিত বিভাগ) — মোট লেনদেন-সংখ্যা
+    // ইন বনাম আউট (এই মাস, নির্বাচিত শাখা) — মোট লেনদেন-সংখ্যা
     const f=getFT();
     chartInst=new Chart(cv,{type:'bar',
       data:{labels:['যুক্ত হয়েছে (ইন)','ব্যবহার হয়েছে (আউট)'],datasets:[{label:'লেনদেন সংখ্যা',data:[f.filter(t=>t.txn_type==='in').length,f.filter(t=>t.txn_type==='out').length],backgroundColor:['#10B981CC','#EF4444CC'],borderRadius:8,borderSkipped:false}]},
@@ -2987,7 +3166,7 @@ function renderDailyTable(list){
   const tb=document.getElementById('dailyBody');
   const defs = getCustomDefs().manpower || [];
   document.getElementById('dailyTheadRow').innerHTML =
-    `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th>${cfThHtml(defs)}<th id="dailyActCol"></th>`;
+    `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>শাখা</th>${cfThHtml(defs)}<th id="dailyActCol"></th>`;
   updateActionBar();
   tb.innerHTML='';
   if(!list.length){
@@ -3014,7 +3193,7 @@ function renderOfficerTable(list){
   const tb=document.getElementById('officerBody');
   const defs = getCustomDefs().manpower || [];
   document.getElementById('officerTheadRow').innerHTML =
-    `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th>
+    `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>শাখা</th>
      <th>শেষ CL</th><th>CL বাকি</th><th>অন্য ছুটি (তারিখ)</th><th>অন্য ছুটি বাকি</th><th>AL নেয়া হয়েছে</th><th>AL নেয়ার তারিখ</th>
      ${cfThHtml(defs)}<th id="officerActCol"></th>`;
   updateActionBar();
@@ -3049,7 +3228,7 @@ function renderStaffTable(list){
   const tb=document.getElementById('staffBody');
   const defs = getCustomDefs().manpower || [];
   document.getElementById('staffTheadRow').innerHTML =
-    `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>বিভাগ</th>
+    `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>শাখা</th>
      <th>শেষ CL</th><th>CL বাকি</th><th>অন্য ছুটি (তারিখ)</th><th>অন্য ছুটি বাকি</th><th>AL নেয়া হয়েছে</th><th>AL নেয়ার তারিখ</th>
      ${cfThHtml(defs)}<th id="staffActCol"></th>`;
   updateActionBar();
@@ -3095,7 +3274,7 @@ function renderActivities(){
   const defs = getCustomDefs().activities || [];
   document.getElementById('actLabel').textContent = `${MN[M]} ${Y}`;
   document.getElementById('activityTheadRow').innerHTML =
-    `<th>তারিখ</th><th>বিভাগ</th><th>বিবরণ</th>${cfThHtml(defs)}<th id="activityActCol"></th>`;
+    `<th>তারিখ</th><th>শাখা</th><th>বিবরণ</th>${cfThHtml(defs)}<th id="activityActCol"></th>`;
   updateActionBar();
   const tb=document.getElementById('activityBody');
   tb.innerHTML='';
@@ -3122,7 +3301,7 @@ function renderActivities(){
 // ═══════════════════════════════════════════════════════
 async function saveTxn(){
   const dept=document.getElementById('txDept').value;
-  if(!canEdit(dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  if(!canEdit(dept)){ toast('⚠️ এই শাখা সম্পাদনার অনুমতি নেই'); return; }
   const txn_type=document.getElementById('txType').value;
   const date=document.getElementById('txDate').value;
   const product_name=document.getElementById('txProduct').value.trim();
@@ -3163,7 +3342,7 @@ async function saveTxn(){
 
 function openEditTxn(id){
   const t=getTxns().find(x=>x.id===id); if(!t) return;
-  if(!canEdit(t.dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  if(!canEdit(t.dept)){ toast('⚠️ এই শাখা সম্পাদনার অনুমতি নেই'); return; }
   document.getElementById('etxId').value=id;
   document.getElementById('etxDept').value=t.dept;
   document.getElementById('etxType').value=t.txn_type;
@@ -3710,7 +3889,7 @@ function openDocDetails(id){
   const rows=[
     ['নাম', d.name],
     ['ধরন', d.item_type==='folder'?'ফোল্ডার':(d.mime_type||'—')],
-    ['বিভাগ', DEPT[d.dept]?.name||d.dept],
+    ['শাখা', DEPT[d.dept]?.name||d.dept],
     ['ক্যাটাগরি ট্যাগ', (d.tags||[]).join(', ')||'—'],
     ['অবস্থান', docFolderPathLabel(d.parent_id)||'রুট'],
   ];
@@ -3851,7 +4030,7 @@ function openAddManpower(){
 
 function openEditManpower(id){
   const m=getManpower().find(x=>x.id===id); if(!m) return;
-  if(!canEdit(m.dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  if(!canEdit(m.dept)){ toast('⚠️ এই শাখা সম্পাদনার অনুমতি নেই'); return; }
   document.getElementById('mpId').value=m.id;
   document.getElementById('mpDept').value=m.dept;
   document.getElementById('mpType').value=m.type;
@@ -3876,7 +4055,7 @@ function openEditManpower(id){
 async function saveManpowerForm(){
   const id=document.getElementById('mpId').value;
   const dept=document.getElementById('mpDept').value;
-  if(!canEdit(dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  if(!canEdit(dept)){ toast('⚠️ এই শাখা সম্পাদনার অনুমতি নেই'); return; }
   const name=document.getElementById('mpName').value.trim();
   if(!name){ toast('⚠️ নাম দিন'); return; }
   const type=document.getElementById('mpType').value;
@@ -3941,7 +4120,7 @@ function deleteManpower(id){
 // ═══════════════════════════════════════════════════════
 function openAttendanceModal(workerId){
   const m=getManpower().find(x=>x.id===workerId); if(!m) return;
-  if(!canEdit(m.dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  if(!canEdit(m.dept)){ toast('⚠️ এই শাখা সম্পাদনার অনুমতি নেই'); return; }
   document.getElementById('attWorkerId').value = workerId;
   document.getElementById('attWorkerName').textContent = m.name;
   document.getElementById('attDate').value = new Date().toISOString().slice(0,10);
@@ -4069,7 +4248,7 @@ function renderReportTable(){
 
   const tbody = document.getElementById('repTbody');
   if(!workers.length){
-    tbody.innerHTML = `<tr><td colspan="${4+extraCols.length}" style="text-align:center;padding:20px;color:#94A3B8;">এই বিভাগে কোনো দৈনিক শ্রমিক নেই</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="${4+extraCols.length}" style="text-align:center;padding:20px;color:#94A3B8;">এই শাখায় কোনো দৈনিক শ্রমিক নেই</td></tr>`;
     return;
   }
   tbody.innerHTML = workers.map(w=>{
@@ -4114,7 +4293,7 @@ function fmtDateDisplay(dateStr){
 function buildReportPrintHTML(){
   const hdr = getReportHeader();
   const dept = document.getElementById('repDept').value;
-  const deptLabel = dept==='all' ? 'সকল বিভাগ' : (DEPT[dept]?.name || dept);
+  const deptLabel = dept==='all' ? 'সকল শাখা' : (DEPT[dept]?.name || dept);
   const start = document.getElementById('repStart').value;
   const end   = document.getElementById('repEnd').value;
   const rangeKey = `${start}_${end}`;
@@ -4139,7 +4318,7 @@ function buildReportPrintHTML(){
     </div>
     <div class="rp-meta">
       <div>সময়কাল: ${fmtDateDisplay(start)} — ${fmtDateDisplay(end)}</div>
-      <div>বিভাগ: ${deptLabel}</div>
+      <div>শাখা: ${deptLabel}</div>
     </div>
     <table class="rp-table">
       <thead><tr>
@@ -4181,7 +4360,7 @@ function openAddActivity(){
 
 function openEditActivity(id){
   const a=getActivities().find(x=>x.id===id); if(!a) return;
-  if(!canEdit(a.dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  if(!canEdit(a.dept)){ toast('⚠️ এই শাখা সম্পাদনার অনুমতি নেই'); return; }
   document.getElementById('actId').value=a.id;
   document.getElementById('actDept').value=a.dept;
   document.getElementById('actDate').value=a.date;
@@ -4195,7 +4374,7 @@ function openEditActivity(id){
 async function saveActivityForm(){
   const id=document.getElementById('actId').value;
   const dept=document.getElementById('actDept').value;
-  if(!canEdit(dept)){ toast('⚠️ এই বিভাগ সম্পাদনার অনুমতি নেই'); return; }
+  if(!canEdit(dept)){ toast('⚠️ এই শাখা সম্পাদনার অনুমতি নেই'); return; }
   const date=document.getElementById('actDate').value;
   const description=document.getElementById('actDesc').value.trim();
   if(!date||!description){ toast('⚠️ তারিখ ও বিবরণ দিন'); return; }

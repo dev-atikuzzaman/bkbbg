@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v2.2 — ডার্ক মোড ফিচার সরানো হয়েছে (ইউজারের অনুরোধে), বাকি সব আগের মতোই
-const CACHE_NAME = 'bgfcl-v20';
+// BGFCL Inventory Service Worker v2.3 — ফন্ট আপলোড/সিলেক্ট + ফন্ট সাইজ/পেজ জুম, "বিভাগ"→"শাখা" নামকরণ, ৮টা নতুন শাখা যোগ
+const CACHE_NAME = 'bgfcl-v21';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
