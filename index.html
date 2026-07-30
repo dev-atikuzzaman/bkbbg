@@ -13,6 +13,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet"/>
   <title>BGFCL স্টক ইনভেন্টরি</title>
 <style>
+/* 🆕 Kalpurush — অ্যাপের সাথেই বান্ডিল করা ডিফল্ট বাংলা ফন্ট।
+   font-display:swap মানে ফন্ট লোড হওয়ার আগ পর্যন্ত ফলব্যাক (Hind
+   Siliguri) দেখাবে, আর ফাইলটা কোনো কারণে লোড না হলে (নেটওয়ার্ক
+   সমস্যা, ফাইল মিসিং ইত্যাদি) ব্রাউজার নিজে থেকেই font-family
+   তালিকার পরের ফন্টে (Hind Siliguri) ফিরে যাবে — এটা কোনো JS কোড
+   ছাড়াই ব্রাউজারের নিজস্ব আচরণ, তাই সবসময় নির্ভরযোগ্য। */
+@font-face{
+  font-family:'Kalpurush';
+  src: url('fonts/Kalpurush.ttf') format('truetype');
+  font-display: swap;
+}
 :root{
   --navy:#0D1B2A;--navy-mid:#1A2E42;--navy-light:#243B55;
   --amber:#F4A300;--amber-light:#FFD166;
@@ -24,7 +35,7 @@
   --orange:#F97316;--orange-l:#FFEDD5;
   --teal:#14B8A6;--teal-l:#CCFBF1;
   --border:#E2E8F0;--shadow:0 4px 24px rgba(13,27,42,.10);
-  --r:14px;--f:'Hind Siliguri',sans-serif;--mono:'Roboto Mono',monospace;
+  --r:14px;--f:'Kalpurush','Hind Siliguri',sans-serif;--mono:'Roboto Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--f);background:#EEF2F7;color:var(--navy);min-height:100vh;font-size:15px;}
@@ -810,7 +821,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 
 <!-- 🆕 PDF রিপোর্ট টেমপ্লেট (স্ক্রিনে দেখা যায় না — html2canvas দিয়ে ছবি বানিয়ে PDF-এ বসানো হয়) -->
 <div id="pdfReportRoot" style="position:fixed;left:-99999px;top:0;width:794px;background:#fff;">
-  <div id="pdfReportTemplate" style="font-family:'Hind Siliguri',sans-serif;padding:36px;color:#0F172A;">
+  <div id="pdfReportTemplate" style="font-family:'Kalpurush','Hind Siliguri',sans-serif;padding:36px;color:#0F172A;">
     <div style="display:flex;align-items:center;gap:14px;border-bottom:3px solid #0B3B60;padding-bottom:16px;margin-bottom:20px;">
       <img src="icon-512.png" style="width:56px;height:56px;border-radius:10px;"/>
       <div>
@@ -1169,7 +1180,8 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     <div class="mbody">
       <div class="fg"><label>ফন্ট বেছে নিন</label>
         <select id="fontPresetSelect" onchange="applyFontPreset(this.value)">
-          <option value="default">ডিফল্ট (Hind Siliguri)</option>
+          <option value="kalpurush">✅ Kalpurush (ডিফল্ট)</option>
+          <option value="default">Hind Siliguri</option>
           <option value="siyamrupali">Siyam Rupali</option>
           <option value="nikoshban">NikoshBan</option>
           <option value="timesnewroman">Times New Roman</option>

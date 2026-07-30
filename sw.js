@@ -1,10 +1,11 @@
-// BGFCL Inventory Service Worker v2.4 — কোড ১২টা মডিউল ফাইলে ভাগ করা হয়েছে (রক্ষণাবেক্ষণ সহজ করতে) + অডিট/এরর লগে সার্ভার-সাইড পেজিনেশন
-const CACHE_NAME = 'bgfcl-v22';
+// BGFCL Inventory Service Worker v2.5 — Kalpurush এখন অ্যাপের বান্ডিল করা ডিফল্ট ফন্ট (Hind Siliguri ফলব্যাক)
+const CACHE_NAME = 'bgfcl-v23';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   'https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;600&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
+  '/fonts/Kalpurush.ttf', // 🆕 ডিফল্ট ফন্ট — অফলাইনেও যেন পাওয়া যায়
   // 🆕 কোড এখন ১২টা আলাদা মডিউল ফাইলে ভাগ করা (আগে একটাই বিশাল ইনলাইন
   // <script> ছিল) — অফলাইনে যেন সবগুলো ফাইলই সাথে সাথে পাওয়া যায়,
   // তাই এখানে সবকটাকে precache তালিকায় যোগ করা হলো।
