@@ -302,7 +302,7 @@ function renderChart(){
   }
   if(chartInst){chartInst.destroy();chartInst=null;}
   const txns=getTxns();
-  const fnt={family:'Hind Siliguri',size:11};
+  const fnt={family:"'Kalpurush','Hind Siliguri'",size:11};
 
   if(filterChart==='bar'){
     // শাখাভিত্তিক তুলনা: বর্তমান প্রোডাক্ট-ধরন সংখ্যা + এই মাসে ইন/আউট লেনদেন সংখ্যা (সব গণনা-ভিত্তিক, একক ভিন্ন হলেও তুলনাযোগ্য)

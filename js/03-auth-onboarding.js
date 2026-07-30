@@ -230,6 +230,7 @@ function finishOnboarding(){
 //  🆕 ফন্ট ও ডিসপ্লে সেটিংস (ফন্ট বাছাই/আপলোড, ফন্ট সাইজ, পেজ জুম)
 // ═══════════════════════════════════════════════════════
 const FONT_PRESETS = {
+  kalpurush:     "'Kalpurush', 'Hind Siliguri', sans-serif", // 🆕 এখন থেকে অ্যাপের ডিফল্ট ফন্ট
   default:       "'Hind Siliguri', sans-serif",
   siyamrupali:   "'Siyam Rupali', 'Hind Siliguri', sans-serif",
   nikoshban:     "'NikoshBan', 'Hind Siliguri', sans-serif",
@@ -238,7 +239,7 @@ const FONT_PRESETS = {
 };
 
 function applyFontPreset(choice){
-  document.documentElement.style.setProperty('--f', FONT_PRESETS[choice] || FONT_PRESETS.default);
+  document.documentElement.style.setProperty('--f', FONT_PRESETS[choice] || FONT_PRESETS.kalpurush);
   localStorage.setItem('bgfcl_font_choice', choice);
   const sel=document.getElementById('fontPresetSelect'); if(sel) sel.value=choice;
 }
@@ -302,13 +303,13 @@ function applyPageZoom(val){
   recalcMainZoom(); // পেজ জুম বদলালেও মূল কনটেন্টের effective ফন্ট-সাইজ যেন অপরিবর্তিত থাকে
 }
 function resetDisplaySettings(){
-  applyFontPreset('default');
+  applyFontPreset('kalpurush');
   document.getElementById('fontSizeSlider').value=100; applyFontSize(100);
   document.getElementById('pageZoomSlider').value=100; applyPageZoom(100);
   toast('↺ ডিফল্ট সেটিংসে ফিরে গেছে');
 }
 function openDisplaySettings(){
-  document.getElementById('fontPresetSelect').value = localStorage.getItem('bgfcl_font_choice')||'default';
+  document.getElementById('fontPresetSelect').value = localStorage.getItem('bgfcl_font_choice')||'kalpurush';
   const fsz = localStorage.getItem('bgfcl_font_size')||'100';
   document.getElementById('fontSizeSlider').value = fsz;
   document.getElementById('fontSizeLabel').textContent = fsz+'%';
@@ -327,7 +328,7 @@ async function initDisplayPrefs(){
   const savedFont = localStorage.getItem('bgfcl_font_choice');
   if(savedFont==='custom'){
     const ok = await loadSavedCustomFont();
-    applyFontPreset(ok ? 'custom' : 'default');
+    applyFontPreset(ok ? 'custom' : 'kalpurush');
   } else if(savedFont){
     applyFontPreset(savedFont);
   }
