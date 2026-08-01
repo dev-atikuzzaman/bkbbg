@@ -35,9 +35,10 @@ function switchMainTab(tab){
   document.getElementById('page-manpower').style.display    = tab==='manpower'   ? '' : 'none';
   document.getElementById('page-activities').style.display  = tab==='activities' ? '' : 'none';
   document.getElementById('page-docs').style.display        = tab==='docs'       ? '' : 'none';
-  // বছর/মাস ফিল্টার শুধু মালামাল, ওভারভিউ ও কার্যক্রম ট্যাবের জন্য প্রাসঙ্গিক
+  document.getElementById('page-finance').style.display     = tab==='finance'    ? '' : 'none';
+  // বছর/মাস ফিল্টার মালামাল, ওভারভিউ, কার্যক্রম ও হিসাব ট্যাবের জন্য প্রাসঙ্গিক
   document.getElementById('controlsRow').style.display = (tab==='manpower'||tab==='docs') ? 'none' : '';
-  const tabLabel = tab==='overview'?'ওভারভিউ':tab==='materials'?'মালামাল':tab==='manpower'?'জনবল':tab==='docs'?'ফাইল/ডকুমেন্টস':'কার্যক্রম';
+  const tabLabel = tab==='overview'?'ওভারভিউ':tab==='materials'?'মালামাল':tab==='manpower'?'জনবল':tab==='docs'?'ফাইল/ডকুমেন্টস':tab==='finance'?'হিসাব':'কার্যক্রম';
   document.getElementById('printBannerTab').textContent = tabLabel;
   document.getElementById('printBannerDate').textContent = 'তারিখ: ' + new Date().toLocaleDateString('bn-BD');
   renderCurrentTab();
@@ -193,6 +194,7 @@ function renderCurrentTab(){
   else if(currentTab==='manpower')    renderManpower();
   else if(currentTab==='activities')  renderActivities();
   else if(currentTab==='docs')        renderDocs();
+  else if(currentTab==='finance')     renderFinance();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -225,6 +227,14 @@ function renderOverview(){
   const docs=getDocs();
   document.getElementById('ovFiles').textContent   = docs.filter(d=>d.item_type==='file').length;
   document.getElementById('ovFolders').textContent = docs.filter(d=>d.item_type==='folder').length;
+
+  // হিসাব — এই মাসের গ্যাস আয়
+  const monthGasEntries = getGasEntries().filter(e=>{
+    const d=new Date(e.entry_date);
+    return (d.getMonth()+1)===M && d.getFullYear()===Y;
+  });
+  const monthGasIncome = monthGasEntries.reduce((s,e)=>s+(+e.amount_taka||0),0);
+  document.getElementById('ovGasIncome').textContent = '৳'+fmtNum(monthGasIncome,0);
 
   // সাম্প্রতিক কার্যকলাপ (audit log থেকে, সর্বশেষ ৮টা)
   const feed=document.getElementById('ovRecentFeed');

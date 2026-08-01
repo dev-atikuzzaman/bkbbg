@@ -15,6 +15,8 @@ const RT_TABLES = [
   { name: CFG.TABLE_ACTIVITIES, reload: reloadActivitiesFromCloud },
   { name: CFG.TABLE_ATTENDANCE, reload: reloadAttendanceFromCloud },
   { name: CFG.TABLE_DOCS,       reload: reloadDocsFromCloud },
+  { name: CFG.TABLE_GAS_ENTRIES, reload: reloadGasEntriesFromCloud },
+  { name: CFG.TABLE_FIN_SETTINGS, reload: reloadFinSettingsFromCloud },
 ];
 
 function scheduleRtReload(tableName, fn){
@@ -72,6 +74,16 @@ async function reloadDocsFromCloud(){
   if(docs) saveDocs(docs);
   if(currentTab==='docs') renderDocs();
 }
+async function reloadGasEntriesFromCloud(){
+  const rows = await supa(CFG.TABLE_GAS_ENTRIES+'?order=entry_date.desc');
+  if(rows) saveGasEntries(rows);
+  if(currentTab==='finance') renderFinance();
+}
+async function reloadFinSettingsFromCloud(){
+  const rows = await supa(CFG.TABLE_FIN_SETTINGS+'?select=*');
+  if(rows) saveFinSettings(rows);
+  if(currentTab==='finance') renderFinance();
+}
 async function reloadManpowerFromCloud(){
   const manpower = await supa(CFG.TABLE_MANPOWER+'?order=name');
   if(manpower?.length) saveManpower(manpower);
@@ -125,6 +137,14 @@ async function fetchFromCloud(){
     const docs = await supa(CFG.TABLE_DOCS+'?order=created_at.desc');
     if(docs) saveDocs(docs); // খালি তালিকাও বৈধ (নতুন ফিচার, sample data নেই)
   }catch(e){ console.warn('doc_items cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
+  try{
+    const gasRows = await supa(CFG.TABLE_GAS_ENTRIES+'?order=entry_date.desc');
+    if(gasRows) saveGasEntries(gasRows);
+  }catch(e){ console.warn('finance_gas_entries cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
+  try{
+    const finRows = await supa(CFG.TABLE_FIN_SETTINGS+'?select=*');
+    if(finRows) saveFinSettings(finRows);
+  }catch(e){ console.warn('finance_settings cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
   renderCurrentTab();
 }
 
@@ -255,6 +275,9 @@ function initApp(){
   document.getElementById('docFileInput').addEventListener('change',function(){
     if(this.files && this.files.length) stageUploadFiles(this.files);
   });
+  // 🆕 হিসাব
+  document.getElementById('btnSetGasPrice').addEventListener('click', openSetGasPrice);
+  document.getElementById('btnAddGasEntry').addEventListener('click', openAddGasEntry);
   // PWA install
   window.addEventListener('beforeinstallprompt',e=>{
     e.preventDefault(); deferredPrompt=e;

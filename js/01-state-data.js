@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════
 let Y = new Date().getFullYear(), M = new Date().getMonth()+1;
 let filterDept = 'all', filterChart = 'bar';
-let currentTab = 'overview'; // 'overview' | 'materials' | 'manpower' | 'activities' | 'docs'
+let currentTab = 'overview'; // 'overview' | 'materials' | 'manpower' | 'activities' | 'docs' | 'finance'
 let _pendingProfiles = []; // সুপার অ্যাডমিনের pending approval তালিকার ক্যাশ (নিরাপদ id-ভিত্তিক লুকআপের জন্য)
 let chartInst = null, deferredPrompt = null;
 let supaOk = false;
@@ -28,6 +28,16 @@ function saveDocs(d){ localStorage.setItem('bgfcl_docs',JSON.stringify(d)); }
 // 🆕 কার্যকলাপ ইতিহাস (অডিট লগ) — কে কখন কী করলো
 function getAuditLog(){ return JSON.parse(localStorage.getItem('bgfcl_audit')||'null') || []; }
 function saveAuditLog(d){ localStorage.setItem('bgfcl_audit',JSON.stringify(d)); }
+
+// 🆕 হিসাব ট্যাব — গ্যাসের দাম (সেটিংস) ও দৈনিক গ্যাস এন্ট্রি
+function getFinSettings(){ return JSON.parse(localStorage.getItem('bgfcl_fin_settings')||'null') || []; }
+function saveFinSettings(d){ localStorage.setItem('bgfcl_fin_settings',JSON.stringify(d)); }
+function getGasPrice(){
+  const row = getFinSettings().find(s=>s.key==='gas_price_per_scm');
+  return row ? +row.value_numeric : null;
+}
+function getGasEntries(){ return JSON.parse(localStorage.getItem('bgfcl_gas_entries')||'null') || []; }
+function saveGasEntries(d){ localStorage.setItem('bgfcl_gas_entries',JSON.stringify(d)); }
 function logAudit(module, action, recordLabel, details){
   const entry = {
     id: crypto.randomUUID(),

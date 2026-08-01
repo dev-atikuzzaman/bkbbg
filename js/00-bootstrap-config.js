@@ -35,6 +35,9 @@ const CFG = {
   TABLE_AUDIT: 'audit_log',             // 🆕 কার্যকলাপ ইতিহাস
   TABLE_ERRORLOG: 'error_log',          // 🆕 এরর ট্র্যাকিং
   TABLE_BACKUPS: 'backup_snapshots',    // 🆕 অটোমেটিক ডেইলি ব্যাকআপ (ভিউ-অনলি, শুধু pg_cron লেখে)
+  TABLE_FIN_SETTINGS: 'finance_settings',     // 🆕 হিসাব ট্যাব — গ্যাসের দাম ইত্যাদি সেটিংস
+  TABLE_GAS_ENTRIES: 'finance_gas_entries',   // 🆕 হিসাব ট্যাব — দৈনিক গ্যাস উৎপাদন/আয়
+  FT3_TO_M3: 0.0283168, // 🆕 আদর্শ কনভার্সন ফ্যাক্টর: 1 ঘনফুট = 0.0283168 ঘনমিটার (1 MMSCFD ≈ 28,316.85 SCM/day)
   SENTRY_DSN: '', // ঐচ্ছিক — sentry.io থেকে ফ্রি অ্যাকাউন্ট বানিয়ে DSN বসালে উন্নত এরর-ট্র্যাকিং চালু হবে
   STORAGE_BUCKET: 'documents',          // 🆕 Supabase Storage বাকেট (ফাইলের বাইট এখানে)
   MAX_VIDEO_SECONDS: 60,                // 🆕 ভিডিওর সর্বোচ্চ দৈর্ঘ্য
@@ -108,7 +111,7 @@ const DEPT = {
   compressor: {name:'কম্প্রেসর',              icon:'💨', color:'#F97316', bg:'#FFEDD5'},
   security:   {name:'সিকিউরিটি',              icon:'🛡️', color:'#EF4444', bg:'#FEE2E2'},
   admin:      {name:'প্রশাসন',                icon:'📋', color:'#F4A300', bg:'#FEF3C7'},
-  electric:   {name:'বিদ্যুৎ',                icon:'⚡', color:'#14B8A6', bg:'#CCFBF1'},
+  electric:   {name:'ইলেক্ট্রিক্যাল',                icon:'⚡', color:'#14B8A6', bg:'#CCFBF1'},
   generator:  {name:'জেনারেটর',               icon:'🔋', color:'#0EA5E9', bg:'#E0F2FE'},
   housing:    {name:'হাউজিং',                 icon:'🏠', color:'#84CC16', bg:'#ECFCCB'},
   condensate: {name:'কনডেনসেট প্রসেসিং',      icon:'💧', color:'#06B6D4', bg:'#CFFAFE'},
@@ -120,5 +123,5 @@ const DEPT = {
 };
 const MN = ['','জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
 const AUDIT_ACTION_LABEL={create:'✅ তৈরি',update:'✏️ আপডেট',delete:'🗑️ মুছেছে',move:'📂 সরিয়েছে',copy:'📄 কপি করেছে',upload:'⬆️ আপলোড',rename:'✏️ রিনেম'};
-const AUDIT_MODULE_LABEL={materials:'📦 মালামাল',manpower:'👷 জনবল',activities:'📝 কার্যক্রম',docs:'📁 ফাইল'};
+const AUDIT_MODULE_LABEL={materials:'📦 মালামাল',manpower:'👷 জনবল',activities:'📝 কার্যক্রম',docs:'📁 ফাইল',finance:'🧾 হিসাব'};
 

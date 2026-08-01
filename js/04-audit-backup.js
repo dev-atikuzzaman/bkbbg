@@ -7,7 +7,7 @@ const ROLE_LABEL = {
   viewer:{full:'ভিউয়ার',     short:'ভিউয়ার'},
   pending:{full:'অনুমোদনের অপেক্ষায়', short:'পেন্ডিং'},
 };
-const DEPT_SHORT = {field:'ফিল্ড', plant:'পিএম', production:'প্রোডাকশন', compressor:'কম্প্রেসর', security:'সিকিউরিটি', admin:'প্রশাসন', electric:'বিদ্যুৎ', generator:'জেনারেটর', housing:'হাউজিং', condensate:'কনডেনসেট', firesafety:'ফায়ার সেফটি', mi_room:'এম.আই রুম', heavy_vehicle:'ভারি যান', mechanical:'মেকানিক্যাল', accounts:'একাউন্টস'};
+const DEPT_SHORT = {field:'ফিল্ড', plant:'পিএম', production:'প্রোডাকশন', compressor:'কম্প্রেসর', security:'সিকিউরিটি', admin:'প্রশাসন', electric:'ইলেক্ট্রিক্যাল', generator:'জেনারেটর', housing:'হাউজিং', condensate:'কনডেনসেট', firesafety:'ফায়ার সেফটি', mi_room:'এম.আই রুম', heavy_vehicle:'ভারি যান', mechanical:'মেকানিক্যাল', accounts:'একাউন্টস'};
 
 function updateUserChip(){
   if(!currentUser) return;
@@ -30,10 +30,13 @@ function updateActionBar(){
   document.getElementById('actionBarManpower').style.display   = canWrite ? '' : 'none';
   document.getElementById('actionBarActivities').style.display = canWrite ? '' : 'none';
   document.getElementById('actionBarDocs').style.display       = canWrite ? '' : 'none';
+  // 🆕 হিসাব — কোম্পানি-ব্যাপী আর্থিক তথ্য, তাই শাখাভিত্তিক admin না, শুধু super admin এডিট করতে পারবে
+  document.getElementById('actionBarFinance').style.display     = (r==='super') ? '' : 'none';
   document.getElementById('dailyActCol').textContent    = canWrite ? 'একশন' : '';
   document.getElementById('staffActCol').textContent    = canWrite ? 'একশন' : '';
   document.getElementById('officerActCol').textContent  = canWrite ? 'একশন' : '';
   document.getElementById('activityActCol').textContent = canWrite ? 'একশন' : '';
+  document.getElementById('gasEntryActCol').textContent = (r==='super') ? 'একশন' : '';
 }
 
 function showUserMenu(){
@@ -132,7 +135,7 @@ async function loadAuditPage(replace){
 }
 function renderAuditModuleFilter(){
   const box=document.getElementById('auditModuleFilter');
-  const modules=[['all','সব'],['materials','📦 মালামাল'],['manpower','👷 জনবল'],['activities','📝 কার্যক্রম'],['docs','📁 ফাইল']];
+  const modules=[['all','সব'],['materials','📦 মালামাল'],['manpower','👷 জনবল'],['activities','📝 কার্যক্রম'],['docs','📁 ফাইল'],['finance','🧾 হিসাব']];
   box.innerHTML = modules.map(([k,l])=>`<span class="doc-tag-chip${_auditFilter===k?' active':''}" onclick="setAuditFilter('${k}')">${l}</span>`).join('');
 }
 function renderAuditLogList(){
