@@ -38,6 +38,10 @@ function getGasPrice(){
 }
 function getGasEntries(){ return JSON.parse(localStorage.getItem('bgfcl_gas_entries')||'null') || []; }
 function saveGasEntries(d){ localStorage.setItem('bgfcl_gas_entries',JSON.stringify(d)); }
+
+// 🆕 হিসাব ট্যাব — মাসিক কনডেনসেট আয়
+function getCondensateEntries(){ return JSON.parse(localStorage.getItem('bgfcl_condensate_entries')||'null') || []; }
+function saveCondensateEntries(d){ localStorage.setItem('bgfcl_condensate_entries',JSON.stringify(d)); }
 function logAudit(module, action, recordLabel, details){
   const entry = {
     id: crypto.randomUUID(),
@@ -119,9 +123,9 @@ function setReportDesc(dept, rangeKey, text){
 }
 
 // ── কাস্টম ফিল্ড (মালামাল/জনবল/কার্যক্রম — সব মডিউলে) ──
-function getCustomDefs(){ return JSON.parse(localStorage.getItem('bgfcl_customfields')||'null') || {items:[],manpower:[],activities:[]}; }
+function getCustomDefs(){ return JSON.parse(localStorage.getItem('bgfcl_customfields')||'null') || {items:[],manpower:[],activities:[],condensate:[]}; }
 function saveCustomDefs(d){ localStorage.setItem('bgfcl_customfields', JSON.stringify(d)); }
-let _cfValueCache = {items:{}, manpower:{}, activities:{}}; // বর্তমানে খোলা ফর্মের কাস্টম ফিল্ড মান (ইমেজের জন্য দরকার)
+let _cfValueCache = {items:{}, manpower:{}, activities:{}, condensate:{}}; // বর্তমানে খোলা ফর্মের কাস্টম ফিল্ড মান (ইমেজের জন্য দরকার)
 // নিরাপত্তা: ব্যবহারকারীর টাইপ করা যেকোনো টেক্সট HTML-এ বসানোর আগে escape করা
 // আবশ্যক, নাহলে কেউ নাম/বিবরণ ফিল্ডে script বসিয়ে অন্যদের ব্রাউজারে চালাতে পারবে (stored XSS)
 function escHtml(s){

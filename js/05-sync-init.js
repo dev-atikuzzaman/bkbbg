@@ -16,6 +16,7 @@ const RT_TABLES = [
   { name: CFG.TABLE_ATTENDANCE, reload: reloadAttendanceFromCloud },
   { name: CFG.TABLE_DOCS,       reload: reloadDocsFromCloud },
   { name: CFG.TABLE_GAS_ENTRIES, reload: reloadGasEntriesFromCloud },
+  { name: CFG.TABLE_CONDENSATE_ENTRIES, reload: reloadCondensateEntriesFromCloud },
   { name: CFG.TABLE_FIN_SETTINGS, reload: reloadFinSettingsFromCloud },
 ];
 
@@ -77,6 +78,11 @@ async function reloadDocsFromCloud(){
 async function reloadGasEntriesFromCloud(){
   const rows = await supa(CFG.TABLE_GAS_ENTRIES+'?order=entry_date.desc');
   if(rows) saveGasEntries(rows);
+  if(currentTab==='finance') renderFinance();
+}
+async function reloadCondensateEntriesFromCloud(){
+  const rows = await supa(CFG.TABLE_CONDENSATE_ENTRIES+'?order=entry_year.desc,entry_month.desc');
+  if(rows) saveCondensateEntries(rows);
   if(currentTab==='finance') renderFinance();
 }
 async function reloadFinSettingsFromCloud(){
@@ -141,6 +147,10 @@ async function fetchFromCloud(){
     const gasRows = await supa(CFG.TABLE_GAS_ENTRIES+'?order=entry_date.desc');
     if(gasRows) saveGasEntries(gasRows);
   }catch(e){ console.warn('finance_gas_entries cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
+  try{
+    const condRows = await supa(CFG.TABLE_CONDENSATE_ENTRIES+'?order=entry_year.desc,entry_month.desc');
+    if(condRows) saveCondensateEntries(condRows);
+  }catch(e){ console.warn('finance_condensate_entries cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
   try{
     const finRows = await supa(CFG.TABLE_FIN_SETTINGS+'?select=*');
     if(finRows) saveFinSettings(finRows);
@@ -278,6 +288,7 @@ function initApp(){
   // 🆕 হিসাব
   document.getElementById('btnSetGasPrice').addEventListener('click', openSetGasPrice);
   document.getElementById('btnAddGasEntry').addEventListener('click', openAddGasEntry);
+  document.getElementById('btnCondensateEntry').addEventListener('click', openCondensateEntry);
   // PWA install
   window.addEventListener('beforeinstallprompt',e=>{
     e.preventDefault(); deferredPrompt=e;

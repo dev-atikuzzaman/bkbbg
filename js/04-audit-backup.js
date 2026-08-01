@@ -37,6 +37,7 @@ function updateActionBar(){
   document.getElementById('officerActCol').textContent  = canWrite ? 'একশন' : '';
   document.getElementById('activityActCol').textContent = canWrite ? 'একশন' : '';
   document.getElementById('gasEntryActCol').textContent = (r==='super') ? 'একশন' : '';
+  document.getElementById('condEntryActCol').textContent = (r==='super') ? 'একশন' : '';
 }
 
 function showUserMenu(){

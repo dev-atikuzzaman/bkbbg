@@ -228,13 +228,15 @@ function renderOverview(){
   document.getElementById('ovFiles').textContent   = docs.filter(d=>d.item_type==='file').length;
   document.getElementById('ovFolders').textContent = docs.filter(d=>d.item_type==='folder').length;
 
-  // হিসাব — এই মাসের গ্যাস আয়
+  // হিসাব — এই মাসের মোট আয় (গ্যাস + কনডেনসেট)
   const monthGasEntries = getGasEntries().filter(e=>{
     const d=new Date(e.entry_date);
     return (d.getMonth()+1)===M && d.getFullYear()===Y;
   });
   const monthGasIncome = monthGasEntries.reduce((s,e)=>s+(+e.amount_taka||0),0);
-  document.getElementById('ovGasIncome').textContent = '৳'+fmtNum(monthGasIncome,0);
+  const condMonthEntry = getCondensateEntries().find(c=>c.entry_year===Y && c.entry_month===M);
+  const monthCondIncome = condMonthEntry ? (+condMonthEntry.income_taka||0) : 0;
+  document.getElementById('ovGasIncome').textContent = '৳'+fmtNum(monthGasIncome+monthCondIncome,0);
 
   // সাম্প্রতিক কার্যকলাপ (audit log থেকে, সর্বশেষ ৮টা)
   const feed=document.getElementById('ovRecentFeed');
