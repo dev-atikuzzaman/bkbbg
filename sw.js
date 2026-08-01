@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v2.5 — Kalpurush এখন অ্যাপের বান্ডিল করা ডিফল্ট ফন্ট (Hind Siliguri ফলব্যাক)
-const CACHE_NAME = 'bgfcl-v23';
+// BGFCL Inventory Service Worker v2.7 — নতুন "🧾 হিসাব" ট্যাব (ধাপ ২: গ্যাস আয়) + "ইলেক্ট্রিক্যাল" নামকরণ
+const CACHE_NAME = 'bgfcl-v25';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -20,6 +20,7 @@ const STATIC_ASSETS = [
   '/js/08-activities-view.js',
   '/js/09-docs-manager.js',
   '/js/10-manpower-crud.js',
+  '/js/12-finance.js',
   '/js/11-activities-crud-ui-boot.js',
 ];
 
