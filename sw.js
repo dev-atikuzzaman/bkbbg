@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v2.7 — নতুন "🧾 হিসাব" ট্যাব (ধাপ ২: গ্যাস আয়) + "ইলেক্ট্রিক্যাল" নামকরণ
-const CACHE_NAME = 'bgfcl-v25';
+// BGFCL Inventory Service Worker v2.8 — "🧾 হিসাব" ট্যাবে কনডেনসেট আয় (ধাপ ৩) যোগ হয়েছে
+const CACHE_NAME = 'bgfcl-v26';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

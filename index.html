@@ -636,7 +636,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <div class="ov-card ov-c5" onclick="switchMainTab('finance')">
         <div class="oi">🧾</div><div class="ot">হিসাব</div>
         <div class="ostats">
-          <div class="ostat">এই মাসে গ্যাস আয় <b id="ovGasIncome">৳0</b></div>
+          <div class="ostat">এই মাসে মোট আয় <b id="ovGasIncome">৳0</b></div>
         </div>
       </div>
     </div>
@@ -826,6 +826,13 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     <div class="action-bar" id="actionBarFinance" style="display:none;">
       <button class="btn-p bp-blue" id="btnSetGasPrice">⛽ গ্যাসের দাম সেট করুন</button>
       <button class="btn-p bp-amber" id="btnAddGasEntry">➕ দৈনিক উৎপাদন এন্ট্রি</button>
+      <button class="btn-p bp-purple" id="btnCondensateEntry">🛢️ এই মাসের কনডেনসেট এন্ট্রি</button>
+    </div>
+
+    <div class="ov-welcome" style="margin-bottom:16px;">
+      <h2 style="font-size:14px;">মোট আয় — <span id="finTotalMonthLabel"></span></h2>
+      <p style="font-size:20px;font-weight:700;opacity:1;font-family:var(--mono);" id="finCombinedMonthIncome">৳0</p>
+      <p style="font-size:11px;">গ্যাস + কনডেনসেট (নির্বাচিত মাস অনুযায়ী)</p>
     </div>
 
     <div class="sum-grid">
@@ -845,6 +852,25 @@ canvas#mainChart{width:100%!important;max-height:300px;}
             <th>এন্ট্রিকারী</th><th id="gasEntryActCol"></th>
           </tr></thead>
           <tbody id="gasEntryBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sum-grid">
+      <div class="sum-card sc-blue"><div class="si">🛢️</div><div class="sv" id="condMonthBbl">0</div><div class="sl">এই মাসে মোট কনডেনসেট (ব্যারেল)</div></div>
+      <div class="sum-card sc-amber"><div class="si">৳</div><div class="sv" id="condMonthTaka">0</div><div class="sl">এই মাসে কনডেনসেট আয়</div></div>
+      <div class="sum-card sc-purple"><div class="si">📊</div><div class="sv" id="condTotalTaka">0</div><div class="sl">সর্বমোট কনডেনসেট আয়</div></div>
+    </div>
+
+    <div class="sec-title">🛢️ মাসিক কনডেনসেট আয়</div>
+    <div class="chart-sec">
+      <div class="log-wrap">
+        <table class="log-table">
+          <thead><tr id="condTheadRow">
+            <th>মাস</th><th>লাইট কনডেনসেট (bbl)</th><th>হেভি কনডেনসেট (bbl)</th><th>আয় (৳)</th>
+            <th>এন্ট্রিকারী</th><th id="condEntryActCol"></th>
+          </tr></thead>
+          <tbody id="condEntryBody"></tbody>
         </table>
       </div>
     </div>
@@ -875,6 +901,28 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <div id="gasEntryPreview" style="font-size:12px;color:var(--muted);margin-bottom:10px;"></div>
       <div class="fg"><label>মন্তব্য (ঐচ্ছিক)</label><textarea id="gasEntryNote" rows="2" style="resize:vertical;"></textarea></div>
       <button class="btn-sub" onclick="saveGasEntry()">✅ সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🆕 মাসিক কনডেনসেট এন্ট্রি (যোগ/সম্পাদনা) -->
+<div class="mo" id="modalCondensateEntry">
+  <div class="modal">
+    <div class="mhdr"><h3 id="condModalTitle">🛢️ কনডেনসেট এন্ট্রি</h3><button class="btn-x" onclick="closeModal('modalCondensateEntry')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="condEntryId"/>
+      <input type="hidden" id="condEntryYear"/>
+      <input type="hidden" id="condEntryMonth"/>
+      <p style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;" id="condMonthLabel"></p>
+      <div class="fg-row">
+        <div class="fg"><label>লাইট কনডেনসেট (ব্যারেল)</label><input type="number" id="condLightBbl" step="0.01" min="0" placeholder="0"/></div>
+        <div class="fg"><label>হেভি কনডেনসেট (ব্যারেল)</label><input type="number" id="condHeavyBbl" step="0.01" min="0" placeholder="0"/></div>
+      </div>
+      <div class="fg"><label>কনডেনসেট থেকে মোট মাসিক আয় (টাকা) *</label><input type="number" id="condIncomeTaka" step="0.01" min="0" placeholder="0"/></div>
+      <div class="fg"><label>মন্তব্য (ঐচ্ছিক)</label><textarea id="condNote" rows="2" style="resize:vertical;"></textarea></div>
+      <div id="cdCustomFields"></div>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('condensate','cdCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
+      <button class="btn-sub" onclick="saveCondensateEntry()">✅ সংরক্ষণ করুন</button>
     </div>
   </div>
 </div>
