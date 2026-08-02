@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v2.8 — "🧾 হিসাব" ট্যাবে কনডেনসেট আয় (ধাপ ৩) যোগ হয়েছে
-const CACHE_NAME = 'bgfcl-v26';
+// BGFCL Inventory Service Worker v2.9 — "🧾 হিসাব" ট্যাবে শাখাভিত্তিক ব্যয়/খরচ (ধাপ ৪, বিলের ছবিসহ) যোগ হয়েছে
+const CACHE_NAME = 'bgfcl-v27';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

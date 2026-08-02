@@ -827,6 +827,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <button class="btn-p bp-blue" id="btnSetGasPrice">⛽ গ্যাসের দাম সেট করুন</button>
       <button class="btn-p bp-amber" id="btnAddGasEntry">➕ দৈনিক উৎপাদন এন্ট্রি</button>
       <button class="btn-p bp-purple" id="btnCondensateEntry">🛢️ এই মাসের কনডেনসেট এন্ট্রি</button>
+      <button class="btn-p" style="background:#DC2626;color:white;" id="btnAddExpense">➕ খরচ যোগ করুন</button>
     </div>
 
     <div class="ov-welcome" style="margin-bottom:16px;">
@@ -871,6 +872,24 @@ canvas#mainChart{width:100%!important;max-height:300px;}
             <th>এন্ট্রিকারী</th><th id="condEntryActCol"></th>
           </tr></thead>
           <tbody id="condEntryBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sum-grid">
+      <div class="sum-card sc-red"><div class="si">💸</div><div class="sv" id="expMonthTaka">0</div><div class="sl">এই মাসে মোট খরচ</div></div>
+      <div class="sum-card sc-purple"><div class="si">📊</div><div class="sv" id="expTotalTaka">0</div><div class="sl">সর্বমোট খরচ (ফিল্টার অনুযায়ী)</div></div>
+    </div>
+
+    <div class="sec-title">💸 শাখাভিত্তিক ব্যয় (খরচ) — <span id="expLogLabel"></span></div>
+    <div class="chart-sec">
+      <div class="log-wrap">
+        <table class="log-table">
+          <thead><tr>
+            <th>তারিখ</th><th>শাখা</th><th>বিবরণ</th><th>পরিমাণ (৳)</th><th>বিল</th>
+            <th>এন্ট্রিকারী</th><th id="expEntryActCol"></th>
+          </tr></thead>
+          <tbody id="expEntryBody"></tbody>
         </table>
       </div>
     </div>
@@ -924,6 +943,37 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('condensate','cdCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
       <button class="btn-sub" onclick="saveCondensateEntry()">✅ সংরক্ষণ করুন</button>
     </div>
+  </div>
+</div>
+
+<!-- 🆕 খরচ যোগ/সম্পাদনা (শাখাভিত্তিক, বিলের ছবিসহ) -->
+<div class="mo" id="modalExpenseEntry">
+  <div class="modal">
+    <div class="mhdr"><h3 id="expModalTitle">➕ খরচ যোগ করুন</h3><button class="btn-x" onclick="closeModal('modalExpenseEntry')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="expEntryId"/>
+      <div class="fg"><label>শাখা *</label>
+        <select id="expDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">ইলেক্ট্রিক্যাল</option><option value="generator">জেনারেটর</option><option value="housing">হাউজিং</option><option value="condensate">কনডেনসেট প্রসেসিং</option><option value="firesafety">ফায়ার সেফটি</option><option value="mi_room">এম. আই রুম</option><option value="heavy_vehicle">ভারি যান</option><option value="mechanical">মেকানিক্যাল</option><option value="accounts">একাউন্টস</option></select>
+      </div>
+      <div class="fg"><label>তারিখ *</label><input type="date" id="expDate"/></div>
+      <div class="fg"><label>বিবরণ (কী বাবদ খরচ) *</label><input type="text" id="expDesc" placeholder="যেমন: পাইপ ফিটিং ক্রয়"/></div>
+      <div class="fg"><label>পরিমাণ (টাকা) *</label><input type="number" id="expAmount" step="0.01" min="0" placeholder="0"/></div>
+      <div class="fg">
+        <label>বিলের ছবি (একটা বা একাধিক)</label>
+        <input type="file" accept="image/*" id="expBillInput" multiple onchange="previewExpenseBills(event)"/>
+        <div id="expBillPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+      </div>
+      <div class="fg"><label>মন্তব্য (ঐচ্ছিক)</label><textarea id="expNote" rows="2" style="resize:vertical;"></textarea></div>
+      <button class="btn-sub" onclick="saveExpenseEntry()">✅ সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🆕 বিলের ছবি বড় করে দেখার প্রিভিউ -->
+<div class="mo" id="modalBillPreview">
+  <div class="modal" style="max-width:520px;">
+    <div class="mhdr"><h3>🧾 বিল</h3><button class="btn-x" onclick="closeModal('modalBillPreview')">✕</button></div>
+    <div class="mbody" style="text-align:center;"><img id="billPreviewImg" style="max-width:100%;max-height:70vh;border-radius:8px;"/></div>
   </div>
 </div>
 <!-- ড্র্যাগের সময় আঙুল/মাউস অনুসরণকারী ভাসমান ছায়া (মোবাইল টাচ-ড্র্যাগের জন্য) -->
