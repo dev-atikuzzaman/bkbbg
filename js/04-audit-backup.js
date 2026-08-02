@@ -30,14 +30,21 @@ function updateActionBar(){
   document.getElementById('actionBarManpower').style.display   = canWrite ? '' : 'none';
   document.getElementById('actionBarActivities').style.display = canWrite ? '' : 'none';
   document.getElementById('actionBarDocs').style.display       = canWrite ? '' : 'none';
-  // 🆕 হিসাব — কোম্পানি-ব্যাপী আর্থিক তথ্য, তাই শাখাভিত্তিক admin না, শুধু super admin এডিট করতে পারবে
-  document.getElementById('actionBarFinance').style.display     = (r==='super') ? '' : 'none';
+  // 🆕 হিসাব — গ্যাস/কনডেনসেট কোম্পানি-ব্যাপী তথ্য (শুধু super), কিন্তু
+  // খরচ শাখাভিত্তিক (admin নিজের শাখার খরচ যোগ করতে পারবে), তাই পুরো
+  // action bar canWrite-এ দেখানো হচ্ছে, ভেতরের বাটনগুলো আলাদাভাবে টগল হয়
+  document.getElementById('actionBarFinance').style.display = canWrite ? '' : 'none';
+  document.getElementById('btnSetGasPrice').style.display      = (r==='super') ? '' : 'none';
+  document.getElementById('btnAddGasEntry').style.display      = (r==='super') ? '' : 'none';
+  document.getElementById('btnCondensateEntry').style.display  = (r==='super') ? '' : 'none';
+  document.getElementById('btnAddExpense').style.display       = canWrite ? '' : 'none';
   document.getElementById('dailyActCol').textContent    = canWrite ? 'একশন' : '';
   document.getElementById('staffActCol').textContent    = canWrite ? 'একশন' : '';
   document.getElementById('officerActCol').textContent  = canWrite ? 'একশন' : '';
   document.getElementById('activityActCol').textContent = canWrite ? 'একশন' : '';
   document.getElementById('gasEntryActCol').textContent = (r==='super') ? 'একশন' : '';
   document.getElementById('condEntryActCol').textContent = (r==='super') ? 'একশন' : '';
+  document.getElementById('expEntryActCol').textContent = canWrite ? 'একশন' : '';
 }
 
 function showUserMenu(){

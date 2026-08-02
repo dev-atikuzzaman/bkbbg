@@ -98,6 +98,44 @@ function renderFinance(){
       condTb.appendChild(tr);
     });
   }
+
+  // ── ব্যয় (খরচ): বিভাগ-ফিল্টার (ওপরের গ্লোবাল filterDept) অনুযায়ী ──
+  const allExpenses = getExpenseEntries().filter(e=> filterDept==='all' || e.dept===filterDept)
+    .slice().sort((a,b)=> b.expense_date.localeCompare(a.expense_date));
+  document.getElementById('expLogLabel').textContent = filterDept==='all' ? 'সকল শাখা' : (DEPT[filterDept]?.name||filterDept);
+  const monthExpenses = allExpenses.filter(e=>{
+    const d=new Date(e.expense_date);
+    return (d.getMonth()+1)===M && d.getFullYear()===Y;
+  });
+  const monthExpTaka = monthExpenses.reduce((s,e)=>s+(+e.amount_taka||0),0);
+  const totalExpTaka = allExpenses.reduce((s,e)=>s+(+e.amount_taka||0),0);
+  document.getElementById('expMonthTaka').textContent = '৳'+fmtNum(monthExpTaka,0);
+  document.getElementById('expTotalTaka').textContent = '৳'+fmtNum(totalExpTaka,0);
+
+  const expTb=document.getElementById('expEntryBody');
+  expTb.innerHTML='';
+  if(!allExpenses.length){
+    expTb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:28px;color:#94A3B8;">এখনো কোনো খরচের এন্ট্রি নেই</td></tr>`;
+  }else{
+    allExpenses.forEach(e=>{
+      const cfg=DEPT[e.dept]||{color:'#64748B',name:e.dept};
+      const canEditThis = canEdit(e.dept);
+      const bills = e.bill_paths||[];
+      const billCell = bills.length
+        ? bills.map(p=>`<img src="${supaStoragePublicUrl(p)}" style="width:32px;height:32px;object-fit:cover;border-radius:5px;cursor:pointer;margin-right:3px;" onclick="openBillPreview('${supaStoragePublicUrl(p)}')"/>`).join('')
+        : '—';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td>${e.expense_date}</td>
+        <td><span class="tag-dept" style="background:${cfg.color}22;color:${cfg.color};">${cfg.name}</span></td>
+        <td>${escHtml(e.description)}</td>
+        <td><strong>৳${fmtNum(e.amount_taka,0)}</strong></td>
+        <td>${billCell}</td>
+        <td style="font-size:12px;">${escHtml(e.entered_by_name||'—')}</td>
+        <td>${canEditThis?`<button class="btn-ei" onclick="openEditExpenseEntry('${e.id}')" title="সম্পাদনা">✏️</button><button class="btn-di" onclick="deleteExpenseEntry('${e.id}')" title="মুছুন">🗑️</button>`:''}</td>`;
+      expTb.appendChild(tr);
+    });
+  }
 }
 
 // ── গ্যাসের দাম সেট করা ──
@@ -302,4 +340,129 @@ function deleteCondensateEntry(id){
   renderFinance();
   toast('🗑️ মুছে গেছে');
   if(supaOk) supa(CFG.TABLE_CONDENSATE_ENTRIES+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
+}
+
+// ═══════════════════════════════════════════════════════
+//  🧾 হিসাব ট্যাব — ধাপ ৪: ব্যয় (খরচ) — শাখাভিত্তিক, বিলের ছবিসহ
+//  (ছবি Supabase Storage-এ যায়, একই বাকেট যেটা ফাইল/ডকুমেন্টস ট্যাব
+//  ব্যবহার করে — supaStorageUpload/Remove/PublicUrl পুনঃব্যবহার করা হয়েছে)
+// ═══════════════════════════════════════════════════════
+let _expStagedFiles = [];   // নতুন সিলেক্ট করা কিন্তু এখনো আপলোড হয়নি এমন ফাইল
+let _expExistingBills = []; // এডিট মোডে আগে থেকে থাকা বিলের path (রিমুভ বাটনে বাদ দেয়া যায়)
+
+function previewExpenseBills(event){
+  const files = Array.from(event.target.files||[]);
+  _expStagedFiles = _expStagedFiles.concat(files); // একাধিকবার ফাইল-পিকার খুললেও আগের সিলেকশন হারাবে না
+  event.target.value='';
+  renderExpenseBillPreviewArea();
+}
+function renderExpenseBillPreviewArea(){
+  const box = document.getElementById('expBillPreview');
+  let html = '';
+  _expExistingBills.forEach((path,i)=>{
+    html += `<div style="position:relative;"><img src="${supaStoragePublicUrl(path)}" style="width:56px;height:56px;object-fit:cover;border-radius:6px;"/><button type="button" onclick="removeExistingBill(${i})" style="position:absolute;top:-6px;right:-6px;background:#DC2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;">✕</button></div>`;
+  });
+  _expStagedFiles.forEach((f,i)=>{
+    html += `<div style="position:relative;"><img src="${URL.createObjectURL(f)}" style="width:56px;height:56px;object-fit:cover;border-radius:6px;"/><button type="button" onclick="removeStagedBill(${i})" style="position:absolute;top:-6px;right:-6px;background:#DC2626;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;">✕</button></div>`;
+  });
+  box.innerHTML = html || '<p style="font-size:11px;color:var(--muted);">কোনো বিল যোগ করা হয়নি</p>';
+}
+function removeExistingBill(i){ _expExistingBills.splice(i,1); renderExpenseBillPreviewArea(); }
+function removeStagedBill(i){ _expStagedFiles.splice(i,1); renderExpenseBillPreviewArea(); }
+function openBillPreview(url){
+  document.getElementById('billPreviewImg').src = url;
+  openModal('modalBillPreview');
+}
+
+function openAddExpense(){
+  document.getElementById('expModalTitle').textContent='➕ খরচ যোগ করুন';
+  document.getElementById('expEntryId').value='';
+  document.getElementById('expDept').value = currentUser?.role==='super' ? 'field' : (currentUser?.reqDept||'field');
+  document.getElementById('expDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('expDesc').value='';
+  document.getElementById('expAmount').value='';
+  document.getElementById('expNote').value='';
+  document.getElementById('expBillInput').value='';
+  _expStagedFiles=[]; _expExistingBills=[];
+  renderExpenseBillPreviewArea();
+  openModal('modalExpenseEntry');
+}
+function openEditExpenseEntry(id){
+  const e = getExpenseEntries().find(x=>x.id===id); if(!e) return;
+  if(!canEdit(e.dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  document.getElementById('expModalTitle').textContent='✏️ খরচ সম্পাদনা';
+  document.getElementById('expEntryId').value=id;
+  document.getElementById('expDept').value=e.dept;
+  document.getElementById('expDate').value=e.expense_date;
+  document.getElementById('expDesc').value=e.description;
+  document.getElementById('expAmount').value=e.amount_taka;
+  document.getElementById('expNote').value=e.note||'';
+  document.getElementById('expBillInput').value='';
+  _expStagedFiles=[];
+  _expExistingBills=(e.bill_paths||[]).slice();
+  renderExpenseBillPreviewArea();
+  openModal('modalExpenseEntry');
+}
+async function saveExpenseEntry(){
+  const id = document.getElementById('expEntryId').value;
+  const dept = document.getElementById('expDept').value;
+  if(!canEdit(dept)){ toast('⚠️ এই শাখায় খরচ যোগ করার অনুমতি নেই'); return; }
+  const date = document.getElementById('expDate').value;
+  const desc = document.getElementById('expDesc').value.trim();
+  const amount = +document.getElementById('expAmount').value;
+  if(!date || !desc || !amount || amount<=0){ toast('⚠️ তারিখ, বিবরণ ও সঠিক পরিমাণ দিন'); return; }
+  const note = document.getElementById('expNote').value.trim();
+
+  toast('⏳ সংরক্ষণ হচ্ছে...');
+  const newPaths = [];
+  for(const file of _expStagedFiles){
+    try{
+      const ext = file.name.includes('.') ? file.name.slice(file.name.lastIndexOf('.')) : '';
+      const path = `expense-bills/${dept}/${crypto.randomUUID()}${ext}`;
+      await supaStorageUpload(path, file);
+      newPaths.push(path);
+    }catch(e){ toast(`❌ ${file.name} আপলোড ব্যর্থ: ${e.message}`); }
+  }
+  const finalPaths = [..._expExistingBills, ...newPaths];
+
+  const entries = getExpenseEntries();
+  const idx = entries.findIndex(x=>x.id===id);
+  const wasEdit = idx>=0;
+  const now = new Date().toISOString();
+  if(wasEdit){
+    // এডিটে যেসব পুরনো বিল রিমুভ বাটনে বাদ দেয়া হয়েছে, সেগুলো Storage থেকেও মুছে দেয়া হচ্ছে
+    const oldPaths = entries[idx].bill_paths||[];
+    const removedPaths = oldPaths.filter(p=>!_expExistingBills.includes(p));
+    if(removedPaths.length) supaStorageRemove(removedPaths).catch(()=>{});
+  }
+  const rec = {
+    id: id || crypto.randomUUID(),
+    dept, expense_date: date, description: desc, amount_taka: amount,
+    bill_paths: finalPaths, note,
+    entered_by_name: currentUser?.name||currentUser?.email||'অজানা',
+    entered_by_email: currentUser?.email||null,
+    created_at: wasEdit ? entries[idx].created_at : now,
+    updated_at: now,
+  };
+  if(wasEdit) entries[idx]=rec; else entries.push(rec);
+  saveExpenseEntries(entries);
+  logAudit('finance', wasEdit?'update':'create', `খরচ: ${desc}`, `৳${fmtNum(amount,0)} (${DEPT[dept]?.name||dept})`);
+  closeModal('modalExpenseEntry');
+  renderFinance();
+  toast(wasEdit ? '✅ আপডেট হয়েছে' : '✅ খরচ যোগ হয়েছে');
+  if(supaOk){
+    if(wasEdit) supa(CFG.TABLE_EXPENSE_ENTRIES+'?id=eq.'+rec.id,'PATCH',rec).catch(notifyCloudSyncFail);
+    else supa(CFG.TABLE_EXPENSE_ENTRIES,'POST',rec).catch(notifyCloudSyncFail);
+  }
+}
+function deleteExpenseEntry(id){
+  const e = getExpenseEntries().find(x=>x.id===id); if(!e) return;
+  if(!canEdit(e.dept)){ toast('⚠️ অনুমতি নেই'); return; }
+  if(!confirm(`"${e.description}" (৳${fmtNum(e.amount_taka,0)}) খরচের এন্ট্রি মুছে দেবেন?`)) return;
+  saveExpenseEntries(getExpenseEntries().filter(x=>x.id!==id));
+  logAudit('finance', 'delete', `খরচ: ${e.description}`, `৳${fmtNum(e.amount_taka,0)}`);
+  renderFinance();
+  toast('🗑️ মুছে গেছে');
+  if(e.bill_paths?.length) supaStorageRemove(e.bill_paths).catch(()=>{});
+  if(supaOk) supa(CFG.TABLE_EXPENSE_ENTRIES+'?id=eq.'+id,'DELETE').catch(notifyCloudSyncFail);
 }

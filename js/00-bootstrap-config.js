@@ -38,6 +38,7 @@ const CFG = {
   TABLE_FIN_SETTINGS: 'finance_settings',     // 🆕 হিসাব ট্যাব — গ্যাসের দাম ইত্যাদি সেটিংস
   TABLE_GAS_ENTRIES: 'finance_gas_entries',   // 🆕 হিসাব ট্যাব — দৈনিক গ্যাস উৎপাদন/আয়
   TABLE_CONDENSATE_ENTRIES: 'finance_condensate_entries', // 🆕 হিসাব ট্যাব — মাসিক কনডেনসেট আয়
+  TABLE_EXPENSE_ENTRIES: 'finance_expense_entries', // 🆕 হিসাব ট্যাব — শাখাভিত্তিক ব্যয়
   FT3_TO_M3: 0.0283168, // 🆕 আদর্শ কনভার্সন ফ্যাক্টর: 1 ঘনফুট = 0.0283168 ঘনমিটার (1 MMSCFD ≈ 28,316.85 SCM/day)
   SENTRY_DSN: '', // ঐচ্ছিক — sentry.io থেকে ফ্রি অ্যাকাউন্ট বানিয়ে DSN বসালে উন্নত এরর-ট্র্যাকিং চালু হবে
   STORAGE_BUCKET: 'documents',          // 🆕 Supabase Storage বাকেট (ফাইলের বাইট এখানে)

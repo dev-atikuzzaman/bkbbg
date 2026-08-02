@@ -42,6 +42,10 @@ function saveGasEntries(d){ localStorage.setItem('bgfcl_gas_entries',JSON.string
 // 🆕 হিসাব ট্যাব — মাসিক কনডেনসেট আয়
 function getCondensateEntries(){ return JSON.parse(localStorage.getItem('bgfcl_condensate_entries')||'null') || []; }
 function saveCondensateEntries(d){ localStorage.setItem('bgfcl_condensate_entries',JSON.stringify(d)); }
+
+// 🆕 হিসাব ট্যাব — শাখাভিত্তিক ব্যয় (বিলের ছবিসহ)
+function getExpenseEntries(){ return JSON.parse(localStorage.getItem('bgfcl_expense_entries')||'null') || []; }
+function saveExpenseEntries(d){ localStorage.setItem('bgfcl_expense_entries',JSON.stringify(d)); }
 function logAudit(module, action, recordLabel, details){
   const entry = {
     id: crypto.randomUUID(),

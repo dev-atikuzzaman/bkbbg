@@ -17,6 +17,7 @@ const RT_TABLES = [
   { name: CFG.TABLE_DOCS,       reload: reloadDocsFromCloud },
   { name: CFG.TABLE_GAS_ENTRIES, reload: reloadGasEntriesFromCloud },
   { name: CFG.TABLE_CONDENSATE_ENTRIES, reload: reloadCondensateEntriesFromCloud },
+  { name: CFG.TABLE_EXPENSE_ENTRIES, reload: reloadExpenseEntriesFromCloud },
   { name: CFG.TABLE_FIN_SETTINGS, reload: reloadFinSettingsFromCloud },
 ];
 
@@ -85,6 +86,11 @@ async function reloadCondensateEntriesFromCloud(){
   if(rows) saveCondensateEntries(rows);
   if(currentTab==='finance') renderFinance();
 }
+async function reloadExpenseEntriesFromCloud(){
+  const rows = await supa(CFG.TABLE_EXPENSE_ENTRIES+'?order=expense_date.desc');
+  if(rows) saveExpenseEntries(rows);
+  if(currentTab==='finance') renderFinance();
+}
 async function reloadFinSettingsFromCloud(){
   const rows = await supa(CFG.TABLE_FIN_SETTINGS+'?select=*');
   if(rows) saveFinSettings(rows);
@@ -151,6 +157,10 @@ async function fetchFromCloud(){
     const condRows = await supa(CFG.TABLE_CONDENSATE_ENTRIES+'?order=entry_year.desc,entry_month.desc');
     if(condRows) saveCondensateEntries(condRows);
   }catch(e){ console.warn('finance_condensate_entries cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
+  try{
+    const expRows = await supa(CFG.TABLE_EXPENSE_ENTRIES+'?order=expense_date.desc');
+    if(expRows) saveExpenseEntries(expRows);
+  }catch(e){ console.warn('finance_expense_entries cloud sync skipped (টেবিল তৈরি করা লাগবে):', e.message); }
   try{
     const finRows = await supa(CFG.TABLE_FIN_SETTINGS+'?select=*');
     if(finRows) saveFinSettings(finRows);
@@ -289,6 +299,7 @@ function initApp(){
   document.getElementById('btnSetGasPrice').addEventListener('click', openSetGasPrice);
   document.getElementById('btnAddGasEntry').addEventListener('click', openAddGasEntry);
   document.getElementById('btnCondensateEntry').addEventListener('click', openCondensateEntry);
+  document.getElementById('btnAddExpense').addEventListener('click', openAddExpense);
   // PWA install
   window.addEventListener('beforeinstallprompt',e=>{
     e.preventDefault(); deferredPrompt=e;
