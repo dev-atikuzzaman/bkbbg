@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v2.9 — "🧾 হিসাব" ট্যাবে শাখাভিত্তিক ব্যয়/খরচ (ধাপ ৪, বিলের ছবিসহ) যোগ হয়েছে
-const CACHE_NAME = 'bgfcl-v27';
+// BGFCL Inventory Service Worker v3.0 — ফাইল/ফোল্ডারে কাস্টম ফিল্ড (ধাপ ৫) + বাল্ক কপি
+const CACHE_NAME = 'bgfcl-v28';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

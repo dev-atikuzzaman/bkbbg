@@ -404,6 +404,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
 .doc-bulk-bar .dbb-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .doc-bulk-bar button{border:none;border-radius:8px;padding:7px 12px;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;}
 .dbb-move{background:var(--blue);color:#fff;}
+.dbb-copy{background:#7C3AED;color:#fff;}
 .dbb-delete{background:var(--red);color:#fff;}
 .dbb-cancel{background:rgba(255,255,255,.15);color:#fff;}
 
@@ -1088,6 +1089,8 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     <div class="mbody">
       <div class="fg"><label>ফোল্ডারের নাম *</label><input type="text" id="folderName" placeholder="যেমন: ইনভয়েস ২০২৬"/></div>
       <div class="fg"><label>ক্যাটাগরি ট্যাগ (কমা দিয়ে আলাদা, ঐচ্ছিক)</label><input type="text" id="folderTags" placeholder="যেমন: হিসাব, জরুরি"/></div>
+      <div id="folderCustomFields"></div>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('docs','folderCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
       <button class="btn-sub" onclick="createFolder()">✅ তৈরি করুন</button>
     </div>
   </div>
@@ -1101,19 +1104,23 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <div id="uploadFileList" style="max-height:180px;overflow-y:auto;margin-bottom:10px;"></div>
       <div class="fg"><label>ক্যাটাগরি ট্যাগ (কমা দিয়ে আলাদা — সবগুলো ফাইলে যুক্ত হবে)</label><input type="text" id="uploadTags" placeholder="যেমন: ইনভয়েস, জানুয়ারি"/></div>
       <p style="font-size:12px;color:var(--muted);margin:4px 0 12px;">🎥 ভিডিও ফাইল সর্বোচ্চ ১ মিনিট দৈর্ঘ্যের হতে পারবে।</p>
+      <div id="uploadCustomFields"></div>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('docs','uploadCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন (সবগুলো ফাইলে যুক্ত হবে)</button>
       <button class="btn-sub" id="uploadConfirmBtn" onclick="startUpload()">✅ আপলোড শুরু করুন</button>
     </div>
   </div>
 </div>
 
-<!-- 🆕 রিনেম -->
+<!-- 🆕 এডিট / রিনেম -->
 <div class="mo" id="modalRenameDoc">
   <div class="modal">
-    <div class="mhdr"><h3>✏️ নাম পরিবর্তন</h3><button class="btn-x" onclick="closeModal('modalRenameDoc')">✕</button></div>
+    <div class="mhdr"><h3>✏️ এডিট / নাম পরিবর্তন</h3><button class="btn-x" onclick="closeModal('modalRenameDoc')">✕</button></div>
     <div class="mbody">
       <input type="hidden" id="renameDocId"/>
       <div class="fg"><label>নতুন নাম *</label><input type="text" id="renameDocName"/></div>
       <div class="fg"><label>ক্যাটাগরি ট্যাগ (কমা দিয়ে আলাদা)</label><input type="text" id="renameDocTags"/></div>
+      <div id="renameCustomFields"></div>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('docs','renameCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
       <button class="btn-sub" onclick="confirmRenameDoc()">✅ সংরক্ষণ করুন</button>
     </div>
   </div>
