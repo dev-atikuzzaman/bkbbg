@@ -290,6 +290,8 @@ function initApp(){
   document.getElementById('btnNewFolder').addEventListener('click',()=>{
     document.getElementById('folderName').value='';
     document.getElementById('folderTags').value='';
+    _cfValueCache.docs = {};
+    renderCustomFieldInputs('docs','folderCustomFields',{});
     openModal('modalNewFolder');
   });
   document.getElementById('docFileInput').addEventListener('change',function(){

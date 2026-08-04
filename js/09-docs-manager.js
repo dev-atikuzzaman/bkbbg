@@ -187,6 +187,7 @@ function renderDocBulkBar(){
     <span>✅ ${docSelected.size}টি নির্বাচিত</span>
     <div class="dbb-actions">
       <button class="dbb-move" onclick="bulkMoveDocsStart()">📂 মুভ করুন</button>
+      <button class="dbb-copy" onclick="bulkCopyDocsStart()">📄 কপি করুন</button>
       <button class="dbb-delete" onclick="bulkDeleteDocs()">🗑️ মুছুন</button>
       <button class="dbb-cancel" onclick="docSelected.clear();renderDocs();">✕ বাতিল</button>
     </div>
@@ -225,6 +226,21 @@ function bulkMoveDocsStart(){
   renderMoveDocTreeMulti(ids);
   openModal('modalMoveDoc');
 }
+function bulkCopyDocsStart(){
+  const ids=[...docSelected];
+  if(!ids.length) return;
+  const items = ids.map(id=>getDocs().find(x=>x.id===id)).filter(Boolean);
+  const files = items.filter(d=>d.item_type==='file'); // ফোল্ডার কপি সাপোর্ট করা হয় না (একক কপিতেও না)
+  if(!files.length){ toast('⚠️ কপি করার জন্য অন্তত একটা ফাইল নির্বাচন করুন — ফোল্ডার কপি করা যায় না'); return; }
+  const noPerm = files.find(d=>!canEdit(d.dept));
+  if(noPerm){ toast(`⚠️ "${noPerm.name}"-এর জন্য অনুমতি নেই`); return; }
+  document.getElementById('moveDocId').value='__bulk__';
+  document.getElementById('moveDocMode').value='bulk-copy';
+  const skipped = items.length - files.length;
+  document.getElementById('moveDocTitle').textContent = `📄 ${files.length}টি ফাইল কপি করুন — গন্তব্য বেছে নিন${skipped?` (${skipped}টি ফোল্ডার বাদ)`:''}`;
+  renderMoveDocTreeMulti(ids);
+  openModal('modalMoveDoc');
+}
 function renderMoveDocTreeMulti(excludeIds){
   const box=document.getElementById('moveDocTree');
   const folders=getDocs().filter(d=>d.item_type==='folder' && !excludeIds.includes(d.id) && !excludeIds.some(eid=>isDocDescendant(eid,d.id)));
@@ -234,12 +250,21 @@ function renderMoveDocTreeMulti(excludeIds){
   });
   box.innerHTML=html;
 }
-function confirmBulkMove(targetFolderId){
+async function confirmBulkMove(targetFolderId){
   const ids=[...docSelected];
+  const mode=document.getElementById('moveDocMode').value;
   closeModal('modalMoveDoc');
-  ids.forEach(id=>moveDocItem(id, targetFolderId));
-  docSelected.clear(); docSelectMode=false;
-  renderDocs(); toast(`✅ ${ids.length}টি আইটেম সরানো হয়েছে`);
+  if(mode==='bulk-copy'){
+    const files = ids.map(id=>getDocs().find(x=>x.id===id)).filter(d=>d && d.item_type==='file');
+    toast(`⏳ ${files.length}টি ফাইল কপি হচ্ছে...`);
+    for(const f of files) await copyDocItem(f.id, targetFolderId);
+    docSelected.clear(); docSelectMode=false;
+    renderDocs(); toast(`✅ ${files.length}টি ফাইল কপি হয়েছে`);
+  }else{
+    ids.forEach(id=>moveDocItem(id, targetFolderId));
+    docSelected.clear(); docSelectMode=false;
+    renderDocs(); toast(`✅ ${ids.length}টি আইটেম সরানো হয়েছে`);
+  }
 }
 
 // ── কনটেক্সট মেনু (⋮) ──
@@ -248,7 +273,7 @@ function openDocCtxMenu(evt, id){
   const menu=document.getElementById('docCtxMenu');
   const isFolder=d.item_type==='folder';
   let html='';
-  html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openRenameDoc('${id}')">✏️ রিনেম</button>`;
+  html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openRenameDoc('${id}')">✏️ এডিট / রিনেম</button>`;
   html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openMoveDoc('${id}','move')">📂 মুভ করুন</button>`;
   if(!isFolder) html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openMoveDoc('${id}','copy')">📄 কপি করুন</button>`;
   if(!isFolder) html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();window.open(supaStoragePublicUrl('${d.storage_path}'),'_blank')">⬇️ ডাউনলোড</button>`;
@@ -266,16 +291,20 @@ function closeDocCtxMenu(){ document.getElementById('docCtxMenu').style.display=
 function closeDocCtxMenuOnce(){ closeDocCtxMenu(); document.removeEventListener('click',closeDocCtxMenuOnce); }
 
 // ── নতুন ফোল্ডার ──
-function createFolder(){
+async function createFolder(){
   const name=document.getElementById('folderName').value.trim();
   if(!name){ toast('⚠️ ফোল্ডারের নাম দিন'); return; }
   const tags=document.getElementById('folderTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const customFields = await collectCustomFieldValues('folderCustomFields', {});
   const dept=currentUser?.reqDept||'field';
   const now=new Date().toISOString();
-  const nf={id:crypto.randomUUID(),dept,parent_id:docCurrentFolder,item_type:'folder',name,tags,storage_path:null,mime_type:null,size_bytes:null,duration_seconds:null,created_at:now,updated_at:now};
+  const nf={id:crypto.randomUUID(),dept,parent_id:docCurrentFolder,item_type:'folder',name,tags,storage_path:null,mime_type:null,size_bytes:null,duration_seconds:null,custom_fields:customFields,created_at:now,updated_at:now};
   const docs=getDocs(); docs.push(nf); saveDocs(docs);
   logAudit('docs', 'create', name, 'ফোল্ডার তৈরি');
   closeModal('modalNewFolder');
+  document.getElementById('folderName').value=''; document.getElementById('folderTags').value='';
+  _cfValueCache.docs = {};
+  renderCustomFieldInputs('docs','folderCustomFields',{});
   renderDocs(); toast('✅ ফোল্ডার তৈরি হয়েছে');
   if(supaOk) supa(CFG.TABLE_DOCS,'POST',nf).catch(notifyCloudSyncFail);
 }
@@ -307,12 +336,15 @@ async function stageUploadFiles(fileList){
   }
   box.innerHTML = rows.join('') || '<p style="color:var(--muted);font-size:12px;">কোনো ফাইল নির্বাচিত হয়নি</p>';
   document.getElementById('uploadTags').value='';
+  _cfValueCache.docs = {};
+  renderCustomFieldInputs('docs','uploadCustomFields',{});
   openModal('modalUploadStage');
 }
 async function startUpload(){
   const validFiles=_stagedFiles.filter(f=>!f._skip);
   if(!validFiles.length){ toast('⚠️ আপলোডযোগ্য কোনো ফাইল নেই'); return; }
   const tags=document.getElementById('uploadTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const customFields = await collectCustomFieldValues('uploadCustomFields', {});
   const dept=currentUser?.reqDept||'field';
   closeModal('modalUploadStage');
   toast(`⏳ ${validFiles.length}টি ফাইল আপলোড হচ্ছে...`);
@@ -325,7 +357,7 @@ async function startUpload(){
       const now=new Date().toISOString();
       const nd={id:crypto.randomUUID(),dept,parent_id:docCurrentFolder,item_type:'file',name:f.name,tags,
         storage_path:storagePath, mime_type:f.type||'application/octet-stream', size_bytes:f.size,
-        duration_seconds: f._duration?Math.round(f._duration):null, created_at:now, updated_at:now};
+        duration_seconds: f._duration?Math.round(f._duration):null, custom_fields:customFields, created_at:now, updated_at:now};
       docs.push(nd);
       logAudit('docs', 'upload', f.name, humanSize(f.size));
       if(supaOk) await supa(CFG.TABLE_DOCS,'POST',nd).catch(notifyCloudSyncFail);
@@ -333,6 +365,8 @@ async function startUpload(){
   }
   saveDocs(docs);
   document.getElementById('docFileInput').value='';
+  _cfValueCache.docs = {};
+  renderCustomFieldInputs('docs','uploadCustomFields',{});
   renderDocs(); toast('✅ আপলোড সম্পন্ন');
 }
 
@@ -343,21 +377,24 @@ function openRenameDoc(id){
   document.getElementById('renameDocId').value=id;
   document.getElementById('renameDocName').value=d.name;
   document.getElementById('renameDocTags').value=(d.tags||[]).join(', ');
+  _cfValueCache.docs = d.custom_fields || {};
+  renderCustomFieldInputs('docs','renameCustomFields', d.custom_fields||{});
   openModal('modalRenameDoc');
 }
-function confirmRenameDoc(){
+async function confirmRenameDoc(){
   const id=document.getElementById('renameDocId').value;
   const docs=getDocs(); const idx=docs.findIndex(x=>x.id===id); if(idx<0) return;
   const name=document.getElementById('renameDocName').value.trim();
   if(!name){ toast('⚠️ নাম দিন'); return; }
   const tags=document.getElementById('renameDocTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const customFields = await collectCustomFieldValues('renameCustomFields', docs[idx].custom_fields||{});
   const oldName = docs[idx].name;
-  docs[idx]={...docs[idx],name,tags,updated_at:new Date().toISOString()};
+  docs[idx]={...docs[idx],name,tags,custom_fields:customFields,updated_at:new Date().toISOString()};
   saveDocs(docs);
   logAudit('docs', 'rename', name, oldName!==name ? `আগের নাম: ${oldName}` : null);
   closeModal('modalRenameDoc');
   renderDocs(); toast('✅ আপডেট হয়েছে');
-  if(supaOk) supa(CFG.TABLE_DOCS+'?id=eq.'+id,'PATCH',{name,tags,updated_at:docs[idx].updated_at}).catch(notifyCloudSyncFail);
+  if(supaOk) supa(CFG.TABLE_DOCS+'?id=eq.'+id,'PATCH',{name,tags,custom_fields:customFields,updated_at:docs[idx].updated_at}).catch(notifyCloudSyncFail);
 }
 
 // ── মুভ / কপি ──
@@ -458,7 +495,15 @@ function openDocDetails(id){
     if(d.duration_seconds) rows.push(['দৈর্ঘ্য', d.duration_seconds+' সেকেন্ড']);
   }
   rows.push(['তৈরি হয়েছে', d.created_at ? new Date(d.created_at).toLocaleString('bn-BD') : '—']);
+  const cfDefs = getCustomDefs().docs || [];
+  const cfRows = cfDefs.filter(def=>d.custom_fields && d.custom_fields[def.id]).map(def=>[def.label, d.custom_fields[def.id]]);
+  let cfHtml = '';
+  cfRows.forEach(([k,v])=>{
+    if(String(v).startsWith('data:image')) cfHtml += `<div style="padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:13px;"><span style="color:var(--muted);">${escHtml(k)}</span><br/><img src="${v}" class="cf-preview-img" style="margin-top:6px;"/></div>`;
+    else cfHtml += `<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:13px;"><span style="color:var(--muted);flex-shrink:0;">${escHtml(k)}</span><span style="font-weight:600;text-align:right;word-break:break-word;">${escHtml(String(v))}</span></div>`;
+  });
   box.innerHTML = rows.map(([k,v])=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:13px;"><span style="color:var(--muted);flex-shrink:0;">${k}</span><span style="font-weight:600;text-align:right;word-break:break-word;">${escHtml(String(v))}</span></div>`).join('')
+    + cfHtml
     + (d.item_type==='file' ? `<a href="${supaStoragePublicUrl(d.storage_path)}" target="_blank" class="btn-sub" style="display:block;text-align:center;text-decoration:none;margin-top:14px;">⬇️ ডাউনলোড / নতুন ট্যাবে খুলুন</a>` : '');
   openModal('modalDocDetails');
 }
