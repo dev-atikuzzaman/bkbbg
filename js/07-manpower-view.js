@@ -39,7 +39,7 @@ function cfTdHtml(defs, values={}){
 
 function renderDailyTable(list){
   const tb=document.getElementById('dailyBody');
-  const defs = getCustomDefs().manpower || [];
+  const defs = getCustomDefs().manpower_daily || [];
   document.getElementById('dailyTheadRow').innerHTML =
     `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>শাখা</th>${cfThHtml(defs)}<th id="dailyActCol"></th>`;
   updateActionBar();
@@ -66,7 +66,7 @@ function renderDailyTable(list){
 
 function renderOfficerTable(list){
   const tb=document.getElementById('officerBody');
-  const defs = getCustomDefs().manpower || [];
+  const defs = getCustomDefs().manpower_officer || [];
   document.getElementById('officerTheadRow').innerHTML =
     `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>শাখা</th>
      <th>শেষ CL</th><th>CL বাকি</th><th>অন্য ছুটি (তারিখ)</th><th>অন্য ছুটি বাকি</th><th>AL নেয়া হয়েছে</th><th>AL নেয়ার তারিখ</th>
@@ -101,7 +101,7 @@ function renderOfficerTable(list){
 
 function renderStaffTable(list){
   const tb=document.getElementById('staffBody');
-  const defs = getCustomDefs().manpower || [];
+  const defs = getCustomDefs().manpower_staff || [];
   document.getElementById('staffTheadRow').innerHTML =
     `<th>নাম</th><th>পদবী</th><th>ফোন</th><th>ঠিকানা</th><th>শাখা</th>
      <th>শেষ CL</th><th>CL বাকি</th><th>অন্য ছুটি (তারিখ)</th><th>অন্য ছুটি বাকি</th><th>AL নেয়া হয়েছে</th><th>AL নেয়ার তারিখ</th>

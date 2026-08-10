@@ -1,10 +1,19 @@
 // ═══════════════════════════════════════════════════════
 //  জনবল CRUD (MANPOWER)
 // ═══════════════════════════════════════════════════════
+// জনবলের ধরন (অফিসার/স্টাফ/দৈনিক শ্রমিক) অনুযায়ী কাস্টম ফিল্ডের আলাদা মডিউল-কী।
+// এভাবে প্রতিটি ক্যাটাগরির কাস্টম ফিল্ড একে অন্যের থেকে সম্পূর্ণ স্বাধীন থাকে।
+function mpModule(){ return 'manpower_' + (document.getElementById('mpType').value || 'daily'); }
+let _mpFormCFValues = {}; // বর্তমানে খোলা জনবল ফর্মের কাস্টম ফিল্ড মান (ধরন পরিবর্তন করলেও বজায় থাকে)
+
 function toggleManpowerFields(){
   const type=document.getElementById('mpType').value;
   document.getElementById('mpStaffFields').style.display = (type==='staff'||type==='officer') ? '' : 'none';
   document.getElementById('mpStaffFieldsTitle').textContent = type==='officer' ? '🗂️ অফিসার সংক্রান্ত অতিরিক্ত তথ্য' : '🗂️ স্টাফ সংক্রান্ত অতিরিক্ত তথ্য';
+  // ধরন বদলালে সেই ক্যাটাগরির নিজস্ব কাস্টম ফিল্ডগুলো দেখানো হয় (আগে থেকে ফর্মে থাকা মান বজায় রেখে)
+  const module = mpModule();
+  _cfValueCache[module] = _mpFormCFValues || {};
+  renderCustomFieldInputs(module, 'mpCustomFields', _cfValueCache[module]);
 }
 
 function toggleAlDateField(){
@@ -27,8 +36,9 @@ function openAddManpower(){
   resetManpowerForm();
   document.getElementById('mpDept').value = currentUser?.reqDept||'field';
   document.getElementById('modalManpowerTitle').textContent='👷 নতুন জনবল যোগ';
-  _cfValueCache.manpower = {};
-  renderCustomFieldInputs('manpower','mpCustomFields',{});
+  _mpFormCFValues = {};
+  _cfValueCache[mpModule()] = {};
+  renderCustomFieldInputs(mpModule(),'mpCustomFields',{});
   openModal('modalManpower');
 }
 
@@ -49,10 +59,10 @@ function openEditManpower(id){
   document.getElementById('mpAlTaken').value=m.al_taken||'no';
   document.getElementById('mpAlDate').value=m.al_date||'';
   document.getElementById('modalManpowerTitle').textContent='✏️ জনবল সম্পাদনা';
-  toggleManpowerFields();
   toggleAlDateField();
-  _cfValueCache.manpower = m.customFields||{};
-  renderCustomFieldInputs('manpower','mpCustomFields', m.customFields||{});
+  _mpFormCFValues = m.customFields||{};
+  _cfValueCache[mpModule()] = _mpFormCFValues;
+  toggleManpowerFields(); // এটি mpModule() অনুযায়ী সঠিক কাস্টম ফিল্ডসেট রেন্ডার করবে
   openModal('modalManpower');
 }
 

@@ -127,9 +127,33 @@ function setReportDesc(dept, rangeKey, text){
 }
 
 // ── কাস্টম ফিল্ড (মালামাল/জনবল/কার্যক্রম — সব মডিউলে) ──
-function getCustomDefs(){ return JSON.parse(localStorage.getItem('bgfcl_customfields')||'null') || {items:[],manpower:[],activities:[],condensate:[],docs:[]}; }
+// জনবলের কাস্টম ফিল্ড এখন প্রতিটি ক্যাটাগরির (অফিসার/স্টাফ/দৈনিক শ্রমিক) জন্য
+// সম্পূর্ণ আলাদা ও স্বাধীনভাবে ম্যানেজ (যোগ/এডিট/ডিলিট) করা যায় — একটির পরিবর্তনে
+// অন্যটি প্রভাবিত হয় না। তাই একক 'manpower' এর বদলে তিনটি আলাদা মডিউল কী ব্যবহৃত হয়:
+// manpower_officer, manpower_staff, manpower_daily
+function getCustomDefs(){
+  const d = JSON.parse(localStorage.getItem('bgfcl_customfields')||'null') || {};
+  // পুরনো ডেটা মাইগ্রেশন: আগে সব ক্যাটাগরির জন্য একটাই 'manpower' তালিকা ছিল।
+  // নতুন তিনটি তালিকা এখনো তৈরি না থাকলে, পুরনো তালিকাটি একবার তিন ক্যাটাগরিতেই
+  // কপি করে দেয়া হয় যাতে আগের কাস্টম ফিল্ডগুলো হারিয়ে না যায়।
+  if(d.manpower && d.manpower.length && !d.manpower_officer && !d.manpower_staff && !d.manpower_daily){
+    d.manpower_officer = JSON.parse(JSON.stringify(d.manpower));
+    d.manpower_staff   = JSON.parse(JSON.stringify(d.manpower));
+    d.manpower_daily   = JSON.parse(JSON.stringify(d.manpower));
+    delete d.manpower;
+    localStorage.setItem('bgfcl_customfields', JSON.stringify(d));
+  }
+  d.items          = d.items||[];
+  d.activities     = d.activities||[];
+  d.condensate     = d.condensate||[];
+  d.docs           = d.docs||[];
+  d.manpower_officer = d.manpower_officer||[];
+  d.manpower_staff    = d.manpower_staff||[];
+  d.manpower_daily    = d.manpower_daily||[];
+  return d;
+}
 function saveCustomDefs(d){ localStorage.setItem('bgfcl_customfields', JSON.stringify(d)); }
-let _cfValueCache = {items:{}, manpower:{}, activities:{}, condensate:{}, docs:{}}; // বর্তমানে খোলা ফর্মের কাস্টম ফিল্ড মান (ইমেজের জন্য দরকার)
+let _cfValueCache = {items:{}, manpower_officer:{}, manpower_staff:{}, manpower_daily:{}, activities:{}, condensate:{}, docs:{}}; // বর্তমানে খোলা ফর্মের কাস্টম ফিল্ড মান (ইমেজের জন্য দরকার)
 // নিরাপত্তা: ব্যবহারকারীর টাইপ করা যেকোনো টেক্সট HTML-এ বসানোর আগে escape করা
 // আবশ্যক, নাহলে কেউ নাম/বিবরণ ফিল্ডে script বসিয়ে অন্যদের ব্রাউজারে চালাতে পারবে (stored XSS)
 function escHtml(s){
@@ -157,12 +181,19 @@ function readFileAsDataURL(file){
   });
 }
 
+const CF_MODULE_LABELS = {
+  items:'মালামাল', activities:'কার্যক্রম', condensate:'কনডেনসেট', docs:'ফাইল/ডকুমেন্টস',
+  manpower_officer:'👔 শুধু অফিসারদের জন্য', manpower_staff:'🧑‍💼 শুধু স্টাফদের জন্য', manpower_daily:'👷 শুধু দৈনিক শ্রমিকদের জন্য',
+};
+
 function openCustomFieldManager(module, refreshTargetId){
   document.getElementById('cfModule').value = module;
   document.getElementById('cfRefreshTarget').value = refreshTargetId;
   document.getElementById('cfLabel').value='';
   document.getElementById('cfOptions').value='';
   document.getElementById('cfType').value='text';
+  const lbl = CF_MODULE_LABELS[module];
+  document.getElementById('cfModuleLabel').textContent = lbl ? `এই কাস্টম ফিল্ডগুলো ${lbl} প্রযোজ্য হবে — অন্য ক্যাটাগরিতে দেখা যাবে না।` : '';
   toggleCfOptionsField();
   renderCfDefList();
   openModal('modalCustomField');
