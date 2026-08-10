@@ -177,7 +177,8 @@ function exportExcel(type){
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `কার্যক্রম ${MN[M]} ${Y}`.slice(0,31));
     } else if(type==='docs'){
       const docs=getDocs();
-      const rows=docs.map(d=>({'নাম':d.name,'ধরন':d.item_type==='folder'?'ফোল্ডার':'ফাইল','ক্যাটাগরি ট্যাগ':(d.tags||[]).join(', '),'সাইজ (বাইট)':d.size_bytes||'','শাখা':DEPT[d.dept]?.name||d.dept,'তৈরি হয়েছে':d.created_at?new Date(d.created_at).toLocaleString('bn-BD'):''}));
+      const typeLabel = d => d.item_type==='folder'?'ফোল্ডার':d.item_type==='note'?'নোট':'ফাইল';
+      const rows=docs.map(d=>({'নাম':d.name,'ধরন':typeLabel(d),'ক্যাটাগরি ট্যাগ':(d.tags||[]).join(', '),'নোট':d.note_content||'','সাইজ (বাইট)':d.size_bytes||'','শাখা':DEPT[d.dept]?.name||d.dept,'তৈরি হয়েছে':d.created_at?new Date(d.created_at).toLocaleString('bn-BD'):''}));
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), 'ফাইল তালিকা');
     }
     XLSX.writeFile(wb, `BGFCL_${type}_${new Date().toISOString().slice(0,10)}.xlsx`);

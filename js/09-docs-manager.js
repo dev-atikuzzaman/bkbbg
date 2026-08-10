@@ -117,13 +117,14 @@ function renderDocTagBar(){
 function renderDocGrid(list){
   const wrap=document.getElementById('docGridWrap');
   if(!list.length){
-    wrap.innerHTML=`<div class="empty-st" style="grid-column:1/-1;"><div class="ei">📭</div><p>${docSearchQuery?'কিছু পাওয়া যায়নি':'এই ফোল্ডার খালি — নতুন ফোল্ডার বা ফাইল যোগ করুন'}</p></div>`;
+    wrap.innerHTML=`<div class="empty-st" style="grid-column:1/-1;"><div class="ei">📭</div><p>${docSearchQuery?'কিছু পাওয়া যায়নি':'এই ফোল্ডার খালি — নতুন ফোল্ডার, ফাইল বা নোট যোগ করুন'}</p></div>`;
     return;
   }
   wrap.innerHTML = list.map(d=>{
     const isFolder=d.item_type==='folder';
-    const thumb = isFolder ? '📁' : (d.mime_type&&d.mime_type.startsWith('image/') ? `<img src="${supaStoragePublicUrl(d.storage_path)}" loading="lazy" draggable="false"/>` : docIconFor(d.mime_type));
-    const meta = isFolder ? '' : humanSize(d.size_bytes);
+    const isNote=d.item_type==='note';
+    const thumb = isFolder ? '📁' : isNote ? '📝' : (d.mime_type&&d.mime_type.startsWith('image/') ? `<img src="${supaStoragePublicUrl(d.storage_path)}" loading="lazy" draggable="false"/>` : docIconFor(d.mime_type));
+    const meta = isFolder ? '' : isNote ? escHtml((d.note_content||'').slice(0,40)) : humanSize(d.size_bytes);
     const dragAttrs = (!docSelectMode && isFolder) ? `ondragover="docDragOver(event)" ondragleave="docDragLeave(event)" ondrop="docDrop(event,'${d.id}')"` : '';
     const checkbox = docSelectMode ? `<div class="doc-select-box${docSelected.has(d.id)?' checked':''}">${docSelected.has(d.id)?'✓':''}</div>` : `<button class="doc-card-menu-btn" onclick="event.stopPropagation();openDocCtxMenu(event,'${d.id}')">⋮</button>`;
     return `<div class="doc-card${docSelectMode?' selectable':''}" draggable="${!docSelectMode}" data-id="${d.id}" data-type="${d.item_type}"
@@ -139,13 +140,14 @@ function renderDocGrid(list){
 function renderDocListView(list){
   const wrap=document.getElementById('docListWrap');
   if(!list.length){
-    wrap.innerHTML=`<div class="empty-st"><div class="ei">📭</div><p>${docSearchQuery?'কিছু পাওয়া যায়নি':'এই ফোল্ডার খালি — নতুন ফোল্ডার বা ফাইল যোগ করুন'}</p></div>`;
+    wrap.innerHTML=`<div class="empty-st"><div class="ei">📭</div><p>${docSearchQuery?'কিছু পাওয়া যায়নি':'এই ফোল্ডার খালি — নতুন ফোল্ডার, ফাইল বা নোট যোগ করুন'}</p></div>`;
     return;
   }
   wrap.innerHTML = list.map(d=>{
     const isFolder=d.item_type==='folder';
-    const icon = isFolder ? '📁' : (d.mime_type&&d.mime_type.startsWith('image/') ? `<img src="${supaStoragePublicUrl(d.storage_path)}" loading="lazy" draggable="false"/>` : docIconFor(d.mime_type));
-    const meta = isFolder ? `${getDocs().filter(x=>x.parent_id===d.id).length} আইটেম` : humanSize(d.size_bytes);
+    const isNote=d.item_type==='note';
+    const icon = isFolder ? '📁' : isNote ? '📝' : (d.mime_type&&d.mime_type.startsWith('image/') ? `<img src="${supaStoragePublicUrl(d.storage_path)}" loading="lazy" draggable="false"/>` : docIconFor(d.mime_type));
+    const meta = isFolder ? `${getDocs().filter(x=>x.parent_id===d.id).length} আইটেম` : isNote ? escHtml((d.note_content||'').slice(0,30)) : humanSize(d.size_bytes);
     const dragAttrs = (!docSelectMode && isFolder) ? `ondragover="docDragOver(event)" ondragleave="docDragLeave(event)" ondrop="docDrop(event,'${d.id}')"` : '';
     const checkbox = docSelectMode ? `<div class="doc-select-box${docSelected.has(d.id)?' checked':''}">${docSelected.has(d.id)?'✓':''}</div>` : '';
     const menuBtn = docSelectMode ? '' : `<button class="doc-list-menu-btn" onclick="event.stopPropagation();openDocCtxMenu(event,'${d.id}')">⋮</button>`;
@@ -165,6 +167,7 @@ function docCardClick(id){
   if(docSelectMode){ toggleDocSelection(id); return; }
   const d=getDocs().find(x=>x.id===id); if(!d) return;
   if(d.item_type==='folder') docNavigateTo(id);
+  else if(d.item_type==='note') openNotePreview(id);
   else openDocPreview(id);
 }
 
@@ -230,14 +233,14 @@ function bulkCopyDocsStart(){
   const ids=[...docSelected];
   if(!ids.length) return;
   const items = ids.map(id=>getDocs().find(x=>x.id===id)).filter(Boolean);
-  const files = items.filter(d=>d.item_type==='file'); // ফোল্ডার কপি সাপোর্ট করা হয় না (একক কপিতেও না)
-  if(!files.length){ toast('⚠️ কপি করার জন্য অন্তত একটা ফাইল নির্বাচন করুন — ফোল্ডার কপি করা যায় না'); return; }
-  const noPerm = files.find(d=>!canEdit(d.dept));
+  const copyable = items.filter(d=>d.item_type==='file'||d.item_type==='note'); // ফোল্ডার কপি সাপোর্ট করা হয় না
+  if(!copyable.length){ toast('⚠️ কপি করার জন্য অন্তত একটা ফাইল বা নোট নির্বাচন করুন — ফোল্ডার কপি করা যায় না'); return; }
+  const noPerm = copyable.find(d=>!canEdit(d.dept));
   if(noPerm){ toast(`⚠️ "${noPerm.name}"-এর জন্য অনুমতি নেই`); return; }
   document.getElementById('moveDocId').value='__bulk__';
   document.getElementById('moveDocMode').value='bulk-copy';
-  const skipped = items.length - files.length;
-  document.getElementById('moveDocTitle').textContent = `📄 ${files.length}টি ফাইল কপি করুন — গন্তব্য বেছে নিন${skipped?` (${skipped}টি ফোল্ডার বাদ)`:''}`;
+  const skipped = items.length - copyable.length;
+  document.getElementById('moveDocTitle').textContent = `📄 ${copyable.length}টি আইটেম কপি করুন — গন্তব্য বেছে নিন${skipped?` (${skipped}টি ফোল্ডার বাদ)`:''}`;
   renderMoveDocTreeMulti(ids);
   openModal('modalMoveDoc');
 }
@@ -255,11 +258,11 @@ async function confirmBulkMove(targetFolderId){
   const mode=document.getElementById('moveDocMode').value;
   closeModal('modalMoveDoc');
   if(mode==='bulk-copy'){
-    const files = ids.map(id=>getDocs().find(x=>x.id===id)).filter(d=>d && d.item_type==='file');
-    toast(`⏳ ${files.length}টি ফাইল কপি হচ্ছে...`);
-    for(const f of files) await copyDocItem(f.id, targetFolderId);
+    const copyable = ids.map(id=>getDocs().find(x=>x.id===id)).filter(d=>d && (d.item_type==='file'||d.item_type==='note'));
+    toast(`⏳ ${copyable.length}টি আইটেম কপি হচ্ছে...`);
+    for(const f of copyable) await copyDocItem(f.id, targetFolderId);
     docSelected.clear(); docSelectMode=false;
-    renderDocs(); toast(`✅ ${files.length}টি ফাইল কপি হয়েছে`);
+    renderDocs(); toast(`✅ ${copyable.length}টি আইটেম কপি হয়েছে`);
   }else{
     ids.forEach(id=>moveDocItem(id, targetFolderId));
     docSelected.clear(); docSelectMode=false;
@@ -272,11 +275,13 @@ function openDocCtxMenu(evt, id){
   const d=getDocs().find(x=>x.id===id); if(!d) return;
   const menu=document.getElementById('docCtxMenu');
   const isFolder=d.item_type==='folder';
+  const isFile=d.item_type==='file';
+  const isNote=d.item_type==='note';
   let html='';
   html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openRenameDoc('${id}')">✏️ এডিট / রিনেম</button>`;
   html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openMoveDoc('${id}','move')">📂 মুভ করুন</button>`;
-  if(!isFolder) html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openMoveDoc('${id}','copy')">📄 কপি করুন</button>`;
-  if(!isFolder) html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();window.open(supaStoragePublicUrl('${d.storage_path}'),'_blank')">⬇️ ডাউনলোড</button>`;
+  if(isFile||isNote) html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openMoveDoc('${id}','copy')">📄 কপি করুন</button>`;
+  if(isFile) html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();window.open(supaStoragePublicUrl('${d.storage_path}'),'_blank')">⬇️ ডাউনলোড</button>`;
   html+=`<button class="doc-ctx-item" onclick="closeDocCtxMenu();openDocDetails('${id}')">ℹ️ বিস্তারিত</button>`;
   html+=`<button class="doc-ctx-item danger" onclick="closeDocCtxMenu();deleteDocItem('${id}')">🗑️ মুছুন</button>`;
   menu.innerHTML=html;
@@ -377,6 +382,13 @@ function openRenameDoc(id){
   document.getElementById('renameDocId').value=id;
   document.getElementById('renameDocName').value=d.name;
   document.getElementById('renameDocTags').value=(d.tags||[]).join(', ');
+  const noteWrap=document.getElementById('renameNoteContentWrap');
+  if(d.item_type==='note'){
+    noteWrap.style.display='';
+    document.getElementById('renameNoteContent').value = d.note_content||'';
+  }else{
+    noteWrap.style.display='none';
+  }
   _cfValueCache.docs = d.custom_fields || {};
   renderCustomFieldInputs('docs','renameCustomFields', d.custom_fields||{});
   openModal('modalRenameDoc');
@@ -389,12 +401,16 @@ async function confirmRenameDoc(){
   const tags=document.getElementById('renameDocTags').value.split(',').map(t=>t.trim()).filter(Boolean);
   const customFields = await collectCustomFieldValues('renameCustomFields', docs[idx].custom_fields||{});
   const oldName = docs[idx].name;
-  docs[idx]={...docs[idx],name,tags,custom_fields:customFields,updated_at:new Date().toISOString()};
+  const patch = {name, tags, custom_fields:customFields, updated_at:new Date().toISOString()};
+  if(docs[idx].item_type==='note'){
+    patch.note_content = document.getElementById('renameNoteContent').value;
+  }
+  docs[idx]={...docs[idx],...patch};
   saveDocs(docs);
   logAudit('docs', 'rename', name, oldName!==name ? `আগের নাম: ${oldName}` : null);
   closeModal('modalRenameDoc');
   renderDocs(); toast('✅ আপডেট হয়েছে');
-  if(supaOk) supa(CFG.TABLE_DOCS+'?id=eq.'+id,'PATCH',{name,tags,custom_fields:customFields,updated_at:docs[idx].updated_at}).catch(notifyCloudSyncFail);
+  if(supaOk) supa(CFG.TABLE_DOCS+'?id=eq.'+id,'PATCH',patch).catch(notifyCloudSyncFail);
 }
 
 // ── মুভ / কপি ──
@@ -436,14 +452,20 @@ function moveDocItem(id, targetFolderId){
   if(supaOk) supa(CFG.TABLE_DOCS+'?id=eq.'+id,'PATCH',{parent_id:targetFolderId,updated_at:docs[idx].updated_at}).catch(notifyCloudSyncFail);
 }
 async function copyDocItem(id, targetFolderId){
-  const d=getDocs().find(x=>x.id===id); if(!d || d.item_type!=='file') return;
+  const d=getDocs().find(x=>x.id===id); if(!d || (d.item_type!=='file' && d.item_type!=='note')) return;
   toast('⏳ কপি হচ্ছে...');
   try{
-    const ext=d.storage_path.includes('.') ? d.storage_path.slice(d.storage_path.lastIndexOf('.')) : '';
-    const newPath=`${d.dept}/${crypto.randomUUID()}${ext}`;
-    await supaStorageCopy(d.storage_path, newPath);
     const now=new Date().toISOString();
-    const nd={...d,id:crypto.randomUUID(),parent_id:targetFolderId,storage_path:newPath,created_at:now,updated_at:now};
+    let nd;
+    if(d.item_type==='note'){
+      // নোট — কোনো Storage অপারেশন লাগে না, শুধু ডেটা কপি
+      nd={...d,id:crypto.randomUUID(),parent_id:targetFolderId,created_at:now,updated_at:now};
+    }else{
+      const ext=d.storage_path.includes('.') ? d.storage_path.slice(d.storage_path.lastIndexOf('.')) : '';
+      const newPath=`${d.dept}/${crypto.randomUUID()}${ext}`;
+      await supaStorageCopy(d.storage_path, newPath);
+      nd={...d,id:crypto.randomUUID(),parent_id:targetFolderId,storage_path:newPath,created_at:now,updated_at:now};
+    }
     const docs=getDocs(); docs.push(nd); saveDocs(docs);
     logAudit('docs', 'copy', nd.name, `গন্তব্য: ${docFolderPathLabel(targetFolderId)||'রুট'}`);
     renderDocs(); toast('✅ কপি হয়েছে');
@@ -468,7 +490,7 @@ function deleteDocItem(id){
   const victims=collectDocDescendants(id);
   const msg = d.item_type==='folder'
     ? `এই ফোল্ডার ও এর ভেতরের সব কিছু (মোট ${victims.length}টি আইটেম) মুছে দেবেন?`
-    : 'এই ফাইলটি মুছে দেবেন?';
+    : d.item_type==='note' ? 'এই নোটটি মুছে দেবেন?' : 'এই ফাইলটি মুছে দেবেন?';
   if(!confirm(msg)) return;
   const victimIds=new Set(victims.map(v=>v.id));
   const storagePaths=victims.filter(v=>v.storage_path).map(v=>v.storage_path);
@@ -483,9 +505,10 @@ function deleteDocItem(id){
 function openDocDetails(id){
   const d=getDocs().find(x=>x.id===id); if(!d) return;
   const box=document.getElementById('docDetailsBody');
+  const typeLabel = d.item_type==='folder' ? 'ফোল্ডার' : d.item_type==='note' ? 'নোট' : (d.mime_type||'—');
   const rows=[
     ['নাম', d.name],
-    ['ধরন', d.item_type==='folder'?'ফোল্ডার':(d.mime_type||'—')],
+    ['ধরন', typeLabel],
     ['শাখা', DEPT[d.dept]?.name||d.dept],
     ['ক্যাটাগরি ট্যাগ', (d.tags||[]).join(', ')||'—'],
     ['অবস্থান', docFolderPathLabel(d.parent_id)||'রুট'],
@@ -502,7 +525,11 @@ function openDocDetails(id){
     if(String(v).startsWith('data:image')) cfHtml += `<div style="padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:13px;"><span style="color:var(--muted);">${escHtml(k)}</span><br/><img src="${v}" class="cf-preview-img" style="margin-top:6px;"/></div>`;
     else cfHtml += `<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:13px;"><span style="color:var(--muted);flex-shrink:0;">${escHtml(k)}</span><span style="font-weight:600;text-align:right;word-break:break-word;">${escHtml(String(v))}</span></div>`;
   });
+  const noteHtml = d.item_type==='note'
+    ? `<div style="padding:10px 0;border-bottom:1px solid #F1F5F9;font-size:13px;"><span style="color:var(--muted);">নোট</span><p style="margin-top:6px;white-space:pre-wrap;">${escHtml(d.note_content||'—')}</p></div>`
+    : '';
   box.innerHTML = rows.map(([k,v])=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid #F1F5F9;font-size:13px;"><span style="color:var(--muted);flex-shrink:0;">${k}</span><span style="font-weight:600;text-align:right;word-break:break-word;">${escHtml(String(v))}</span></div>`).join('')
+    + noteHtml
     + cfHtml
     + (d.item_type==='file' ? `<a href="${supaStoragePublicUrl(d.storage_path)}" target="_blank" class="btn-sub" style="display:block;text-align:center;text-decoration:none;margin-top:14px;">⬇️ ডাউনলোড / নতুন ট্যাবে খুলুন</a>` : '');
   openModal('modalDocDetails');
@@ -520,6 +547,52 @@ function openDocPreview(id){
   else if(d.mime_type==='application/pdf') box.innerHTML=`<div style="font-size:48px;">📕</div><a href="${url}" target="_blank" class="btn-sub" style="display:block;text-align:center;text-decoration:none;margin-top:10px;">PDF নতুন ট্যাবে খুলুন</a>`;
   else box.innerHTML=`<div style="font-size:48px;">${docIconFor(d.mime_type)}</div><a href="${url}" target="_blank" class="btn-sub" style="display:block;text-align:center;text-decoration:none;margin-top:10px;">ফাইল খুলুন / ডাউনলোড</a>`;
   openModal('modalDocPreview');
+}
+
+// ═══════════════════════════════════════════════════════
+//  📝 নোট — ফাইল আপলোড ছাড়াই সরাসরি টেক্সট নোট রাখার সুবিধা
+// ═══════════════════════════════════════════════════════
+function openNotePreview(id){
+  const d=getDocs().find(x=>x.id===id); if(!d || d.item_type!=='note') return;
+  document.getElementById('docPreviewTitle').textContent=d.name;
+  const box=document.getElementById('docPreviewBody');
+  const cfDefs = getCustomDefs().docs || [];
+  const cfRows = cfDefs.filter(def=>d.custom_fields && d.custom_fields[def.id]).map(def=>[def.label, d.custom_fields[def.id]]);
+  let cfHtml = cfRows.length ? '<div style="text-align:left;margin-top:14px;border-top:1px solid #F1F5F9;padding-top:10px;">' : '';
+  cfRows.forEach(([k,v])=>{
+    if(String(v).startsWith('data:image')) cfHtml += `<div style="padding:6px 0;font-size:12px;"><span style="color:var(--muted);">${escHtml(k)}</span><br/><img src="${v}" class="cf-preview-img" style="margin-top:4px;"/></div>`;
+    else cfHtml += `<div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;font-size:12px;"><span style="color:var(--muted);">${escHtml(k)}</span><span style="font-weight:600;">${escHtml(String(v))}</span></div>`;
+  });
+  if(cfRows.length) cfHtml += '</div>';
+  const tagsHtml = (d.tags||[]).length ? `<div style="margin-top:10px;">${d.tags.map(t=>`<span class="doc-tag-chip" style="cursor:default;">${escHtml(t)}</span>`).join(' ')}</div>` : '';
+  box.innerHTML = `<div style="text-align:left;white-space:pre-wrap;font-size:14px;line-height:1.7;">${escHtml(d.note_content||'(খালি নোট)')}</div>${tagsHtml}${cfHtml}
+    <button class="btn-sub" style="margin-top:16px;" onclick="closeModal('modalDocPreview');openRenameDoc('${id}')">✏️ এডিট করুন</button>`;
+  openModal('modalDocPreview');
+}
+function openAddNote(){
+  document.getElementById('noteTitle').value='';
+  document.getElementById('noteContent').value='';
+  document.getElementById('noteTags').value='';
+  _cfValueCache.docs = {};
+  renderCustomFieldInputs('docs','noteCustomFields',{});
+  openModal('modalNoteEntry');
+}
+async function saveNote(){
+  const title = document.getElementById('noteTitle').value.trim();
+  if(!title){ toast('⚠️ শিরোনাম দিন'); return; }
+  const content = document.getElementById('noteContent').value;
+  const tags = document.getElementById('noteTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const customFields = await collectCustomFieldValues('noteCustomFields', {});
+  const dept = currentUser?.reqDept||'field';
+  const now = new Date().toISOString();
+  const nn = {id:crypto.randomUUID(), dept, parent_id:docCurrentFolder, item_type:'note', name:title, tags,
+    storage_path:null, mime_type:null, size_bytes:null, duration_seconds:null, note_content:content,
+    custom_fields:customFields, created_at:now, updated_at:now};
+  const docs=getDocs(); docs.push(nn); saveDocs(docs);
+  logAudit('docs', 'create', title, 'নোট তৈরি');
+  closeModal('modalNoteEntry');
+  renderDocs(); toast('✅ নোট যোগ হয়েছে');
+  if(supaOk) supa(CFG.TABLE_DOCS,'POST',nn).catch(notifyCloudSyncFail);
 }
 
 // ── ড্র্যাগ & ড্রপ (পিসি — HTML5 নেটিভ) ──

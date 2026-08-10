@@ -297,6 +297,7 @@ function initApp(){
   document.getElementById('docFileInput').addEventListener('change',function(){
     if(this.files && this.files.length) stageUploadFiles(this.files);
   });
+  document.getElementById('btnAddNote').addEventListener('click', openAddNote);
   // 🆕 হিসাব
   document.getElementById('btnSetGasPrice').addEventListener('click', openSetGasPrice);
   document.getElementById('btnAddGasEntry').addEventListener('click', openAddGasEntry);
