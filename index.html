@@ -1208,7 +1208,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
         <div class="fg" id="mpAlDateWrap" style="display:none;"><label>AL নেয়ার তারিখ</label><input type="date" id="mpAlDate"/></div>
       </div>
       <div id="mpCustomFields"></div>
-      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('manpower','mpCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager(mpModule(),'mpCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন (শুধু এই ধরনের জন্য)</button>
       <button class="btn-sub" onclick="saveManpowerForm()">✅ সংরক্ষণ করুন</button>
     </div>
   </div>
@@ -1313,6 +1313,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     <div class="mbody">
       <input type="hidden" id="cfModule"/>
       <input type="hidden" id="cfRefreshTarget"/>
+      <div id="cfModuleLabel" style="font-size:12px;color:#64748B;margin:-6px 0 12px;"></div>
       <div class="subsec-title">📋 বিদ্যমান কাস্টম ফিল্ড</div>
       <div id="cfDefList" style="margin-bottom:16px;"></div>
       <div class="subsec-title">➕ নতুন কাস্টম ফিল্ড</div>
