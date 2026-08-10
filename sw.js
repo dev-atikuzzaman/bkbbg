@@ -1,5 +1,5 @@
-// BGFCL Inventory Service Worker v3.0 — ফাইল/ফোল্ডারে কাস্টম ফিল্ড (ধাপ ৫) + বাল্ক কপি
-const CACHE_NAME = 'bgfcl-v28';
+// BGFCL Inventory Service Worker v3.1 — ফাইল ট্যাবে "📝 নোট" (কাস্টম ফিল্ডসহ টেক্সট নোট, ফাইল আপলোড ছাড়াই)
+const CACHE_NAME = 'bgfcl-v29';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

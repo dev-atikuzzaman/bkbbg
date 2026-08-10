@@ -802,6 +802,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <label class="btn-p bp-blue" style="cursor:pointer;">⬆️ ফাইল আপলোড
         <input type="file" id="docFileInput" multiple style="display:none"/>
       </label>
+      <button class="btn-p" style="background:#0EA5E9;color:white;" id="btnAddNote">📝 নোট যোগ করুন</button>
       <button class="btn-p" style="background:#166534;color:white;" onclick="exportExcel('docs')">📊 Excel তালিকা</button>
     </div>
 
@@ -1096,6 +1097,21 @@ canvas#mainChart{width:100%!important;max-height:300px;}
   </div>
 </div>
 
+<!-- 🆕 নোট যোগ করা -->
+<div class="mo" id="modalNoteEntry">
+  <div class="modal">
+    <div class="mhdr"><h3>📝 নোট যোগ করুন</h3><button class="btn-x" onclick="closeModal('modalNoteEntry')">✕</button></div>
+    <div class="mbody">
+      <div class="fg"><label>শিরোনাম *</label><input type="text" id="noteTitle" placeholder="যেমন: মিটিং নোট"/></div>
+      <div class="fg"><label>নোট লিখুন</label><textarea id="noteContent" rows="6" style="resize:vertical;" placeholder="এখানে লিখুন..."></textarea></div>
+      <div class="fg"><label>ক্যাটাগরি ট্যাগ (কমা দিয়ে আলাদা, ঐচ্ছিক)</label><input type="text" id="noteTags" placeholder="যেমন: জরুরি, মিটিং"/></div>
+      <div id="noteCustomFields"></div>
+      <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('docs','noteCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
+      <button class="btn-sub" onclick="saveNote()">✅ সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
 <!-- 🆕 আপলোড স্টেজিং (একাধিক ফাইল, ট্যাগ দিয়ে আপলোড) -->
 <div class="mo" id="modalUploadStage">
   <div class="modal">
@@ -1119,6 +1135,7 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       <input type="hidden" id="renameDocId"/>
       <div class="fg"><label>নতুন নাম *</label><input type="text" id="renameDocName"/></div>
       <div class="fg"><label>ক্যাটাগরি ট্যাগ (কমা দিয়ে আলাদা)</label><input type="text" id="renameDocTags"/></div>
+      <div class="fg" id="renameNoteContentWrap" style="display:none;"><label>নোট</label><textarea id="renameNoteContent" rows="6" style="resize:vertical;"></textarea></div>
       <div id="renameCustomFields"></div>
       <button type="button" class="btn-p bp-purple" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="openCustomFieldManager('docs','renameCustomFields')">🧩 আরও কাস্টম ফিল্ড যুক্ত করুন</button>
       <button class="btn-sub" onclick="confirmRenameDoc()">✅ সংরক্ষণ করুন</button>
