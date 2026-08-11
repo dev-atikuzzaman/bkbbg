@@ -230,6 +230,7 @@ main{max-width:1100px;margin:0 auto;padding:18px 14px 120px;}
 .in-tag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:7px;background:var(--blue-l);color:#1D4ED8;}
 .btn-di{background:none;border:none;color:#CBD5E1;cursor:pointer;font-size:13px;padding:2px;border-radius:4px;transition:color .15s;}
 .btn-di:hover{color:var(--red);}
+.btn-di.cf-edit:hover{color:#2563EB;}
 .btn-ei{background:none;border:none;color:#CBD5E1;cursor:pointer;font-size:12px;padding:2px;border-radius:4px;transition:color .15s;}
 .btn-ei:hover{color:var(--blue);}
 .btn-expand{width:100%;background:none;border:none;border-top:1px solid var(--border);padding:8px;font-family:var(--f);font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;text-align:center;transition:background .15s;}
@@ -1313,10 +1314,11 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     <div class="mbody">
       <input type="hidden" id="cfModule"/>
       <input type="hidden" id="cfRefreshTarget"/>
+      <input type="hidden" id="cfEditingId"/>
       <div id="cfModuleLabel" style="font-size:12px;color:#64748B;margin:-6px 0 12px;"></div>
       <div class="subsec-title">📋 বিদ্যমান কাস্টম ফিল্ড</div>
       <div id="cfDefList" style="margin-bottom:16px;"></div>
-      <div class="subsec-title">➕ নতুন কাস্টম ফিল্ড</div>
+      <div class="subsec-title">➕ নতুন কাস্টম ফিল্ড / এডিট</div>
       <div class="fg"><label>ফিল্ডের নাম *</label><input type="text" id="cfLabel" placeholder="যেমন: গ্রেড / রক্তের গ্রুপ / ছবি"/></div>
       <div class="fg"><label>ফিল্ডের ধরন *</label>
         <select id="cfType" onchange="toggleCfOptionsField()">
@@ -1329,7 +1331,10 @@ canvas#mainChart{width:100%!important;max-height:300px;}
         <label>ড্রপডাউন অপশনসমূহ (কমা দিয়ে আলাদা করুন) *</label>
         <input type="text" id="cfOptions" placeholder="যেমন: A+, A-, B+, B-, O+, O-"/>
       </div>
-      <button class="btn-sub" onclick="addCustomFieldDef()">✅ কাস্টম ফিল্ড যোগ করুন</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-sub" id="cfSaveBtn" style="flex:1;" onclick="addCustomFieldDef()">➕ যোগ করুন</button>
+        <button class="btn-sub" id="cfCancelEditBtn" style="display:none;flex:0 0 auto;background:#94A3B8;" onclick="cancelEditCustomFieldDef()">বাতিল</button>
+      </div>
     </div>
   </div>
 </div>
