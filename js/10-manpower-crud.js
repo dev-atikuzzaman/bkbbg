@@ -28,8 +28,41 @@ function resetManpowerForm(){
   document.getElementById('mpClRemain').value='';
   document.getElementById('mpOtherRemain').value='';
   document.getElementById('mpAlTaken').value='no';
+  setManpowerPhotoPreview(null);
+  document.getElementById('mpPhotoInput').value='';
   toggleManpowerFields();
   toggleAlDateField();
+}
+
+// প্রোফাইল ছবি প্রিভিউ (গোলাকার) দেখানো/লুকানো — ফটো থাকলে ছবি, না থাকলে প্লেসহোল্ডার আইকন
+function setManpowerPhotoPreview(dataUrl){
+  document.getElementById('mpPhotoData').value = dataUrl || '';
+  const img = document.getElementById('mpPhotoPreview');
+  const ph  = document.getElementById('mpPhotoPlaceholder');
+  const rmBtn = document.getElementById('mpPhotoRemoveBtn');
+  if(dataUrl){
+    img.src = dataUrl; img.style.display='';
+    ph.style.display='none';
+    rmBtn.style.display='';
+  } else {
+    img.src=''; img.style.display='none';
+    ph.style.display='flex';
+    rmBtn.style.display='none';
+  }
+}
+
+async function onManpowerPhotoChange(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  try{
+    const dataUrl = await readFileAsDataURL(file);
+    setManpowerPhotoPreview(dataUrl);
+  }catch(err){ toast('⚠️ ছবি পড়া যায়নি'); }
+}
+
+function removeManpowerPhoto(){
+  setManpowerPhotoPreview(null);
+  document.getElementById('mpPhotoInput').value='';
 }
 
 function openAddManpower(){
@@ -58,6 +91,7 @@ function openEditManpower(id){
   document.getElementById('mpOtherRemain').value=m.other_leave_remaining ?? '';
   document.getElementById('mpAlTaken').value=m.al_taken||'no';
   document.getElementById('mpAlDate').value=m.al_date||'';
+  setManpowerPhotoPreview(m.photo||null);
   document.getElementById('modalManpowerTitle').textContent='✏️ জনবল সম্পাদনা';
   toggleAlDateField();
   _mpFormCFValues = m.customFields||{};
@@ -83,6 +117,7 @@ async function saveManpowerForm(){
     designation: document.getElementById('mpDesig').value.trim(),
     phone: document.getElementById('mpPhone').value.trim(),
     address: document.getElementById('mpAddress').value.trim(),
+    photo: document.getElementById('mpPhotoData').value || null,
     cl_last_date:null, cl_remaining:0, other_leave_last_date:null, other_leave_remaining:0, al_taken:'no', al_date:null,
     customFields,
   };

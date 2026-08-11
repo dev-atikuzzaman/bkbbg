@@ -18,6 +18,7 @@ function renderManpower(){
   renderOfficerTable(officer);
   renderStaffTable(staff);
   renderDailyTable(daily);
+  renderManpowerProfileOverview();
 }
 
 // সারাংশ কার্ডের নিচে কোন শাখায় কতজন আছেন তার হিসাব (নামের বদলে)
@@ -30,6 +31,89 @@ function renderNameChips(elId, list){
   box.innerHTML = deptNames.map(k=>{
     const label = DEPT[k]?.name || k;
     return `<span class="snm">${escHtml(label)} - ${counts[k]} জন</span>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  ওভারভিউ প্রোফাইল কার্ড (অফিসার/স্টাফ/দৈনিক শ্রমিক কার্ডে ক্লিক করলে)
+// ═══════════════════════════════════════════════════════
+let _mpOverviewType = null; // null মানে বন্ধ; নাহলে 'officer' | 'staff' | 'daily'
+
+const MP_OVERVIEW_META = {
+  officer: {title:'🎖️ অফিসারদের প্রোফাইল ওভারভিউ', emptyMsg:'কোনো অফিসারের তথ্য নেই', module:'manpower_officer'},
+  staff:   {title:'🧑‍💼 স্টাফদের প্রোফাইল ওভারভিউ', emptyMsg:'কোনো স্টাফের তথ্য নেই', module:'manpower_staff'},
+  daily:   {title:'👷 দৈনিক শ্রমিকদের প্রোফাইল ওভারভিউ', emptyMsg:'কোনো দৈনিক শ্রমিকের তথ্য নেই', module:'manpower_daily'},
+};
+
+function toggleManpowerOverview(type){
+  _mpOverviewType = (_mpOverviewType===type) ? null : type;
+  renderManpowerProfileOverview();
+}
+
+function closeManpowerOverview(){
+  _mpOverviewType = null;
+  renderManpowerProfileOverview();
+}
+
+// কাস্টম ফিল্ডগুলোর মধ্যে "পিএফ" / "জেএস" লেবেলযুক্ত ফিল্ড খুঁজে তার মান বের করা হয়
+function findPfJsValue(m){
+  const defs = (getCustomDefs()[MP_OVERVIEW_META[m.type]?.module] || []);
+  const match = defs.find(d=>{
+    const l = (d.label||'').toLowerCase();
+    return l.includes('পিএফ') || l.includes('জেএস') || l.includes('pf') || l.includes('js');
+  });
+  if(!match) return null;
+  return (m.customFields && m.customFields[match.id]) || null;
+}
+
+function renderManpowerProfileOverview(){
+  const overviewBox   = document.getElementById('manpowerProfileOverview');
+  const officerTitle  = document.getElementById('officerTableTitle');
+  const officerSec    = document.getElementById('officerTableSec');
+  const staffTitle    = document.getElementById('staffTableTitle');
+  const staffSec      = document.getElementById('staffTableSec');
+  const dailyTitle    = document.getElementById('dailyTableTitle');
+  const dailySec      = document.getElementById('dailyTableSec');
+
+  if(!_mpOverviewType){
+    overviewBox.style.display='none';
+    [officerTitle,officerSec,staffTitle,staffSec,dailyTitle,dailySec].forEach(el=>{ if(el) el.style.display=''; });
+    return;
+  }
+
+  // যে ক্যাটাগরির প্রোফাইল ওভারভিউ দেখানো হচ্ছে, শুধু সেই ক্যাটাগরির তালিকা লুকানো হয়
+  const hideMap = {
+    officer:[officerTitle,officerSec],
+    staff:[staffTitle,staffSec],
+    daily:[dailyTitle,dailySec],
+  };
+  [officerTitle,officerSec,staffTitle,staffSec,dailyTitle,dailySec].forEach(el=>{ if(el) el.style.display=''; });
+  (hideMap[_mpOverviewType]||[]).forEach(el=>{ if(el) el.style.display='none'; });
+
+  overviewBox.style.display='';
+  document.querySelector('#manpowerProfileOverviewTitle span').textContent = MP_OVERVIEW_META[_mpOverviewType].title;
+
+  const list = getFM().filter(m=>m.type===_mpOverviewType);
+  const grid = document.getElementById('manpowerProfileGrid');
+  if(!list.length){
+    grid.innerHTML = `<div class="pc-empty-msg">${MP_OVERVIEW_META[_mpOverviewType].emptyMsg}</div>`;
+    return;
+  }
+  grid.innerHTML = list.map(m=>{
+    const cfg = DEPT[m.dept]||{color:'#64748B',name:m.dept};
+    const pfJs = findPfJsValue(m);
+    const photoHtml = m.photo
+      ? `<img class="pc-photo" src="${escHtml(m.photo)}"/>`
+      : `<div class="pc-photo-ph">👤</div>`;
+    return `
+      <div class="profile-card">
+        ${photoHtml}
+        <div class="pc-name">${escHtml(m.name)}</div>
+        <div class="pc-desig">${escHtml(m.designation)||'—'}</div>
+        <div class="pc-dept" style="background:${cfg.color}22;color:${cfg.color};">${escHtml(cfg.name)}</div>
+        <div class="pc-row">পিএফ নং/জেএস নং: ${pfJs ? escHtml(pfJs) : '—'}</div>
+        <div class="pc-row">📞 ${escHtml(m.phone)||'—'}</div>
+      </div>`;
   }).join('');
 }
 
