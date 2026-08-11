@@ -20,11 +20,17 @@ function renderManpower(){
   renderDailyTable(daily);
 }
 
-// সারাংশ কার্ডের নিচে কে কে আছেন তার নামের তালিকা (ড্যাশবোর্ড ভিউ)
+// সারাংশ কার্ডের নিচে কোন শাখায় কতজন আছেন তার হিসাব (নামের বদলে)
 function renderNameChips(elId, list){
   const box=document.getElementById(elId);
   if(!list.length){ box.innerHTML='<span class="snm-empty">কেউ নেই</span>'; return; }
-  box.innerHTML = list.map(m=>`<span class="snm">${escHtml(m.name)}</span>`).join('');
+  const counts = {};
+  list.forEach(m=>{ const k=m.dept||'—'; counts[k]=(counts[k]||0)+1; });
+  const deptNames = Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+  box.innerHTML = deptNames.map(k=>{
+    const label = DEPT[k]?.name || k;
+    return `<span class="snm">${escHtml(label)} - ${counts[k]} জন</span>`;
+  }).join('');
 }
 
 function cfThHtml(defs){ return defs.map(d=>`<th>${escHtml(d.label)}</th>`).join(''); }
