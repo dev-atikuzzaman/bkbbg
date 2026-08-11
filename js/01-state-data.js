@@ -189,9 +189,12 @@ const CF_MODULE_LABELS = {
 function openCustomFieldManager(module, refreshTargetId){
   document.getElementById('cfModule').value = module;
   document.getElementById('cfRefreshTarget').value = refreshTargetId;
+  document.getElementById('cfEditingId').value = '';
   document.getElementById('cfLabel').value='';
   document.getElementById('cfOptions').value='';
   document.getElementById('cfType').value='text';
+  document.getElementById('cfSaveBtn').textContent = '➕ যোগ করুন';
+  document.getElementById('cfCancelEditBtn').style.display = 'none';
   const lbl = CF_MODULE_LABELS[module];
   document.getElementById('cfModuleLabel').textContent = lbl ? `এই কাস্টম ফিল্ডগুলো ${lbl} প্রযোজ্য হবে — অন্য ক্যাটাগরিতে দেখা যাবে না।` : '';
   toggleCfOptionsField();
@@ -215,31 +218,76 @@ function renderCfDefList(){
   box.innerHTML = defs.map(d=>`
     <div class="cf-row">
       <div style="font-size:13px;"><strong>${escHtml(d.label)}</strong> <span style="color:#94A3B8;font-size:11px;">(${typeLabel[d.type]||d.type})</span></div>
-      <button class="btn-di" onclick="deleteCustomFieldDef('${module}','${d.id}')" title="মুছুন">🗑️</button>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-di cf-edit" onclick="startEditCustomFieldDef('${module}','${d.id}')" title="এডিট করুন" style="color:#2563EB;">✏️</button>
+        <button class="btn-di" onclick="deleteCustomFieldDef('${module}','${d.id}')" title="মুছুন">🗑️</button>
+      </div>
     </div>`).join('');
+}
+
+function startEditCustomFieldDef(module, id){
+  const def = (getCustomDefs()[module]||[]).find(d=>d.id===id);
+  if(!def) return;
+  document.getElementById('cfEditingId').value = id;
+  document.getElementById('cfLabel').value = def.label;
+  document.getElementById('cfType').value = def.type;
+  document.getElementById('cfOptions').value = (def.options||[]).join(', ');
+  toggleCfOptionsField();
+  document.getElementById('cfSaveBtn').textContent = '✅ আপডেট করুন';
+  document.getElementById('cfCancelEditBtn').style.display = '';
+  document.getElementById('cfLabel').focus();
+}
+
+function cancelEditCustomFieldDef(){
+  document.getElementById('cfEditingId').value = '';
+  document.getElementById('cfLabel').value = '';
+  document.getElementById('cfOptions').value = '';
+  document.getElementById('cfType').value = 'text';
+  toggleCfOptionsField();
+  document.getElementById('cfSaveBtn').textContent = '➕ যোগ করুন';
+  document.getElementById('cfCancelEditBtn').style.display = 'none';
 }
 
 function addCustomFieldDef(){
   const module = document.getElementById('cfModule').value;
+  const editingId = document.getElementById('cfEditingId').value;
   const label  = document.getElementById('cfLabel').value.trim();
   if(!label){ toast('⚠️ ফিল্ডের নাম দিন'); return; }
   const type = document.getElementById('cfType').value;
-  const def = {id:crypto.randomUUID(), label, type};
+  let options;
   if(type==='dropdown'){
-    const opts = document.getElementById('cfOptions').value.split(',').map(s=>s.trim()).filter(Boolean);
-    if(!opts.length){ toast('⚠️ অপশনগুলো কমা দিয়ে আলাদা করে লিখুন'); return; }
-    def.options = opts;
+    options = document.getElementById('cfOptions').value.split(',').map(s=>s.trim()).filter(Boolean);
+    if(!options.length){ toast('⚠️ অপশনগুলো কমা দিয়ে আলাদা করে লিখুন'); return; }
   }
+
   const defs = getCustomDefs();
   defs[module] = defs[module] || [];
-  defs[module].push(def);
-  saveCustomDefs(defs);
-  document.getElementById('cfLabel').value='';
-  document.getElementById('cfOptions').value='';
-  renderCfDefList();
-  refreshOpenFormCustomFields();
-  renderCurrentTab(); // নতুন ফিল্ড টেবিলের কলামেও যোগ হোক
-  toast('✅ কাস্টম ফিল্ড যোগ হয়েছে');
+
+  if(editingId){
+    // বিদ্যমান কাস্টম ফিল্ড এডিট (id অপরিবর্তিত থাকে, তাই আগের এন্ট্রির ডেটা ঠিক থাকে)
+    const idx = defs[module].findIndex(d=>d.id===editingId);
+    if(idx===-1){ toast('⚠️ ফিল্ডটি খুঁজে পাওয়া যায়নি'); return; }
+    const updated = {id:editingId, label, type};
+    if(type==='dropdown') updated.options = options;
+    defs[module][idx] = updated;
+    saveCustomDefs(defs);
+    cancelEditCustomFieldDef();
+    renderCfDefList();
+    refreshOpenFormCustomFields();
+    renderCurrentTab();
+    toast('✅ কাস্টম ফিল্ড আপডেট হয়েছে');
+  } else {
+    const def = {id:crypto.randomUUID(), label, type};
+    if(type==='dropdown') def.options = options;
+    defs[module].push(def);
+    saveCustomDefs(defs);
+    document.getElementById('cfLabel').value='';
+    document.getElementById('cfOptions').value='';
+    renderCfDefList();
+    refreshOpenFormCustomFields();
+    renderCurrentTab(); // নতুন ফিল্ড টেবিলের কলামেও যোগ হোক
+    toast('✅ কাস্টম ফিল্ড যোগ হয়েছে');
+  }
 }
 
 function deleteCustomFieldDef(module, id){
@@ -247,6 +295,7 @@ function deleteCustomFieldDef(module, id){
   const defs = getCustomDefs();
   defs[module] = (defs[module]||[]).filter(d=>d.id!==id);
   saveCustomDefs(defs);
+  if(document.getElementById('cfEditingId').value===id) cancelEditCustomFieldDef();
   renderCfDefList();
   refreshOpenFormCustomFields();
   renderCurrentTab();
