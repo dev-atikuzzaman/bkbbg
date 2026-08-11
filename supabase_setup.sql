@@ -119,6 +119,7 @@ create table if not exists public.manpower (
   other_leave_last_date date,
   other_leave_remaining numeric default 0,
   al_taken text default 'no', -- 'yes' | 'no'
+  photo text, -- প্রোফাইল ছবি (base64 data URL হিসেবে সংরক্ষিত)
   created_at timestamptz default now()
 );
 alter table public.manpower enable row level security;

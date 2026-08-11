@@ -196,6 +196,17 @@ main{max-width:1100px;margin:0 auto;padding:18px 14px 120px;}
 .sum-names{margin-top:8px;padding-top:8px;border-top:1px dashed #E2E8F0;font-size:11px;color:#475569;max-height:88px;overflow-y:auto;line-height:1.6;}
 .sum-names .snm{display:inline-block;background:#F1F5F9;border-radius:10px;padding:2px 8px;margin:0 3px 3px 0;}
 .sum-names .snm-empty{color:#CBD5E1;}
+.sum-card-click{cursor:pointer;transition:transform .15s,box-shadow .15s;}
+.sum-card-click:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1);}
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:22px;}
+.profile-card{background:white;border-radius:var(--r);box-shadow:var(--shadow);padding:16px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;}
+.profile-card .pc-photo{width:76px;height:76px;border-radius:50%;object-fit:cover;border:2px solid #E2E8F0;margin-bottom:8px;}
+.profile-card .pc-photo-ph{width:76px;height:76px;border-radius:50%;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:28px;color:#CBD5E1;margin-bottom:8px;}
+.profile-card .pc-name{font-size:14px;font-weight:700;color:var(--navy);}
+.profile-card .pc-desig{font-size:12px;color:#475569;}
+.profile-card .pc-dept{font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-top:2px;}
+.profile-card .pc-row{font-size:11.5px;color:#64748B;}
+.profile-card .pc-empty-msg{grid-column:1/-1;text-align:center;padding:28px;color:#94A3B8;}
 
 /* SECTION TITLE */
 .sec-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
@@ -723,14 +734,23 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     </div>
 
     <div class="sum-grid">
-      <div class="sum-card sc-purple"><div class="si">🎖️</div><div class="sv" id="sumOfficer">0</div><div class="sl">অফিসার</div><div class="sum-names" id="namesOfficer"></div></div>
-      <div class="sum-card sc-green"><div class="si">🧑‍💼</div><div class="sv" id="sumStaff">0</div><div class="sl">স্টাফ</div><div class="sum-names" id="namesStaff"></div></div>
-      <div class="sum-card sc-blue"><div class="si">👷</div><div class="sv" id="sumDaily">0</div><div class="sl">দৈনিক শ্রমিক</div><div class="sum-names" id="namesDaily"></div></div>
+      <div class="sum-card sc-purple sum-card-click" onclick="toggleManpowerOverview('officer')"><div class="si">🎖️</div><div class="sv" id="sumOfficer">0</div><div class="sl">অফিসার</div><div class="sum-names" id="namesOfficer"></div></div>
+      <div class="sum-card sc-green sum-card-click" onclick="toggleManpowerOverview('staff')"><div class="si">🧑‍💼</div><div class="sv" id="sumStaff">0</div><div class="sl">স্টাফ</div><div class="sum-names" id="namesStaff"></div></div>
+      <div class="sum-card sc-blue sum-card-click" onclick="toggleManpowerOverview('daily')"><div class="si">👷</div><div class="sv" id="sumDaily">0</div><div class="sl">দৈনিক শ্রমিক</div><div class="sum-names" id="namesDaily"></div></div>
       <div class="sum-card sc-amber"><div class="si">👥</div><div class="sv" id="sumManTotal">0</div><div class="sl">মোট জনবল</div></div>
     </div>
 
-    <div class="sec-title">🎖️ অফিসার তালিকা</div>
-    <div class="chart-sec">
+    <!-- অফিসার/স্টাফ/দৈনিক শ্রমিক কার্ডে ক্লিক করলে এখানে প্রোফাইল কার্ড আকারে ওভারভিউ দেখানো হয় (নিচের তালিকা লুকিয়ে) -->
+    <div id="manpowerProfileOverview" style="display:none;">
+      <div class="sec-title" id="manpowerProfileOverviewTitle" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <span></span>
+        <button type="button" class="btn-p" style="background:#334155;color:white;" onclick="closeManpowerOverview()">✕ বন্ধ করুন</button>
+      </div>
+      <div class="profile-grid" id="manpowerProfileGrid"></div>
+    </div>
+
+    <div class="sec-title" id="officerTableTitle">🎖️ অফিসার তালিকা</div>
+    <div class="chart-sec" id="officerTableSec">
       <div class="log-wrap">
         <table class="log-table">
           <thead><tr id="officerTheadRow">
@@ -743,8 +763,8 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       </div>
     </div>
 
-    <div class="sec-title">🧑‍💼 স্টাফ তালিকা</div>
-    <div class="chart-sec">
+    <div class="sec-title" id="staffTableTitle">🧑‍💼 স্টাফ তালিকা</div>
+    <div class="chart-sec" id="staffTableSec">
       <div class="log-wrap">
         <table class="log-table">
           <thead><tr id="staffTheadRow">
@@ -757,8 +777,8 @@ canvas#mainChart{width:100%!important;max-height:300px;}
       </div>
     </div>
 
-    <div class="sec-title">👷 দৈনিক শ্রমিক তালিকা</div>
-    <div class="chart-sec">
+    <div class="sec-title" id="dailyTableTitle">👷 দৈনিক শ্রমিক তালিকা</div>
+    <div class="chart-sec" id="dailyTableSec">
       <div class="log-wrap">
         <table class="log-table">
           <thead><tr id="dailyTheadRow">
@@ -1178,6 +1198,16 @@ canvas#mainChart{width:100%!important;max-height:300px;}
     <div class="mhdr"><h3 id="modalManpowerTitle">👷 নতুন জনবল যোগ</h3><button class="btn-x" onclick="closeModal('modalManpower')">✕</button></div>
     <div class="mbody">
       <input type="hidden" id="mpId"/>
+      <input type="hidden" id="mpPhotoData"/>
+      <div class="fg" style="text-align:center;">
+        <label>প্রোফাইল ছবি</label>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <img id="mpPhotoPreview" src="" style="display:none;width:88px;height:88px;border-radius:50%;object-fit:cover;border:2px solid #E2E8F0;"/>
+          <div id="mpPhotoPlaceholder" style="width:88px;height:88px;border-radius:50%;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:30px;color:#CBD5E1;">👤</div>
+          <input type="file" accept="image/*" id="mpPhotoInput" onchange="onManpowerPhotoChange(event)" style="max-width:220px;"/>
+          <button type="button" class="btn-di" id="mpPhotoRemoveBtn" style="display:none;" onclick="removeManpowerPhoto()">🗑️ ছবি সরান</button>
+        </div>
+      </div>
       <div class="fg-row">
         <div class="fg"><label>শাখা *</label>
           <select id="mpDept"><option value="field">ফিল্ড মেইনটেন্যান্স</option><option value="plant">প্লান্ট মেইনটেন্যান্স</option><option value="production">প্রোডাকশন</option><option value="compressor">কম্প্রেসর</option><option value="security">সিকিউরিটি</option><option value="admin">প্রশাসন</option><option value="electric">ইলেক্ট্রিক্যাল</option><option value="generator">জেনারেটর</option><option value="housing">হাউজিং</option><option value="condensate">কনডেনসেট প্রসেসিং</option><option value="firesafety">ফায়ার সেফটি</option><option value="mi_room">এম. আই রুম</option><option value="heavy_vehicle">ভারি যান</option><option value="mechanical">মেকানিক্যাল</option><option value="accounts">একাউন্টস</option></select>
