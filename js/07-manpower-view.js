@@ -55,12 +55,16 @@ function closeManpowerOverview(){
   renderManpowerProfileOverview();
 }
 
-// কাস্টম ফিল্ডগুলোর মধ্যে "পিএফ" / "জেএস" লেবেলযুক্ত ফিল্ড খুঁজে তার মান বের করা হয়
+// কাস্টম ফিল্ডগুলোর মধ্যে "পিএফ" / "জেএস" লেবেলযুক্ত ফিল্ড খুঁজে তার মান বের করা হয়।
+// নিয়ম: অফিসারের ক্ষেত্রে শুধু "পিএফ" (PF) লেবেলযুক্ত ফিল্ড দেখানো হবে, স্টাফের ক্ষেত্রে শুধু
+// "জেএস" (JS) লেবেলযুক্ত ফিল্ড দেখানো হবে, দৈনিক শ্রমিকের ক্ষেত্রে এই ফিল্ড একেবারেই দরকার নেই।
 function findPfJsValue(m){
+  if(m.type!=='officer' && m.type!=='staff') return null;
   const defs = (getCustomDefs()[MP_OVERVIEW_META[m.type]?.module] || []);
   const match = defs.find(d=>{
     const l = (d.label||'').toLowerCase();
-    return l.includes('পিএফ') || l.includes('জেএস') || l.includes('pf') || l.includes('js');
+    if(m.type==='officer') return l.includes('পিএফ') || l.includes('pf');
+    return l.includes('জেএস') || l.includes('js');
   });
   if(!match) return null;
   return (m.customFields && m.customFields[match.id]) || null;
@@ -102,6 +106,7 @@ function renderManpowerProfileOverview(){
   grid.innerHTML = list.map(m=>{
     const cfg = DEPT[m.dept]||{color:'#64748B',name:m.dept};
     const pfJs = findPfJsValue(m);
+    const pfJsLabel = m.type==='officer' ? 'পিএফ নং' : (m.type==='staff' ? 'জেএস নং' : null);
     const photoHtml = m.photo
       ? `<img class="pc-photo" src="${escHtml(m.photo)}"/>`
       : `<div class="pc-photo-ph">👤</div>`;
@@ -111,7 +116,7 @@ function renderManpowerProfileOverview(){
         <div class="pc-name">${escHtml(m.name)}</div>
         <div class="pc-desig">${escHtml(m.designation)||'—'}</div>
         <div class="pc-dept" style="background:${cfg.color}22;color:${cfg.color};">${escHtml(cfg.name)}</div>
-        <div class="pc-row">পিএফ নং/জেএস নং: ${pfJs ? escHtml(pfJs) : '—'}</div>
+        ${pfJsLabel ? `<div class="pc-row">${pfJsLabel}: ${pfJs ? escHtml(pfJs) : '—'}</div>` : ''}
         <div class="pc-row">📞 ${escHtml(m.phone)||'—'}</div>
       </div>`;
   }).join('');
