@@ -113,7 +113,7 @@ function renderManpowerProfileOverview(){
     return `
       <div class="profile-card">
         ${photoHtml}
-        <div class="pc-name">${escHtml(m.name)}</div>
+        <div class="pc-name">${escHtml(mpDisplayName(m))}</div>
         <div class="pc-desig">${escHtml(m.designation)||'—'}</div>
         <div class="pc-dept" style="background:${cfg.color}22;color:${cfg.color};">${escHtml(cfg.name)}</div>
         ${pfJsLabel ? `<div class="pc-row">${pfJsLabel}: ${pfJs ? escHtml(pfJs) : '—'}</div>` : ''}
@@ -123,6 +123,11 @@ function renderManpowerProfileOverview(){
 }
 
 function cfThHtml(defs){ return defs.map(d=>`<th>${escHtml(d.label)}</th>`).join(''); }
+// অফিসার ও স্টাফের নামের আগে "জনাব" যোগ করা হয় (দৈনিক শ্রমিকের ক্ষেত্রে নয়)
+function mpDisplayName(m){
+  const prefix = (m.type==='officer' || m.type==='staff') ? 'জনাব ' : '';
+  return prefix + (m.name||'');
+}
 function cfTdHtml(defs, values={}){
   return defs.map(d=>{
     const v = values && values[d.id];
@@ -148,7 +153,7 @@ function renderDailyTable(list){
     const canE=canEdit(m.dept);
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td><strong>${escHtml(m.name)}</strong></td>
+      <td><strong>${escHtml(mpDisplayName(m))}</strong></td>
       <td>${escHtml(m.designation)||'—'}</td>
       <td>${escHtml(m.phone)||'—'}</td>
       <td>${escHtml(m.address)||'—'}</td>
@@ -177,7 +182,7 @@ function renderOfficerTable(list){
     const canE=canEdit(m.dept);
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td><strong>${escHtml(m.name)}</strong></td>
+      <td><strong>${escHtml(mpDisplayName(m))}</strong></td>
       <td>${escHtml(m.designation)||'—'}</td>
       <td>${escHtml(m.phone)||'—'}</td>
       <td>${escHtml(m.address)||'—'}</td>
@@ -212,7 +217,7 @@ function renderStaffTable(list){
     const canE=canEdit(m.dept);
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td><strong>${escHtml(m.name)}</strong></td>
+      <td><strong>${escHtml(mpDisplayName(m))}</strong></td>
       <td>${escHtml(m.designation)||'—'}</td>
       <td>${escHtml(m.phone)||'—'}</td>
       <td>${escHtml(m.address)||'—'}</td>

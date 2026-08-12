@@ -66,7 +66,7 @@ function runGlobalSearch(qRaw){
       return `
         <div class="profile-card">
           ${photoHtml}
-          <div class="pc-name">${escHtml(m.name)}</div>
+          <div class="pc-name">${escHtml(mpDisplayName(m))}</div>
           <div class="pc-desig">${escHtml(m.designation)||'—'} · ${MP_TYPE_LABEL[m.type]||''}</div>
           <div class="pc-dept" style="background:${cfg.color}22;color:${cfg.color};">${escHtml(cfg.name)}</div>
           ${pfJsLabel ? `<div class="pc-row">${pfJsLabel}: ${pfJs ? escHtml(pfJs) : '—'}</div>` : ''}
