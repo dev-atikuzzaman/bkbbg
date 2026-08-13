@@ -181,6 +181,41 @@ function readFileAsDataURL(file){
   });
 }
 
+// ছবি (বিশেষত মোবাইল ক্যামেরার বড় ফটো, ৩-৮ MB) সরাসরি base64 করে
+// localStorage/Supabase-এ পাঠালে পেজ আটকে যায় বা কোটা ছাড়িয়ে সাইলেন্টলি ব্যর্থ হয়।
+// তাই আপলোডের সময়ই ক্যানভাসে রিসাইজ+কম্প্রেস করে ছোট (সাধারণত ২০-৮০ KB) dataURL বানানো হয়।
+function readImageAsCompressedDataURL(file, maxDim=400, quality=0.75){
+  return new Promise((resolve, reject)=>{
+    if(!file.type || !file.type.startsWith('image/')){
+      reject(new Error('এটি একটি ছবি ফাইল নয়'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onerror = ()=>reject(new Error('ফাইল পড়া যায়নি'));
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onerror = ()=>reject(new Error('ছবি লোড করা যায়নি'));
+      img.onload = ()=>{
+        let {width, height} = img;
+        if(width > height){
+          if(width > maxDim){ height = Math.round(height * maxDim / width); width = maxDim; }
+        } else {
+          if(height > maxDim){ width = Math.round(width * maxDim / height); height = maxDim; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        try{
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        }catch(err){ reject(err); }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 const CF_MODULE_LABELS = {
   items:'মালামাল', activities:'কার্যক্রম', condensate:'কনডেনসেট', docs:'ফাইল/ডকুমেন্টস',
   manpower_officer:'👔 শুধু অফিসারদের জন্য', manpower_staff:'🧑‍💼 শুধু স্টাফদের জন্য', manpower_daily:'👷 শুধু দৈনিক শ্রমিকদের জন্য',
