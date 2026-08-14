@@ -55,12 +55,9 @@ async function onManpowerPhotoChange(e){
   const file = e.target.files && e.target.files[0];
   if(!file) return;
   try{
-    toast('⏳ ছবি প্রসেস হচ্ছে...');
-    // মোবাইল ক্যামেরার আসল বড় ছবি (কয়েক MB) সরাসরি না নিয়ে ছোট করে (compressed) নেয়া হয়,
-    // যাতে সংরক্ষণের সময় localStorage/ক্লাউড সিঙ্ক আটকে না যায়
-    const dataUrl = await readImageAsCompressedDataURL(file, 400, 0.75);
+    const dataUrl = await readFileAsDataURL(file);
     setManpowerPhotoPreview(dataUrl);
-  }catch(err){ toast('⚠️ ছবি পড়া যায়নি: '+(err?.message||'')); }
+  }catch(err){ toast('⚠️ ছবি পড়া যায়নি'); }
 }
 
 function removeManpowerPhoto(){
@@ -110,20 +107,6 @@ async function saveManpowerForm(){
   const name=document.getElementById('mpName').value.trim();
   if(!name){ toast('⚠️ নাম দিন'); return; }
   const type=document.getElementById('mpType').value;
-
-  // ডাবল-ক্লিক/একাধিকবার সাবমিট ঠেকাতে ও ইউজারকে "কাজ হচ্ছে" বোঝাতে বাটন সাময়িক ডিজেবল করা হয়
-  const saveBtn = document.querySelector('#modalManpower .btn-sub[onclick="saveManpowerForm()"]');
-  if(saveBtn && saveBtn.disabled) return; // ইতিমধ্যে সেভ চলছে
-  const prevBtnText = saveBtn ? saveBtn.textContent : '';
-  if(saveBtn){ saveBtn.disabled = true; saveBtn.textContent = '⏳ সংরক্ষণ হচ্ছে...'; }
-  try{
-    await _saveManpowerFormInner(id, dept, name, type);
-  } finally {
-    if(saveBtn){ saveBtn.disabled = false; saveBtn.textContent = prevBtnText; }
-  }
-}
-
-async function _saveManpowerFormInner(id, dept, name, type){
   const list=getManpower();
   const idx=list.findIndex(m=>m.id===id);
   const existingCF = idx>=0 ? (list[idx].customFields||{}) : {};
@@ -153,14 +136,7 @@ async function _saveManpowerFormInner(id, dept, name, type){
   } else {
     list.push(rec);
   }
-  try{
-    saveManpower(list);
-  }catch(err){
-    // localStorage কোটা ছাড়ালে (সাধারণত অনেক বড় ছবি জমে থাকলে) এখানে ধরা পড়বে,
-    // আগে এটি কোনো বার্তা ছাড়াই মডাল স্টাক করে রাখতো
-    toast('⚠️ সংরক্ষণ ব্যর্থ — ডিভাইসের সংরক্ষণাগার পূর্ণ (ছবি ছোট করে আবার চেষ্টা করুন)');
-    return;
-  }
+  saveManpower(list);
   const typeLabel = type==='officer'?'অফিসার':type==='staff'?'স্টাফ':'দৈনিক শ্রমিক';
   logAudit('manpower', wasEdit?'update':'create', name, typeLabel);
   closeModal('modalManpower');

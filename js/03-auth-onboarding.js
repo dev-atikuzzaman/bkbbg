@@ -40,6 +40,11 @@ async function doLogin(){
         showPendingScreen(p);
         return;
       }
+      if(p.status==='rejected'){
+        hideLoader();
+        toast('⛔ আপনার অ্যাকাউন্ট নিষ্ক্রিয় করা হয়েছে। বিস্তারিত জানতে সুপার অ্যাডমিনের সাথে যোগাযোগ করুন।');
+        return;
+      }
       setCurrentUser({id:p.id,email,role:p.role,name:p.name,dept:p.dept,reqDept:p.req_dept});
     } else {
       setCurrentUser({id:'u',email,role:'viewer',name:email,dept:'',reqDept:''});
@@ -56,11 +61,10 @@ async function doSignup(){
   const name    = document.getElementById('suName').value.trim();
   const desig   = document.getElementById('suDesig').value.trim();
   const dept    = document.getElementById('suDept').value;
-  const reqDept = document.getElementById('suReqDept').value;
   const email   = document.getElementById('suEmail').value.trim();
   const pass    = document.getElementById('suPass').value;
   const pass2   = document.getElementById('suPass2').value;
-  if(!name||!desig||!dept||!reqDept||!email||!pass){ toast('⚠️ সব তথ্য পূরণ করুন'); return; }
+  if(!name||!desig||!dept||!email||!pass){ toast('⚠️ সব তথ্য পূরণ করুন'); return; }
   if(pass!==pass2){ toast('⚠️ পাসওয়ার্ড দুটো মিলছে না'); return; }
   if(pass.length<6){ toast('⚠️ পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে'); return; }
 
@@ -77,9 +81,11 @@ async function doSignup(){
     if(d?.session){ persistSupaSession(d.session); }
 
     try{
+      // req_dept-এ আপাতত dept-ই বসানো হচ্ছে (শুধু রেফারেন্সের জন্য) — আসল ভূমিকা
+      // (এডমিন/সহকারী এডমিন/ভিউয়ার) ও শাখা সুপার অ্যাডমিন অনুমোদনের সময় ঠিক করে দেবেন
       await supa(CFG.TABLE_PROF,'POST',{
         id: uid, email, name, designation:desig,
-        dept, req_dept:reqDept,
+        dept, req_dept:dept,
         role:'pending', status:'pending',
         created_at: new Date().toISOString(),
       });
@@ -89,10 +95,10 @@ async function doSignup(){
       }
     }
 
-    notifySuperAdmin(name, desig, DEPT[reqDept]?.name||reqDept, email);
+    notifySuperAdmin(name, desig, DEPT[dept]?.name||dept, email);
     hideLoader();
-    setCurrentUser({id:uid,email,role:'pending',name,dept,reqDept});
-    showPendingScreen({name,req_dept:reqDept});
+    setCurrentUser({id:uid,email,role:'pending',name,dept,reqDept:dept});
+    showPendingScreen({name,req_dept:dept});
     toast('✅ সাইন-আপ সফল! ইমেইল ভেরিফাই করুন।');
   }catch(e){
     hideLoader();
@@ -110,10 +116,10 @@ async function doSignup(){
 
 function notifySuperAdmin(name, desig, deptName, email){
   // Open mailto as fallback notification
-  const sub = encodeURIComponent(`[BGFCL Inventory] নতুন অ্যাডমিন অনুরোধ - ${name}`);
+  const sub = encodeURIComponent(`[BGFCL Inventory] নতুন সদস্য অনুরোধ - ${name}`);
   const body = encodeURIComponent(
-    `নাম: ${name}\nপদবী: ${desig}\nইমেইল: ${email}\nঅনুরোধকৃত শাখা: ${deptName}\n\n` +
-    `অনুগ্রহ করে অ্যাপে লগইন করে Pending Approvals থেকে অনুমোদন করুন।`
+    `নাম: ${name}\nপদবী: ${desig}\nইমেইল: ${email}\nশাখা (চাকরি): ${deptName}\n\n` +
+    `অনুগ্রহ করে অ্যাপে লগইন করে সদস্য ব্যবস্থাপনা থেকে ভূমিকা ও শাখা ঠিক করে অনুমোদন করুন।`
   );
   window.open(`mailto:${CFG.SUPER_ADMIN_EMAIL}?subject=${sub}&body=${body}`,'_blank');
 }
@@ -124,7 +130,7 @@ function showPendingScreen(p){
   const pf = document.getElementById('pendingForm');
   pf.style.display='';
   document.getElementById('pendingMsg').textContent=
-    `${p.name} — ${DEPT[p.req_dept]?.name||p.req_dept} শাখার অ্যাডমিন অনুরোধ পাঠানো হয়েছে। সুপার অ্যাডমিন (${CFG.SUPER_ADMIN_EMAIL}) অনুমোদন করলে আপনি ইমেইলে জানবেন।`;
+    `${p.name} — সদস্য হওয়ার অনুরোধ পাঠানো হয়েছে। সুপার অ্যাডমিন (${CFG.SUPER_ADMIN_EMAIL}) আপনার ভূমিকা ও শাখা ঠিক করে অনুমোদন করলে আপনি ইমেইলে জানবেন।`;
 }
 
 function doResetPass(){

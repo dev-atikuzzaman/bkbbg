@@ -111,7 +111,7 @@ function renderManpowerProfileOverview(){
       ? `<img class="pc-photo" src="${escHtml(m.photo)}"/>`
       : `<div class="pc-photo-ph">👤</div>`;
     return `
-      <div class="profile-card" onclick="openManpowerDetail('${m.id}')" style="cursor:pointer;">
+      <div class="profile-card">
         ${photoHtml}
         <div class="pc-name">${escHtml(mpDisplayName(m))}</div>
         <div class="pc-desig">${escHtml(m.designation)||'—'}</div>
@@ -120,70 +120,6 @@ function renderManpowerProfileOverview(){
         <div class="pc-row">📞 ${escHtml(m.phone)||'—'}</div>
       </div>`;
   }).join('');
-}
-
-// ═══════════════════════════════════════════════════════
-//  🆕 প্রোফাইল কার্ডে ক্লিক করলে বিস্তারিত মডাল খোলে
-// ═══════════════════════════════════════════════════════
-function openManpowerDetail(id){
-  const m = getManpower().find(x=>x.id===id);
-  if(!m) return;
-  const cfg = DEPT[m.dept]||{color:'#64748B',name:m.dept};
-  const defs = getCustomDefs()[MP_OVERVIEW_META[m.type]?.module] || [];
-  const photoHtml = m.photo
-    ? `<img src="${escHtml(m.photo)}" style="width:110px;height:110px;border-radius:50%;object-fit:cover;border:3px solid ${cfg.color}33;"/>`
-    : `<div style="width:110px;height:110px;border-radius:50%;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:44px;">👤</div>`;
-
-  const row = (label, val) => `
-    <div style="display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #F1F5F9;font-size:13.5px;">
-      <span style="color:#64748B;">${escHtml(label)}</span>
-      <span style="font-weight:600;color:#1E293B;text-align:right;">${val!==null && val!==undefined && val!=='' ? escHtml(String(val)) : '—'}</span>
-    </div>`;
-
-  let rowsHtml = '';
-  rowsHtml += row('পদবী', m.designation);
-  rowsHtml += row('ফোন', m.phone);
-  rowsHtml += row('ঠিকানা', m.address);
-  rowsHtml += row('শাখা', cfg.name);
-
-  if(m.type==='officer' || m.type==='staff'){
-    rowsHtml += row('শেষ CL এর তারিখ', m.cl_last_date);
-    rowsHtml += row('CL বাকি', m.cl_remaining ?? 0);
-    rowsHtml += row('অন্য ছুটি (তারিখ)', m.other_leave_last_date);
-    rowsHtml += row('অন্য ছুটি বাকি', m.other_leave_remaining ?? 0);
-    rowsHtml += row('AL নেয়া হয়েছে', m.al_taken==='yes' ? '✅ হ্যাঁ' : '❌ না');
-    if(m.al_taken==='yes') rowsHtml += row('AL নেয়ার তারিখ', m.al_date);
-  }
-
-  // কাস্টম ফিল্ডগুলো (ছবি টাইপ হলে আলাদাভাবে দেখানো হয়)
-  defs.forEach(d=>{
-    const v = m.customFields && m.customFields[d.id];
-    if(d.type==='image' && v){
-      rowsHtml += `
-        <div style="padding:9px 0;border-bottom:1px solid #F1F5F9;font-size:13.5px;">
-          <div style="color:#64748B;margin-bottom:6px;">${escHtml(d.label)}</div>
-          <img src="${escHtml(v)}" class="cf-preview-img" style="max-width:100%;border-radius:8px;"/>
-        </div>`;
-    } else {
-      rowsHtml += row(d.label, v);
-    }
-  });
-
-  document.getElementById('mpDetailTitle').textContent = `${m.type==='daily'?'👷':'🎖️'} প্রোফাইল বিস্তারিত`;
-  document.getElementById('mpDetailBody').innerHTML = `
-    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:16px;">
-      ${photoHtml}
-      <div style="font-size:17px;font-weight:700;color:#1E293B;text-align:center;">${escHtml(mpDisplayName(m))}</div>
-      <div style="font-size:12.5px;padding:3px 10px;border-radius:20px;background:${cfg.color}22;color:${cfg.color};font-weight:600;">${escHtml(cfg.name)}</div>
-    </div>
-    <div>${rowsHtml}</div>
-    ${canEdit(m.dept) ? `
-      <div style="display:flex;gap:8px;margin-top:16px;">
-        <button class="btn-sub" style="flex:1;" onclick="closeModal('modalManpowerDetail'); openEditManpower('${m.id}');">✏️ সম্পাদনা করুন</button>
-        ${m.type==='daily' ? `<button class="btn-sub" style="flex:1;" onclick="closeModal('modalManpowerDetail'); openAttendanceModal('${m.id}');">📅 উপস্থিতি</button>` : ''}
-      </div>` : ''}
-  `;
-  openModal('modalManpowerDetail');
 }
 
 function cfThHtml(defs){ return defs.map(d=>`<th>${escHtml(d.label)}</th>`).join(''); }

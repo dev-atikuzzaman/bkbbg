@@ -4,6 +4,7 @@
 const ROLE_LABEL = {
   super:{full:'সুপার এডমিন', short:'সুপার'},
   admin:{full:'শাখা এডমিন',  short:'এডমিন'},
+  assistant:{full:'সহকারী এডমিন', short:'সহ-এডমিন'},
   viewer:{full:'ভিউয়ার',     short:'ভিউয়ার'},
   pending:{full:'অনুমোদনের অপেক্ষায়', short:'পেন্ডিং'},
 };
@@ -24,7 +25,7 @@ function updateUserChip(){
 
 function updateActionBar(){
   const r = currentUser?.role;
-  const canWrite = r==='super' || r==='admin';
+  const canWrite = r==='super' || r==='admin' || r==='assistant';
   document.getElementById('actionBar').style.display = canWrite ? '' : 'none';
   document.getElementById('logActCol').textContent = canWrite ? 'কার্যক্রম' : '';
   document.getElementById('actionBarManpower').style.display   = canWrite ? '' : 'none';
@@ -52,25 +53,28 @@ function showUserMenu(){
   const r = u?.role;
   const deptName = DEPT[u?.dept]?.name || '—';
   const reqDeptName = DEPT[u?.reqDept]?.name || '—';
+  const avatarBg = r==='super'?'#F4A300':(r==='admin'?'#3B82F6':(r==='assistant'?'#8B5CF6':'#64748B'));
+  const roleText = r==='super'?'👑 সুপার অ্যাডমিন':(r==='admin'?'🔑 শাখা অ্যাডমিন':(r==='assistant'?'🧑‍🤝‍🧑 সহকারী এডমিন':(r==='pending'?'⏳ পেন্ডিং':'👁️ ভিউয়ার')));
   let html = `
     <div style="text-align:center;margin-bottom:16px;">
-      <div style="width:60px;height:60px;border-radius:50%;background:${r==='super'?'#F4A300':r==='admin'?'#3B82F6':'#64748B'};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:white;margin:0 auto 10px;">${escHtml((u?.name||'?')[0]?.toUpperCase())}</div>
+      <div style="width:60px;height:60px;border-radius:50%;background:${avatarBg};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:white;margin:0 auto 10px;">${escHtml((u?.name||'?')[0]?.toUpperCase())}</div>
       <strong style="font-size:15px;">${escHtml(u?.name)||'অজ্ঞাত'}</strong><br/>
       <span style="font-size:12px;color:#64748B;">${escHtml(u?.email)}</span>
     </div>
     <div style="background:#F8FAFC;border-radius:10px;padding:12px;margin-bottom:14px;font-size:13px;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:#64748B;">ভূমিকা</span><strong>${r==='super'?'👑 সুপার অ্যাডমিন':r==='admin'?'🔑 শাখা অ্যাডমিন':r==='pending'?'⏳ পেন্ডিং':'👁️ ভিউয়ার'}</strong></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="color:#64748B;">ভূমিকা</span><strong>${roleText}</strong></div>
       ${r!=='viewer'&&r!=='pending'?`<div style="display:flex;justify-content:space-between;"><span style="color:#64748B;">শাখা</span><strong>${r==='super'?'সকল শাখা':reqDeptName}</strong></div>`:''}
     </div>
   `;
   html+=`<button onclick="closeModal('modalUser');openDisplaySettings();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🔤 ফন্ট ও ডিসপ্লে</button>`;
   html+=`<button onclick="closeModal('modalUser');startOnboarding();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">❓ টিউটোরিয়াল আবার দেখুন</button>`;
-  if(r==='super'||r==='admin'){
+  if(r==='super'||r==='admin'||r==='assistant'){
     html+=`<button onclick="closeModal('modalUser');openAuditLog();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🕓 কার্যকলাপ লগ (অডিট)</button>`;
     html+=`<button onclick="closeModal('modalUser');openErrorLog();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🐞 এরর লগ</button>`;
   }
   if(r==='super'){
     html+=`<button onclick="closeModal('modalUser');openBackupList();" style="width:100%;background:#F1F5F9;border:1px solid var(--border);border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:var(--navy);font-weight:600;cursor:pointer;margin-bottom:8px;">🗄️ ব্যাকআপ তালিকা</button>`;
+    html+=`<button onclick="closeModal('modalUser');openMemberManagement();" style="width:100%;background:#EDE9FE;border:1px solid #C4B5FD;border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:#6D28D9;font-weight:700;cursor:pointer;margin-bottom:8px;">👥 সদস্য ব্যবস্থাপনা</button>`;
   }
   html+=`<button onclick="doLogout()" style="width:100%;background:var(--red-l);border:1px solid #FECACA;border-radius:9px;padding:10px;font-family:var(--f);font-size:13px;color:#DC2626;font-weight:600;cursor:pointer;">🚪 লগআউট</button>`;
   document.getElementById('userMenuBody').innerHTML=html;
@@ -280,7 +284,15 @@ async function loadPendingApprovals(){
       <div class="pending-card">
         <div class="pending-info">
           <strong>${escHtml(p.name)} — ${escHtml(p.designation)}</strong>
-          <span>${escHtml(DEPT[p.req_dept]?.name||p.req_dept)} শাখার অ্যাডমিন · ${escHtml(p.email)}</span>
+          <span>${escHtml(DEPT[p.dept]?.name||p.dept)} · ${escHtml(p.email)}</span>
+        </div>
+        <div class="pending-assign">
+          <select id="pendRole_${p.id}" class="pend-select">
+            <option value="viewer">👁️ ভিউয়ার</option>
+            <option value="assistant">🧑‍🤝‍🧑 সহকারী এডমিন</option>
+            <option value="admin" selected>🛡️ শাখা এডমিন</option>
+          </select>
+          <select id="pendDept_${p.id}" class="pend-select">${deptOptionsHtml(p.dept)}</select>
         </div>
         <button class="btn-approve" onclick="approveUser('${p.id}')">✅ অনুমোদন</button>
         <button class="btn-reject"  onclick="rejectUser('${p.id}')">❌ বাতিল</button>
@@ -288,14 +300,24 @@ async function loadPendingApprovals(){
   }catch(e){ console.log('pending load error',e); }
 }
 
+// শাখার ড্রপডাউন অপশনগুলো (DEPT অবজেক্ট থেকে) HTML হিসেবে তৈরি — সদস্য ব্যবস্থাপনা ও
+// পেন্ডিং অনুমোদন উভয় জায়গায় পুনঃব্যবহারের জন্য একটা কমন হেল্পার ফাংশন
+function deptOptionsHtml(selectedDept){
+  return Object.keys(DEPT).map(k=>
+    `<option value="${k}" ${k===selectedDept?'selected':''}>${escHtml(DEPT[k].name)}</option>`
+  ).join('');
+}
+
 async function approveUser(id){
   const p = _pendingProfiles.find(x=>x.id===id); if(!p) return;
+  const role = document.getElementById('pendRole_'+id).value;
+  const dept = document.getElementById('pendDept_'+id).value;
   showLoader('অনুমোদন করা হচ্ছে...');
   try{
-    await supa(CFG.TABLE_PROF+'?id=eq.'+id,'PATCH',{role:'admin',status:'approved',req_dept:p.req_dept});
+    await supa(CFG.TABLE_PROF+'?id=eq.'+id,'PATCH',{role, status:'approved', req_dept:dept});
     // Notify via mailto
-    const sub = encodeURIComponent(`[BGFCL Inventory] আপনার অ্যাডমিন অনুরোধ অনুমোদিত হয়েছে`);
-    const body= encodeURIComponent(`${p.name},\n\nআপনার ${DEPT[p.req_dept]?.name||p.req_dept} শাখার অ্যাডমিন অনুরোধ অনুমোদিত হয়েছে।\nএখন অ্যাপে লগইন করুন।`);
+    const sub = encodeURIComponent(`[BGFCL Inventory] আপনার সদস্য অনুরোধ অনুমোদিত হয়েছে`);
+    const body= encodeURIComponent(`${p.name},\n\nআপনাকে ${ROLE_LABEL[role]?.full||role} হিসেবে ${DEPT[dept]?.name||dept} শাখার জন্য অনুমোদন করা হয়েছে।\nএখন অ্যাপে লগইন করুন।`);
     window.open(`mailto:${p.email}?subject=${sub}&body=${body}`,'_blank');
     hideLoader();
     toast('✅ অনুমোদন সম্পন্ন');
@@ -311,6 +333,109 @@ async function rejectUser(id){
     await supa(CFG.TABLE_PROF+'?id=eq.'+id,'PATCH',{status:'rejected'});
     hideLoader(); toast('🗑️ অনুরোধ বাতিল করা হয়েছে');
     loadPendingApprovals();
+  }catch(e){ hideLoader(); toast('❌ ব্যর্থ: '+e.message); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  🆕 সদস্য ব্যবস্থাপনা (শুধু সুপার অ্যাডমিন) — সব approved সদস্যের ভূমিকা/শাখা
+//  পরিবর্তন এবং রিমুভ করা যায়। সুপার অ্যাডমিন নিজে এই তালিকায় দেখানো হয় না,
+//  কারণ super-এর ভূমিকা কনফিগ থেকে (ইমেইল ম্যাচ করে) নির্ধারিত, ডাটাবেস থেকে নয়।
+// ═══════════════════════════════════════════════════════
+let _allMembers = [];
+let _memberSearchQ = '';
+
+async function openMemberManagement(){
+  if(currentUser?.role!=='super'){ toast('⛔ শুধু সুপার অ্যাডমিন প্রবেশ করতে পারবেন'); return; }
+  openModal('modalMemberMgmt');
+  document.getElementById('memberMgmtBody').innerHTML = `<div style="text-align:center;padding:30px;color:#94A3B8;">লোড হচ্ছে...</div>`;
+  await loadAllMembers();
+}
+
+async function loadAllMembers(){
+  try{
+    _allMembers = await supa(CFG.TABLE_PROF+'?status=eq.approved&email=neq.'+encodeURIComponent(CFG.SUPER_ADMIN_EMAIL)+'&order=name.asc');
+  }catch(e){
+    document.getElementById('memberMgmtBody').innerHTML = `<div style="text-align:center;padding:30px;color:#DC2626;">লোড ব্যর্থ: ${escHtml(e.message)}</div>`;
+    return;
+  }
+  renderMemberManagement();
+}
+
+function filterMemberList(q){
+  _memberSearchQ = (q||'').toLowerCase();
+  renderMemberManagement();
+}
+
+function renderMemberManagement(){
+  const box = document.getElementById('memberMgmtBody');
+  const q = _memberSearchQ;
+  const list = q ? _allMembers.filter(m=>(m.name||'').toLowerCase().includes(q) || (m.email||'').toLowerCase().includes(q)) : _allMembers;
+
+  let html = `<input type="text" class="mm-search" placeholder="🔍 নাম বা ইমেইল দিয়ে সদস্য খুঁজুন..." value="${escHtml(q)}" oninput="filterMemberList(this.value)"/>`;
+
+  if(!list.length){
+    html += `<div style="text-align:center;padding:30px;color:#94A3B8;">${q?'কোনো সদস্য পাওয়া যায়নি':'অনুমোদিত কোনো সদস্য নেই'}</div>`;
+    box.innerHTML = html;
+    return;
+  }
+
+  const badgeColor = {admin:'#3B82F622;color:#3B82F6', assistant:'#8B5CF622;color:#8B5CF6', viewer:'#64748B22;color:#64748B'};
+
+  html += list.map(m=>{
+    const role = m.role||'viewer';
+    const badge = badgeColor[role] || badgeColor.viewer;
+    return `
+    <div class="mm-card">
+      <div class="mm-top">
+        <div class="mm-avatar">${escHtml((m.name||'?')[0]?.toUpperCase())}</div>
+        <div>
+          <div class="mm-name">${escHtml(m.name)}</div>
+          <div class="mm-email">${escHtml(m.email)}</div>
+        </div>
+        <div class="mm-badge" style="background:${badge};">${ROLE_LABEL[role]?.full||role}</div>
+      </div>
+      <div class="mm-row">
+        <select class="pend-select" id="mmRole_${m.id}">
+          <option value="viewer" ${role==='viewer'?'selected':''}>👁️ ভিউয়ার</option>
+          <option value="assistant" ${role==='assistant'?'selected':''}>🧑‍🤝‍🧑 সহকারী এডমিন</option>
+          <option value="admin" ${role==='admin'?'selected':''}>🛡️ শাখা এডমিন</option>
+        </select>
+        <select class="pend-select" id="mmDept_${m.id}">${deptOptionsHtml(m.req_dept||m.dept)}</select>
+      </div>
+      <div class="mm-actions">
+        <button class="mm-save" onclick="saveMemberChanges('${m.id}')">💾 সংরক্ষণ</button>
+        <button class="mm-remove" onclick="removeMember('${m.id}')">🗑️ রিমুভ</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  box.innerHTML = html;
+}
+
+async function saveMemberChanges(id){
+  const role = document.getElementById('mmRole_'+id).value;
+  const dept = document.getElementById('mmDept_'+id).value;
+  showLoader('সংরক্ষণ করা হচ্ছে...');
+  try{
+    await supa(CFG.TABLE_PROF+'?id=eq.'+id,'PATCH',{role, req_dept:dept});
+    const m = _allMembers.find(x=>x.id===id);
+    if(m){ m.role=role; m.req_dept=dept; }
+    hideLoader();
+    toast('✅ পরিবর্তন সংরক্ষিত হয়েছে');
+    renderMemberManagement();
+  }catch(e){ hideLoader(); toast('❌ ব্যর্থ: '+e.message); }
+}
+
+async function removeMember(id){
+  const m = _allMembers.find(x=>x.id===id); if(!m) return;
+  if(!confirm(`${m.name} কে সদস্য তালিকা থেকে রিমুভ করবেন? তিনি আর লগইন করতে পারবেন না।`)) return;
+  showLoader('রিমুভ করা হচ্ছে...');
+  try{
+    await supa(CFG.TABLE_PROF+'?id=eq.'+id,'PATCH',{status:'rejected'});
+    _allMembers = _allMembers.filter(x=>x.id!==id);
+    hideLoader();
+    toast('🗑️ সদস্য রিমুভ করা হয়েছে');
+    renderMemberManagement();
   }catch(e){ hideLoader(); toast('❌ ব্যর্থ: '+e.message); }
 }
 

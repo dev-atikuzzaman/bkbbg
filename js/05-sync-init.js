@@ -202,7 +202,7 @@ async function syncNow(){
 function canEdit(dept){
   const r = currentUser?.role;
   if(r==='super') return true;
-  if(r==='admin' && currentUser.reqDept===dept) return true;
+  if((r==='admin' || r==='assistant') && currentUser.reqDept===dept) return true;
   return false;
 }
 
