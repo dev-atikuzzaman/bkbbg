@@ -253,7 +253,7 @@ as $$
     select 1 from public.profiles p
     where p.id = auth.uid()
       and p.status = 'approved'
-      and (p.role = 'super' or (p.role = 'admin' and p.req_dept = target_dept))
+      and (p.role = 'super' or ((p.role = 'admin' or p.role = 'assistant') and p.req_dept = target_dept))
   );
 $$;
 
@@ -268,7 +268,7 @@ as $$
     join public.manpower m on m.id = worker
     where p.id = auth.uid()
       and p.status = 'approved'
-      and (p.role = 'super' or (p.role = 'admin' and p.req_dept = m.dept))
+      and (p.role = 'super' or ((p.role = 'admin' or p.role = 'assistant') and p.req_dept = m.dept))
   );
 $$;
 
